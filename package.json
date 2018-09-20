@@ -18,7 +18,9 @@
   },
   "dependencies": {
     "@types/lodash-es": "^4.17.1",
+    "@types/xlsx": "0.0.36",
     "cq-websocket": "^1.6.0",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "xlsx": "^0.14.0"
   }
 }

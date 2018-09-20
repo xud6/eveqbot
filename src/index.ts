@@ -1,6 +1,8 @@
 import CQWebSocket from 'cq-websocket'
 import { WebsocketType } from 'cq-websocket'
-import { startsWith, replace, trimStart, trim } from 'lodash'
+import { startsWith, replace, trimStart, trim, filter } from 'lodash'
+import { itemData } from './itemdb'
+import { forEach } from 'lodash-es';
 
 let cqwebConfig = {
   access_token: "",
@@ -27,6 +29,8 @@ bot.on('message', (event, context) => {
   if (startsWith(context.message, '.jita')) {
     let message = context.message;
     message = trim(replace(message, '.jita', ''));
+    filter(itemData,(value)=>{
+    })
     event.setMessage(message)
   }
 })
