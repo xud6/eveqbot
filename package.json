@@ -17,7 +17,8 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
+    "@types/lodash-es": "^4.17.1",
     "cq-websocket": "^1.6.0",
-    "lodash-es": "^4.17.11"
+    "lodash": "^4.17.11"
   }
 }

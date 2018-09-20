@@ -1,5 +1,6 @@
 import CQWebSocket from 'cq-websocket'
 import { WebsocketType } from 'cq-websocket'
+import {startsWith,replace,trimStart, trim} from 'lodash'
 
 let cqwebConfig = {
   access_token: "",
@@ -21,7 +22,20 @@ bot.on('socket.connecting', function (wsType, attempts) {
 
 bot.on('message', (event, context) => {
   console.log(event);
-  console.log(context)
+  console.log(event.getMessage())
+  console.log(context);
+  if(startsWith(context.message,'.jita')){
+    if(context.message_type === 'private'){
+      // bot('send_private_msg',{
+      //   user_id:context.user_id,
+      //   message:context.message
+      // })
+      let message = context.message;
+      message = trim(replace(message,'.jita',''));
+      event.setMessage(message)
+    }
+  }
+
 })
 
 bot.connect()
