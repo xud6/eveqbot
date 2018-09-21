@@ -1,7 +1,7 @@
 import CQWebSocket from 'cq-websocket'
 import { WebsocketType } from 'cq-websocket'
 import { startsWith, replace, trimStart, trim, filter } from 'lodash'
-import { itemData } from './itemdb'
+import { itemData } from './itemdb/importData'
 import { forEach } from 'lodash';
 
 let cqwebConfig = {
