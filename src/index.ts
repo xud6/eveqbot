@@ -2,7 +2,7 @@ import CQWebSocket from 'cq-websocket'
 import { WebsocketType } from 'cq-websocket'
 import { startsWith, replace, trimStart, trim, filter } from 'lodash'
 import { itemData } from './itemdb'
-import { forEach } from 'lodash-es';
+import { forEach } from 'lodash';
 
 let cqwebConfig = {
   access_token: "",
