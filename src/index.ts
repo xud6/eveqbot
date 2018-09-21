@@ -17,9 +17,9 @@ class cQQBot {
       console.log(`attemp to connect ${wsType} No.${attempts} failed`)
     })
 
-    this.bot.on('message', async (event, context) :Promise<string|void>=> {
+    this.bot.on('message', async (event, context): Promise<string | void> => {
       let d = await this.handlerMessage(event, context)
-      if(d){
+      if (d) {
         return d;
       }
     })
@@ -35,14 +35,19 @@ class cQQBot {
         console.log(message);
         let items = this.itemdb.search(message)
         if (items.length > 0 && items.length <= 5) {
-          let marketdata = await Promise.all(items.map(async item=>{
+          console.log("搜索结果为：" + join(map(items, item => {
+            return item.name
+          }), "/"))
+          let marketdata = await Promise.all(items.map(async item => {
             let market = this.CEVEMarketApi.getMarketString(await this.CEVEMarketApi.marketRegion(item.typeID))
             return `${item.name} --- ${market}`;
           }))
-          return join(marketdata,"\n");
+          return join(marketdata, "\n");
         } else if (items.length > 5) {
+          console.log(`搜索结果过多: ${items.length}`)
           return `共有${items.length}种物品符合该条件，请给出更明确的物品名称`
         } else {
+          console.log(`找不到 ${message}`)
           return '找不到该物品'
         }
       }
