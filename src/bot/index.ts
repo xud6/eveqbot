@@ -20,9 +20,10 @@ export class cQQBot {
         })
 
         this.bot.on('message', async (event, context): Promise<string | void> => {
+            console.log(context)
             let d = await this.handlerMessage(event, context)
             if (d) {
-                return d;
+                return `[CQ:at,qq=${context.user_id}]\n${d}`;
             }
         })
     }

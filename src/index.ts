@@ -2,10 +2,6 @@ import { cItemdb } from './itemdb/index';
 import { cCEVEMarketApi } from './CEveMarketApi';
 import { cQQBot } from './bot';
 
-
-
-
-
 let cqwebConfig = {
   access_token: "",
   host: "172.81.230.235",
