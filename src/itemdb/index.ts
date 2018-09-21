@@ -16,6 +16,9 @@ export class cItemdb {
         })
     }
     search(name:string){
-        return this.searchByFullName(name);
+        console.time('search complete in ')
+        let res = this.searchByFullName(name);
+        console.timeEnd('search complete in ')
+        return res
     }
 }

@@ -26,9 +26,10 @@ export interface apiSearchNameResponse {
 export class cCEVEMarketApi {
     readonly baseUrl = 'https://www.ceve-market.org/api/'
     async marketRegion(itemId: string, regionId: string = '10000002'): Promise<apiMarketResponse> {
-        console.log('make get market api call');
+        console.log(`make get market api call for ${itemId}`);
+        console.time(`get market api call for ${itemId} end in `)
         const url = `${this.baseUrl}market/region/${regionId}/type/${itemId}.json`
-        return await new Promise<apiMarketResponse>((resolve, reject) => {
+        let res = await new Promise<apiMarketResponse>((resolve, reject) => {
             request.get(url, { json: true }, (error, response, body) => {
                 if (error) {
                     console.error('get market api failed:', error);
@@ -38,6 +39,8 @@ export class cCEVEMarketApi {
                 resolve(body);
             })
         })
+        console.timeEnd(`get market api call for ${itemId} end in `)
+        return res;
     }
     getMarketString(data: apiMarketResponse) {
         return `最高收价:${data.buy.max} / 最低卖价:${data.sell.min} | 总挂单量:(${data.all.volume})`

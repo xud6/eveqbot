@@ -13,7 +13,8 @@ export interface itemDataType {
 }
 
 export function loadFromCeveMarketXLS(fileName:string){
-
+    console.log('start import xls');
+    console.time('import xls take ')
     let itemSheet = workbook.Sheets[workbook.SheetNames[0]]
 
     // Rename column name to EN to ease usage
@@ -32,5 +33,7 @@ export function loadFromCeveMarketXLS(fileName:string){
     itemSheet.H1.v = 'group5';
     itemSheet.H1.w = 'group5';
     
-    return XLSX.utils.sheet_to_json<itemDataType>(itemSheet);
+    let d = XLSX.utils.sheet_to_json<itemDataType>(itemSheet);
+    console.timeEnd('import xls take:')
+    return d
 }
