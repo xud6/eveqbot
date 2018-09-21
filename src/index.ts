@@ -3,10 +3,11 @@ import { WebsocketType, CQWebSocketOption, CQWebSocket } from 'cq-websocket'
 import { startsWith, replace, trimStart, trim, filter, join, map } from 'lodash'
 import { forEach } from 'lodash';
 import { cItemdb } from './itemdb/index';
+import { cCEVEMarketApi } from './CEveMarketApi';
 
 class cQQBot {
   readonly bot: CQWebSocket
-  constructor(config: Partial<CQWebSocketOption>, readonly itemdb: cItemdb) {
+  constructor(config: Partial<CQWebSocketOption>, readonly itemdb: cItemdb, readonly CEVEMarketApi: cCEVEMarketApi) {
     this.bot = new CQWebSocketFactory(config);
     this.bot.on('socket.connecting', function (wsType, attempts) {
       console.log(`attemp to connect ${wsType} No.${attempts} started`)
@@ -16,17 +17,17 @@ class cQQBot {
       console.log(`attemp to connect ${wsType} No.${attempts} failed`)
     })
 
-    this.bot.on('message', (event, context) => {
-      let res = this.handlerMessage(event, context);
-      if (res) {
-        event.setMessage(res)
+    this.bot.on('message', async (event, context) :Promise<string|void>=> {
+      let d = await this.handlerMessage(event, context)
+      if(d){
+        return d;
       }
     })
   }
   startup() {
     this.bot.connect()
   }
-  handlerMessage(event: CQEvent, context: Record<string, any>): string | null {
+  async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | null> {
     if (startsWith(context.message, '.jita')) {
       let message: string = context.message;
       message = trim(replace(message, '.jita', ''));
@@ -34,9 +35,11 @@ class cQQBot {
         console.log(message);
         let items = this.itemdb.search(message)
         if (items.length > 0 && items.length <= 5) {
-          return join(map(items, (item) => {
-            return item.name
-          }), "\n");
+          let marketdata = await Promise.all(items.map(async item=>{
+            let market = this.CEVEMarketApi.getMarketString(await this.CEVEMarketApi.marketRegion(item.typeID))
+            return `${item.name} --- ${market}`;
+          }))
+          return join(marketdata,"\n");
         } else if (items.length > 5) {
           return `共有${items.length}种物品符合该条件，请给出更明确的物品名称`
         } else {
@@ -60,5 +63,6 @@ let cqwebConfig = {
 
 console.log(cqwebConfig)
 let itemdb = new cItemdb('itemdb.xls');
-let bot = new cQQBot(cqwebConfig, itemdb);
+let CEVEMarketApi = new cCEVEMarketApi();
+let bot = new cQQBot(cqwebConfig, itemdb, CEVEMarketApi);
 bot.startup();
