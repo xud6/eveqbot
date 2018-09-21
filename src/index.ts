@@ -1,12 +1,9 @@
 import { cItemdb } from './itemdb/index';
 import { cCEVEMarketApi } from './CEveMarketApi';
 import { cQQBot } from './bot';
+import { CQWebSocketOption } from 'cq-websocket';
 
-let cqwebConfig = {
-  access_token: "",
-  host: "172.81.230.235",
-  port: 6700
-}
+let cqwebConfig:Partial<CQWebSocketOption> = require('./../config.json')
 
 console.log(cqwebConfig)
 let itemdb = new cItemdb('itemdb.xls');
