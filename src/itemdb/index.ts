@@ -15,7 +15,7 @@ export class cItemdb {
                 return false
             }
         })
-        console.time('Fullname search complete in ')
+        console.timeEnd('Fullname search complete in ')
         return res
     }
     searchByWord(name: string) {
@@ -30,18 +30,16 @@ export class cItemdb {
                 }
             })
         })
-        console.time('Word search complete in ')
+        console.timeEnd('Word search complete in ')
         return result;
     }
     search(name: string) {
         console.time('search complete in ')
         let res = this.searchByFullName(name);
-        if(res.length = 0){
+        if(res.length == 0){
             res = this.searchByWord(name);
         }
         console.timeEnd('search complete in ')
         return res
     }
 }
-
-let test = new cItemdb('itemdb.xls');
