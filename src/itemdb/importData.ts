@@ -1,4 +1,4 @@
-import XLSX = require('xlsx')
+import XLSX from 'xlsx'
 var workbook = XLSX.readFile('itemdb.xls');
 
 export interface itemDataType {
