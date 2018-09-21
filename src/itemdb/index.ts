@@ -1,5 +1,5 @@
 import { loadFromCeveMarketXLS, itemDataType } from './importData'
-import { filter, map } from 'lodash';
+import { filter, map, words, join } from 'lodash';
 
 export class cItemdb {
     readonly itemData: itemDataType[]
@@ -21,7 +21,9 @@ export class cItemdb {
     searchByWord(name: string) {
         console.time('Word search complete in ')
         let result = this.itemData
-        map(name, word => {
+        let eWords = words(name, /(\d+)|(\w+)|[^(?:,& )]/g);
+        console.log('word explode result :' + join(eWords, '|'))
+        map(eWords, word => {
             result = filter(result, d => {
                 if (d.name.indexOf(word) >= 0) {
                     return true
@@ -36,10 +38,13 @@ export class cItemdb {
     search(name: string) {
         console.time('search complete in ')
         let res = this.searchByFullName(name);
-        if(res.length == 0){
+        if (res.length == 0) {
             res = this.searchByWord(name);
         }
         console.timeEnd('search complete in ')
         return res
+    }
+    swapCommonName(name: string) {
+
     }
 }
