@@ -1,5 +1,6 @@
 import { loadFromCeveMarketXLS, itemDataType } from './importData'
 import { filter, map, words, join } from 'lodash';
+import { commonNameTransfer } from './commonName';
 
 export class cItemdb {
     readonly itemData: itemDataType[]
@@ -85,7 +86,7 @@ export class cItemdb {
         return result;
     }
     switchDataSets(name: string): itemDataType[] {
-        if(name.indexOf('涂装') >= 0){
+        if (name.indexOf('涂装') >= 0) {
             console.log('itemDataSkin')
             return this.itemDataSkin;
         }
@@ -93,10 +94,10 @@ export class cItemdb {
             //has blueprint in name
             console.log('itemDataBlueprint')
             return this.itemDataBlueprint;
-        }else if(name.indexOf('屹立') >= 0){
+        } else if (name.indexOf('屹立') >= 0) {
             console.log('itemDataUpwell')
             return this.itemDataUpwell;
-        }else{
+        } else {
             console.log('itemDataNormal')
             return this.itemDataNormal;
         }
@@ -106,12 +107,9 @@ export class cItemdb {
         let itemData = this.switchDataSets(name)
         let res = this.searchByFullName(name, itemData);
         if (res.length == 0) {
-            res = this.searchByWord(name, itemData);
+            res = this.searchByWord(commonNameTransfer(name), itemData);
         }
         console.timeEnd('search complete in ')
         return res
-    }
-    swapCommonName(name: string) {
-
     }
 }

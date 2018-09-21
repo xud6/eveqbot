@@ -1,3 +1,5 @@
+import { forEach, replace } from "lodash";
+
 interface commonNameTableObj {
     o:string,
     t:string
@@ -16,3 +18,14 @@ const commonNameTable:commonNameTableObj[]=[
     {o:"PLEX",t:"飞行员执照"},
     {o:"全抗",t:"适应性"},
 ]
+
+export function commonNameTransfer(name:string):string{
+    let res = name;
+    forEach(commonNameTable,obj=>{
+        res = replace(res, obj.o, obj.t)
+    })
+    if(res !== name){
+        console.log(`CommonName processed from [${name}] to [${res}]`)
+    }
+    return res
+}
