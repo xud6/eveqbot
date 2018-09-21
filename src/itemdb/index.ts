@@ -1,7 +1,7 @@
 import { loadFromCeveMarketXLS,itemDataType } from './importData'
 import { filter } from 'lodash';
 
-export class itemdb {
+export class cItemdb {
     readonly itemData:itemDataType[]
     constructor(readonly dataXlsName:string){
         this.itemData = loadFromCeveMarketXLS(dataXlsName);
