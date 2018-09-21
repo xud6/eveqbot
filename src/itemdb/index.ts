@@ -4,7 +4,8 @@ import { filter, map, words, join } from 'lodash';
 export class cItemdb {
     readonly itemData: itemDataType[]
     readonly itemDataBlueprint: itemDataType[]
-    readonly itemDataNoneBluepront: itemDataType[]
+    readonly itemDataUpwell: itemDataType[]
+    readonly itemDataNormal: itemDataType[]
     constructor(readonly dataXlsName: string) {
         this.itemData = loadFromCeveMarketXLS(dataXlsName);
         this.itemDataBlueprint = filter(this.itemData, item => {
@@ -14,8 +15,23 @@ export class cItemdb {
                 return false
             }
         })
-        this.itemDataNoneBluepront = filter(this.itemData, item => {
+        let itemDataNoneBluepront = filter(this.itemData, item => {
             if (item.name.indexOf("蓝图") >= 0) {
+                return false
+            } else {
+                return true
+            }
+        })
+
+        this.itemDataUpwell = filter(itemDataNoneBluepront, item => {
+            if (item.name.indexOf("屹立") >= 0) {
+                return true
+            } else {
+                return false
+            }
+        })
+        this.itemDataNormal = filter(itemDataNoneBluepront, item => {
+            if (item.name.indexOf("屹立") >= 0) {
                 return false
             } else {
                 return true
@@ -51,17 +67,19 @@ export class cItemdb {
         console.timeEnd('Word search complete in ')
         return result;
     }
-    switchBlueprintData(name: string): itemDataType[] {
+    switchDataSets(name: string): itemDataType[] {
         if (name.indexOf('蓝图') >= 0) {
             //has blueprint in name
             return this.itemDataBlueprint;
+        }else if(name.indexOf('屹立') >= 0){
+            return this.itemDataUpwell;
         }else{
-            return this.itemDataNoneBluepront;
+            return this.itemDataNormal;
         }
     }
     search(name: string) {
         console.time('search complete in ')
-        let itemData = this.switchBlueprintData(name)
+        let itemData = this.switchDataSets(name)
         let res = this.searchByFullName(name, itemData);
         if (res.length == 0) {
             res = this.searchByWord(name, itemData);
