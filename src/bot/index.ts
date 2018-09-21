@@ -21,41 +21,40 @@ export class cQQBot {
 
         this.bot.on('message', async (event, context): Promise<string | void> => {
             console.log(context)
-            let d = await this.handlerMessage(event, context)
-            if (d) {
-                return `[CQ:at,qq=${context.user_id}]\n${d}`;
-            }
+            return await this.handlerMessage(event, context)
         })
     }
     startup() {
         this.bot.connect()
     }
-    async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | null> {
+    async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | void> {
         if (startsWith(context.message, '.jita')) {
-            let message: string = context.message;
-            message = trim(replace(message, '.jita', ''));
+            let message = trim(replace(context.message, '.jita', ''));
             if (message.length > 0) {
-                console.log(message);
-                let items = this.itemdb.search(message)
-                if (items.length > 0 && items.length <= 5) {
-                    console.log("搜索结果为：" + join(map(items, item => {
-                        return item.name
-                    }), "/"))
-                    let marketdata: string[] = await Promise.all(items.map(async item => {
-                        let market = this.CEVEMarketApi.getMarketString(await this.CEVEMarketApi.marketRegion(item.typeID))
-                        return `${item.name} --- ${market}`;
-                    }))
-                    return join(marketdata, "\n");
-                } else if (items.length > 5) {
-                    console.log(`搜索结果过多: ${items.length}`)
-                    return `共有${items.length}种物品符合该条件，请给出更明确的物品名称`
-                } else {
-                    console.log(`找不到 ${message}`)
-                    return '找不到该物品'
-                }
+                let res = await this.handlerMessageJita(message)
+                return `[CQ:at,qq=${context.user_id}]\n${res}`
             }
         }
-        return null
+    }
+    async handlerMessageJita(message: string):Promise<string> {
+        console.log(message);
+        let items = this.itemdb.search(message)
+        if (items.length > 0 && items.length <= 5) {
+            console.log("搜索结果为：" + join(map(items, item => {
+                return item.name
+            }), "/"))
+            let marketdata: string[] = await Promise.all(items.map(async item => {
+                let market = this.CEVEMarketApi.getMarketString(await this.CEVEMarketApi.marketRegion(item.typeID))
+                return `${item.name} --- ${market}`;
+            }))
+            return join(marketdata, "\n");
+        } else if (items.length > 5) {
+            console.log(`搜索结果过多: ${items.length}`)
+            return `共有${items.length}种物品符合该条件，请给出更明确的物品名称`
+        } else {
+            console.log(`找不到 ${message}`)
+            return '找不到该物品'
+        }
     }
 }
 
