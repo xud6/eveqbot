@@ -26,6 +26,7 @@ export interface apiSearchNameResponse {
 export class cCEVEMarketApi {
     readonly baseUrl = 'https://www.ceve-market.org/api/'
     async marketRegion(itemId: string, regionId: string = '10000002'): Promise<apiMarketResponse> {
+        console.log('make get market api call');
         const url = `${this.baseUrl}market/region/${regionId}/type/${itemId}.json`
         return await new Promise<apiMarketResponse>((resolve, reject) => {
             request.get(url, { json: true }, (error, response, body) => {
