@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
+        "module": "commonjs",
         "noImplicitAny": true,
-        "target": "es5",
+        "target": "es2015",
         "esModuleInterop":true,
         "strictNullChecks":true
     }
