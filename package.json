@@ -1,5 +1,5 @@
 {
-  "name": "@xdq/qbotmain",
+  "name": "@xdq/eveqbot",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
