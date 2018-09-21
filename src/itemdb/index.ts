@@ -3,19 +3,36 @@ import { filter, map, words, join } from 'lodash';
 
 export class cItemdb {
     readonly itemData: itemDataType[]
+    readonly itemDataSkin: itemDataType[]
     readonly itemDataBlueprint: itemDataType[]
     readonly itemDataUpwell: itemDataType[]
     readonly itemDataNormal: itemDataType[]
     constructor(readonly dataXlsName: string) {
         this.itemData = loadFromCeveMarketXLS(dataXlsName);
-        this.itemDataBlueprint = filter(this.itemData, item => {
+
+        this.itemDataSkin = filter(this.itemData, item => {
+            if (item.name.indexOf("涂装") >= 0) {
+                return true
+            } else {
+                return false
+            }
+        })
+        let itemDataNoneSkin = filter(this.itemData, item => {
+            if (item.name.indexOf("涂装") >= 0) {
+                return false
+            } else {
+                return true
+            }
+        })
+
+        this.itemDataBlueprint = filter(itemDataNoneSkin, item => {
             if (item.name.indexOf("蓝图") >= 0) {
                 return true
             } else {
                 return false
             }
         })
-        let itemDataNoneBluepront = filter(this.itemData, item => {
+        let itemDataNoneBluepront = filter(itemDataNoneSkin, item => {
             if (item.name.indexOf("蓝图") >= 0) {
                 return false
             } else {
@@ -68,7 +85,10 @@ export class cItemdb {
         return result;
     }
     switchDataSets(name: string): itemDataType[] {
-        if (name.indexOf('蓝图') >= 0) {
+        if(name.indexOf('涂装') >= 0){
+            return this.itemDataSkin;
+        }
+        else if (name.indexOf('蓝图') >= 0) {
             //has blueprint in name
             return this.itemDataBlueprint;
         }else if(name.indexOf('屹立') >= 0){
