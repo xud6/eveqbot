@@ -86,14 +86,18 @@ export class cItemdb {
     }
     switchDataSets(name: string): itemDataType[] {
         if(name.indexOf('涂装') >= 0){
+            console.log('itemDataSkin')
             return this.itemDataSkin;
         }
         else if (name.indexOf('蓝图') >= 0) {
             //has blueprint in name
+            console.log('itemDataBlueprint')
             return this.itemDataBlueprint;
         }else if(name.indexOf('屹立') >= 0){
+            console.log('itemDataUpwell')
             return this.itemDataUpwell;
         }else{
+            console.log('itemDataNormal')
             return this.itemDataNormal;
         }
     }
