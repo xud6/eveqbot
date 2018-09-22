@@ -23,6 +23,14 @@ export interface apiSearchNameResponse {
     typename: string
 }
 
+function numberFormat(num: number) {
+    if (num === 0) {
+        return '-'
+    } else {
+        return num.toLocaleString();
+    }
+}
+
 export class cCEVEMarketApi {
     readonly baseUrl = 'https://www.ceve-market.org/api/'
     async marketRegion(itemId: string, regionId: string = '10000002'): Promise<apiMarketResponse> {
@@ -43,10 +51,10 @@ export class cCEVEMarketApi {
         return res;
     }
     getMarketString(data: apiMarketResponse) {
-        let buyHigh = Number(data.buy.max).toLocaleString();
-        let sellLow = Number(data.sell.min).toLocaleString();
-        let buyAmount = Number(data.buy.volume).toLocaleString();
-        let sellAmount = Number(data.sell.volume).toLocaleString();
+        let buyHigh = numberFormat(Number(data.buy.max));
+        let sellLow = numberFormat(Number(data.sell.min));
+        let buyAmount = numberFormat(Number(data.buy.volume));
+        let sellAmount = numberFormat(Number(data.sell.volume));
         return `最高收价: ${buyHigh} / 最低卖价: ${sellLow} | 挂单量: ${buyAmount} / ${sellAmount}`
     }
     async searchName(name: string): Promise<apiSearchNameResponse[]> {
