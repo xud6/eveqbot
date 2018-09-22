@@ -26,7 +26,7 @@ export class cItemdb {
                 groups: compact([data.group1, data.group2, data.group3, data.group4, data.group5])
             }
         });
-
+        console.log(`imported ${this.itemData.length} items`)
         this.itemDataSkin = filter(this.itemData, item => {
             if (item.searchData.includes("涂装")) {
                 return true
