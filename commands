@@ -1,0 +1,2 @@
+docker build -t xudaiqing/eveqbot:latest .
+docker push xudaiqing/eveqbot:latest
