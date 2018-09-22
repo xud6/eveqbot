@@ -78,7 +78,7 @@ export class cQQBot {
             console.log(`Command [${command.op}] with [${command.msg}] from [${context.user_id}]`);
             switch (command.op) {
                 case opType.JITA:
-                    res = await this.handlerMessageJita(command.msg);
+                    res = await this.handlerMessageJita(command.msg,context);
                     break;
             }
             if (res) {
@@ -86,7 +86,12 @@ export class cQQBot {
             }
         }
     }
-    async handlerMessageJita(message: string): Promise<string | null> {
+    async handlerMessageJita(message: string,context: Record<string, any>): Promise<string | null> {
+        if(message.length > 30){
+            console.log(`search content too long from [${context.user_id}]`)
+            return `查询内容过长，当前共${message.length}个字符`
+        }
+
         let items = this.itemdb.search(message)
         if (items.length > 0 && items.length <= 5) {
             console.log("搜索结果为：" + join(map(items, item => {
