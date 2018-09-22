@@ -34,6 +34,6 @@ export function loadFromCeveMarketXLS(fileName:string){
     itemSheet.H1.w = 'group5';
     
     let d = XLSX.utils.sheet_to_json<itemDataType>(itemSheet);
-    console.timeEnd('import xls take:')
+    console.timeEnd('import xls take ')
     return d
 }
