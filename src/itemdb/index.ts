@@ -1,15 +1,31 @@
-import { loadFromCeveMarketXLS, itemDataType } from './importData'
-import { filter, map, words, join } from 'lodash';
+import { loadFromCeveMarketXLS } from './importData'
+import { filter, map, words, join, compact } from 'lodash';
 import { commonNameTransfer } from './commonName';
 
+export interface tItemData {
+    itemId: number,
+    name: string,
+    nameUpperCase: string,
+    groups: string[]
+}
+
 export class cItemdb {
-    readonly itemData: itemDataType[]
-    readonly itemDataSkin: itemDataType[]
-    readonly itemDataBlueprint: itemDataType[]
-    readonly itemDataUpwell: itemDataType[]
-    readonly itemDataNormal: itemDataType[]
+    readonly itemData: tItemData[]
+    readonly itemDataSkin: tItemData[]
+    readonly itemDataBlueprint: tItemData[]
+    readonly itemDataUpwell: tItemData[]
+    readonly itemDataNormal: tItemData[]
     constructor(readonly dataXlsName: string) {
-        this.itemData = loadFromCeveMarketXLS(dataXlsName);
+        let rawData = loadFromCeveMarketXLS(dataXlsName);
+
+        this.itemData = rawData.map(data => {
+            return {
+                itemId: parseInt(data.typeID),
+                name: data.name,
+                nameUpperCase: data.name.toUpperCase(),
+                groups: compact([data.group1, data.group2, data.group3, data.group4, data.group5])
+            }
+        });
 
         this.itemDataSkin = filter(this.itemData, item => {
             if (item.name.includes("涂装")) {
@@ -56,7 +72,7 @@ export class cItemdb {
             }
         })
     }
-    searchByExact(name: string, itemData: itemDataType[]): itemDataType[] {
+    searchByExact(name: string, itemData: tItemData[]): tItemData[] {
         for (let item of itemData) {
             if (item.name === name) {
                 return [item];
@@ -64,7 +80,7 @@ export class cItemdb {
         }
         return [];
     }
-    searchByFullName(name: string, itemData: itemDataType[]) {
+    searchByFullName(name: string, itemData: tItemData[]) {
         console.time('Fullname search complete in ')
         let res = filter(itemData, item => {
             if (item.name.includes(name)) {
@@ -76,7 +92,7 @@ export class cItemdb {
         console.timeEnd('Fullname search complete in ')
         return res
     }
-    searchByWord(name: string, itemData: itemDataType[]) {
+    searchByWord(name: string, itemData: tItemData[]) {
         console.time('Word search complete in ')
         let result = itemData
         let eWords = words(name, /(\d+)|(\w+)|[^(?:,& \u000A\u000B\u000C\u000D\u0085\u2028\u2029)]/g);
@@ -93,7 +109,7 @@ export class cItemdb {
         console.timeEnd('Word search complete in ')
         return result;
     }
-    switchDataSets(name: string): itemDataType[] {
+    switchDataSets(name: string): tItemData[] {
         if (name.includes('涂装')) {
             console.log('itemDataSkin')
             return this.itemDataSkin;
@@ -114,7 +130,7 @@ export class cItemdb {
         console.time('search complete in ')
         let itemData = this.switchDataSets(name)
         let res = this.searchByExact(name, itemData);
-        if(res.length == 0){
+        if (res.length == 0) {
             res = this.searchByFullName(name, itemData);
         }
         if (res.length == 0) {

@@ -1,8 +1,7 @@
 import CQWebSocketFactory, { CQWebSocket, CQWebSocketOption, CQEvent } from "cq-websocket";
-import { cItemdb } from "../itemdb";
+import { cItemdb, tItemData } from "../itemdb";
 import { cCEVEMarketApi } from "../CEveMarketApi";
 import { startsWith, trim, replace, map, join, forEach } from "lodash";
-import { itemDataType } from "../itemdb/importData";
 
 enum opType {
     JITA = '.jita',
@@ -23,7 +22,7 @@ function checkStartWith(msg: string, tags: string[]): string | null {
     return null
 }
 
-function formatItemNames(items: itemDataType[], div: number = 5) {
+function formatItemNames(items: tItemData[], div: number = 5) {
     let d = 0;
     return join(map(items, item => {
         d++;
@@ -119,7 +118,7 @@ export class cQQBot {
                 return item.name
             }), "/"))
             let marketdata: string[] = await Promise.all(items.map(async item => {
-                let market = this.CEVEMarketApi.getMarketString(await this.CEVEMarketApi.marketRegion(item.typeID))
+                let market = this.CEVEMarketApi.getMarketString(await this.CEVEMarketApi.marketRegion(item.itemId.toString()))
                 return `${item.name} --- ${market}`;
             }))
             return join(marketdata, "\n");
