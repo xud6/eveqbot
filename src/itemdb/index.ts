@@ -56,6 +56,14 @@ export class cItemdb {
             }
         })
     }
+    searchByExact(name: string, itemData: itemDataType[]): itemDataType[] {
+        for (let item of itemData) {
+            if (item.name === name) {
+                return [item];
+            }
+        }
+        return [];
+    }
     searchByFullName(name: string, itemData: itemDataType[]) {
         console.time('Fullname search complete in ')
         let res = filter(itemData, item => {
@@ -105,7 +113,10 @@ export class cItemdb {
     search(name: string) {
         console.time('search complete in ')
         let itemData = this.switchDataSets(name)
-        let res = this.searchByFullName(name, itemData);
+        let res = this.searchByExact(name, itemData);
+        if(res.length == 0){
+            res = this.searchByFullName(name, itemData);
+        }
         if (res.length == 0) {
             res = this.searchByWord(commonNameTransfer(name), itemData);
         }
