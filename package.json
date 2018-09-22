@@ -1,8 +1,9 @@
 {
   "name": "@xdq/eveqbot",
   "version": "0.0.1",
-  "description": "",
+  "description": "qq bot for eve market",
   "main": "dist/index.js",
+  "repository": "https://github.com/xud6/eveqbot.git",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "run": "ts-node src/index.ts",
