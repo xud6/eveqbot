@@ -1,9 +1,20 @@
 const gulp = require("gulp");
 const ts = require("gulp-typescript");
-const tsProject = ts.createProject("tsconfig.json");
+const tsProject = ts.createProject("tsconfig.json", { declaration: true });
+const del = require("del")
+const merge = require("merge")
 
-gulp.task("build", function () {
-    return tsProject.src()
+gulp.task("cleanDist", function () {
+    return del('dist/**/*')
+})
+
+gulp.task("build", ["cleanDist"], function () {
+    let tsResult = gulp.src("src/**/*.ts")
         .pipe(tsProject())
-        .js.pipe(gulp.dest("dist"));
+    return merge([
+        tsResult.js
+            .pipe(gulp.dest('dist')),
+        tsResult.dts
+            .pipe(gulp.dest('dist/definitions'))
+    ])
 });

@@ -14,9 +14,11 @@
   "devDependencies": {
     "@types/lodash": "^4.14.116",
     "@types/request": "^2.47.1",
+    "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-cli": "^2.0.1",
     "gulp-typescript": "^5.0.0-alpha.3",
+    "merge": "^1.2.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.3"
   },
