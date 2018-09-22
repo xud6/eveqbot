@@ -27,7 +27,7 @@ function numberFormat(num: number) {
     if (num === 0) {
         return '-'
     } else {
-        return num.toLocaleString();
+        return num.toLocaleString("arab", { minimumFractionDigits: 2 });
     }
 }
 
