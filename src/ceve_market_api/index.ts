@@ -23,11 +23,11 @@ export interface apiSearchNameResponse {
     typename: string
 }
 
-function numberFormat(num: number) {
+function numberFormat(num: number, minimumFractionDigits: number = 0) {
     if (num === 0) {
         return '-'
     } else {
-        return num.toLocaleString("arab", { minimumFractionDigits: 2 });
+        return num.toLocaleString("arab", { minimumFractionDigits: minimumFractionDigits });
     }
 }
 
@@ -51,8 +51,8 @@ export class cCEVEMarketApi {
         return res;
     }
     getMarketString(data: apiMarketResponse) {
-        let buyHigh = numberFormat(Number(data.buy.max));
-        let sellLow = numberFormat(Number(data.sell.min));
+        let buyHigh = numberFormat(Number(data.buy.max),2);
+        let sellLow = numberFormat(Number(data.sell.min),2);
         let buyAmount = numberFormat(Number(data.buy.volume));
         let sellAmount = numberFormat(Number(data.sell.volume));
         return `最高收价: ${buyHigh} / 最低卖价: ${sellLow} | 挂单量: ${buyAmount} / ${sellAmount}`
