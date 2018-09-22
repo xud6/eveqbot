@@ -28,5 +28,6 @@ USER appDeploy
 
 ENV PM2_PUBLIC_KEY ''
 ENV PM2_SECRET_KEY ''
+ENV coolq_host 'coolq'
 
 CMD ["pm2-runtime", "dist/index.js"]
