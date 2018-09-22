@@ -12,14 +12,14 @@ export class cItemdb {
         this.itemData = loadFromCeveMarketXLS(dataXlsName);
 
         this.itemDataSkin = filter(this.itemData, item => {
-            if (item.name.indexOf("涂装") >= 0) {
+            if (item.name.includes("涂装")) {
                 return true
             } else {
                 return false
             }
         })
         let itemDataNoneSkin = filter(this.itemData, item => {
-            if (item.name.indexOf("涂装") >= 0) {
+            if (item.name.includes("涂装")) {
                 return false
             } else {
                 return true
@@ -27,14 +27,14 @@ export class cItemdb {
         })
 
         this.itemDataBlueprint = filter(itemDataNoneSkin, item => {
-            if (item.name.indexOf("蓝图") >= 0) {
+            if (item.name.includes("蓝图")) {
                 return true
             } else {
                 return false
             }
         })
         let itemDataNoneBluepront = filter(itemDataNoneSkin, item => {
-            if (item.name.indexOf("蓝图") >= 0) {
+            if (item.name.includes("蓝图")) {
                 return false
             } else {
                 return true
@@ -42,14 +42,14 @@ export class cItemdb {
         })
 
         this.itemDataUpwell = filter(itemDataNoneBluepront, item => {
-            if (item.name.indexOf("屹立") >= 0) {
+            if (item.name.includes("屹立")) {
                 return true
             } else {
                 return false
             }
         })
         this.itemDataNormal = filter(itemDataNoneBluepront, item => {
-            if (item.name.indexOf("屹立") >= 0) {
+            if (item.name.includes("屹立")) {
                 return false
             } else {
                 return true
@@ -67,7 +67,7 @@ export class cItemdb {
     searchByFullName(name: string, itemData: itemDataType[]) {
         console.time('Fullname search complete in ')
         let res = filter(itemData, item => {
-            if (item.name.indexOf(name) >= 0) {
+            if (item.name.includes(name)) {
                 return true
             } else {
                 return false
@@ -83,7 +83,7 @@ export class cItemdb {
         console.log('word explode result :' + join(eWords, '|'))
         map(eWords, word => {
             result = filter(result, d => {
-                if (d.name.indexOf(word) >= 0) {
+                if (d.name.includes(word)) {
                     return true
                 } else {
                     return false
@@ -94,15 +94,15 @@ export class cItemdb {
         return result;
     }
     switchDataSets(name: string): itemDataType[] {
-        if (name.indexOf('涂装') >= 0) {
+        if (name.includes('涂装')) {
             console.log('itemDataSkin')
             return this.itemDataSkin;
         }
-        else if (name.indexOf('蓝图') >= 0) {
+        else if (name.includes('蓝图')) {
             //has blueprint in name
             console.log('itemDataBlueprint')
             return this.itemDataBlueprint;
-        } else if (name.indexOf('屹立') >= 0) {
+        } else if (name.includes('屹立')) {
             console.log('itemDataUpwell')
             return this.itemDataUpwell;
         } else {
