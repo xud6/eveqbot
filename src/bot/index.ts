@@ -139,6 +139,8 @@ export class cQQBot {
             return `https://eve.okzai.net/jfcx`
         } else if (message.includes('kb') || message.includes('KB')) {
             return `https://kb.ceve-market.org/`
+        } else if (message.includes('导航') || message.includes('旗舰')) {
+            return `http://eve.sgfans.org/navigator/jumpLayout`
         } else if (message.includes('合同') || message.includes('货柜')) {
             return `http://tools.ceve-market.org/contract/`
         } else if (message.includes('扫描') || message.includes('5度')) {
