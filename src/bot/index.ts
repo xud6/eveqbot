@@ -5,7 +5,8 @@ import { startsWith, trim, replace, map, join, forEach } from "lodash";
 import { itemDataType } from "../itemdb/importData";
 
 enum opType {
-    JITA = '.jita'
+    JITA = '.jita',
+    ADDR = '.addr'
 }
 
 interface tCommand {
@@ -42,6 +43,9 @@ export class cQQBot {
         resultPriceListLimit: 5,
         resultNameListLimit: 50
     }
+    readonly addr = {
+        searchContentLimit: 10
+    }
     constructor(
         config: Partial<CQWebSocketOption>,
         readonly itemdb: cItemdb,
@@ -66,14 +70,19 @@ export class cQQBot {
 
     async checkMessage(event: CQEvent, context: Record<string, any>): Promise<tCommand | null> {
         let jita = checkStartWith(context.message, ['.jita', '。jita', '.吉他', '。吉他']);
-        console.log(jita)
         if (jita) {
             return {
                 op: opType.JITA,
                 msg: jita
             }
         }
-
+        let addr = checkStartWith(context.message, ['.addr', '。adr', '.地址', '。地址']);
+        if (addr) {
+            return {
+                op: opType.ADDR,
+                msg: addr
+            }
+        }
         return null
     }
     async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | void> {
@@ -84,6 +93,9 @@ export class cQQBot {
             switch (command.op) {
                 case opType.JITA:
                     res = await this.handlerMessageJita(command.msg, context);
+                    break;
+                case opType.ADDR:
+                    res = await this.handlerMessageAddr(command.msg, context);
                     break;
             }
             if (res) {
@@ -98,7 +110,8 @@ export class cQQBot {
         }
 
         let items = this.itemdb.search(message)
-        if (items.length = 0) {
+        console.log(items)
+        if (items.length == 0) {
             console.log(`找不到 ${message}`)
             return '找不到该物品'
         } else if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
@@ -116,6 +129,25 @@ export class cQQBot {
         } else {
             console.log(`搜索结果过多: ${items.length}`)
             return `共有${items.length}种物品符合该条件，请给出更明确的物品名称`
+        }
+    }
+    async handlerMessageAddr(message: string, context: Record<string, any>): Promise<string | null> {
+        if (message.length > this.addr.searchContentLimit) {
+            console.log(`search content too long from [${context.user_id}]`)
+            return `查询内容过长，当前共${message.length}个字符，最大${this.addr.searchContentLimit}`
+        }
+        if (message.includes('出勤') || message.includes('积分')) {
+            return `https://eve.okzai.net/jfcx`
+        } else if (message.includes('kb') || message.includes('KB')) {
+            return `https://kb.ceve-market.org/`
+        } else if (message.includes('合同') || message.includes('货柜')) {
+            return `http://tools.ceve-market.org/contract/`
+        } else if (message.includes('扫描') || message.includes('5度')) {
+            return `http://tools.ceve-market.org/`
+        } else if (message.includes('市场')) {
+            return `https://www.ceve-market.org/home/`
+        } else {
+            return `我理解不了`
         }
     }
 }
