@@ -5,7 +5,7 @@ import { startsWith, trim, replace, map, join, forEach } from "lodash";
 import { itemDataType } from "../itemdb/importData";
 
 enum opType {
-    JITA
+    JITA='.jita'
 }
 
 interface tCommand {
@@ -52,7 +52,6 @@ export class cQQBot {
         })
 
         this.bot.on('message', async (event, context): Promise<string | void> => {
-            console.log(context)
             return await this.handlerMessage(event, context)
         })
     }
@@ -76,6 +75,7 @@ export class cQQBot {
         let command = await this.checkMessage(event, context);
         if (command) {
             let res: string | null = null
+            console.log(`Command [${command.op}] with [${command.msg}] from [${context.user_id}]`);
             switch (command.op) {
                 case opType.JITA:
                     res = await this.handlerMessageJita(command.msg);
@@ -87,7 +87,6 @@ export class cQQBot {
         }
     }
     async handlerMessageJita(message: string): Promise<string | null> {
-        console.log(`Command .jita with :${message}`);
         let items = this.itemdb.search(message)
         if (items.length > 0 && items.length <= 5) {
             console.log("搜索结果为：" + join(map(items, item => {
