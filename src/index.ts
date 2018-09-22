@@ -1,6 +1,6 @@
 import { cItemdb } from './itemdb/index';
-import { cCEVEMarketApi } from './CEveMarketApi';
-import { cQQBot } from './bot';
+import { cCEVEMarketApi } from './CEveMarketApi/index';
+import { cQQBot } from './bot/index';
 import { CQWebSocketOption } from 'cq-websocket';
 
 let cqwebConfig:Partial<CQWebSocketOption> = {}

@@ -1,6 +1,6 @@
 import CQWebSocketFactory, { CQWebSocket, CQWebSocketOption, CQEvent, WebsocketType } from "cq-websocket";
-import { cItemdb, tItemData } from "../itemdb";
-import { cCEVEMarketApi } from "../CEveMarketApi";
+import { cItemdb, tItemData } from "../itemdb/index";
+import { cCEVEMarketApi } from "../CEveMarketApi/index";
 import { startsWith, trim, replace, map, join, forEach, take } from "lodash";
 
 enum opType {
