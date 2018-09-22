@@ -17,5 +17,8 @@ COPY itemdb.xls /app/
 COPY dist /app/dist/
 
 RUN npm install --production && npm cache clean --force
+RUN npm install pm2 -g
+ENV PM2_PUBLIC_KEY ''
+ENV PM2_SECRET_KEY ''
 
-CMD [ "npm", "start" ]
+CMD ["pm2-runtime", "dist/index.js"]
