@@ -45,8 +45,9 @@ export class cCEVEMarketApi {
     getMarketString(data: apiMarketResponse) {
         let buyHigh = Number(data.buy.max).toLocaleString();
         let sellLow = Number(data.sell.min).toLocaleString();
-        let amount = Number(data.all.volume).toLocaleString();
-        return `最高收价: ${buyHigh} / 最低卖价: ${sellLow} | 总挂单量: ${amount}`
+        let buyAmount = Number(data.buy.volume).toLocaleString();
+        let sellAmount = Number(data.sell.volume).toLocaleString();
+        return `最高收价: ${buyHigh} / 最低卖价: ${sellLow} | 挂单量: ${buyAmount} / ${sellAmount}`
     }
     async searchName(name: string): Promise<apiSearchNameResponse[]> {
         const url = `${this.baseUrl}searchname`;
