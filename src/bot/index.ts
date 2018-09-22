@@ -1,7 +1,8 @@
 import CQWebSocketFactory, { CQWebSocket, CQWebSocketOption, CQEvent } from "cq-websocket";
 import { cItemdb } from "../itemdb";
 import { cCEVEMarketApi } from "../CEveMarketApi";
-import { startsWith, trim, replace, map, join } from "lodash";
+import { startsWith, trim, replace, map, join, forEach } from "lodash";
+import { itemDataType } from "../itemdb/importData";
 
 enum opType {
     JITA
@@ -13,12 +14,25 @@ interface tCommand {
 }
 
 function checkStartWith(msg: string, tags: string[]): string | null {
-    for (let tag in tags) {
+    for (let tag of tags) {
         if (startsWith(msg, tag)) {
             return trim(replace(msg, tag, ''));
         }
     }
     return null
+}
+
+function formatItemNames(items: itemDataType[], div: number = 5) {
+    let d = 0;
+    return join(map(items, item => {
+        d++;
+        if(d>div){
+            d=0
+            return item.name + '\n'
+        }else{
+            return item.name
+        }
+    }), " / ")
 }
 
 export class cQQBot {
@@ -48,6 +62,7 @@ export class cQQBot {
 
     async checkMessage(event: CQEvent, context: Record<string, any>): Promise<tCommand | null> {
         let jita = checkStartWith(context.message, ['.jita', '。jita', '.吉他', '。吉他']);
+        console.log(jita)
         if (jita) {
             return {
                 op: opType.JITA,
@@ -72,7 +87,7 @@ export class cQQBot {
         }
     }
     async handlerMessageJita(message: string): Promise<string | null> {
-        console.log(message);
+        console.log(`Command .jita with :${message}`);
         let items = this.itemdb.search(message)
         if (items.length > 0 && items.length <= 5) {
             console.log("搜索结果为：" + join(map(items, item => {
@@ -83,6 +98,9 @@ export class cQQBot {
                 return `${item.name} --- ${market}`;
             }))
             return join(marketdata, "\n");
+        } else if (items.length < 50) {
+            console.log(`搜索结果过多: ${items.length}`)
+            return `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n` + formatItemNames(items);
         } else if (items.length > 5) {
             console.log(`搜索结果过多: ${items.length}`)
             return `共有${items.length}种物品符合该条件，请给出更明确的物品名称`
