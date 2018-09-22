@@ -12,6 +12,15 @@ interface tCommand {
     msg: string
 }
 
+function checkStartWith(msg: string, tags: string[]): string | null {
+    for (let tag in tags) {
+        if (startsWith(msg, tag)) {
+            return trim(replace(msg, tag, ''));
+        }
+    }
+    return null
+}
+
 export class cQQBot {
     readonly bot: CQWebSocket
     constructor(
@@ -36,22 +45,17 @@ export class cQQBot {
     startup() {
         this.bot.connect()
     }
+
     async checkMessage(event: CQEvent, context: Record<string, any>): Promise<tCommand | null> {
-        if (startsWith(context.message, '.jita')) {
-            let message = trim(replace(context.message, '.jita', ''));
+        let jita = checkStartWith(context.message, ['.jita', '。jita', '.吉他', '。吉他']);
+        if (jita) {
             return {
                 op: opType.JITA,
-                msg: message
+                msg: jita
             }
-        } else if (startsWith(context.message, '。jita')) {
-            let message = trim(replace(context.message, '。jita', ''));
-            return {
-                op: opType.JITA,
-                msg: message
-            }
-        } else {
-            return null
         }
+
+        return null
     }
     async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | void> {
         let command = await this.checkMessage(event, context);
