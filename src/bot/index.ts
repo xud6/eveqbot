@@ -3,6 +3,15 @@ import { cItemdb } from "../itemdb";
 import { cCEVEMarketApi } from "../CEveMarketApi";
 import { startsWith, trim, replace, map, join } from "lodash";
 
+enum opType {
+    JITA
+}
+
+interface tCommand {
+    op: opType,
+    msg: string
+}
+
 export class cQQBot {
     readonly bot: CQWebSocket
     constructor(
@@ -27,16 +36,38 @@ export class cQQBot {
     startup() {
         this.bot.connect()
     }
-    async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | void> {
+    async checkMessage(event: CQEvent, context: Record<string, any>): Promise<tCommand | null> {
         if (startsWith(context.message, '.jita')) {
             let message = trim(replace(context.message, '.jita', ''));
-            if (message.length > 0) {
-                let res = await this.handlerMessageJita(message)
+            return {
+                op: opType.JITA,
+                msg: message
+            }
+        } else if (startsWith(context.message, '。jita')) {
+            let message = trim(replace(context.message, '。jita', ''));
+            return {
+                op: opType.JITA,
+                msg: message
+            }
+        } else {
+            return null
+        }
+    }
+    async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | void> {
+        let command = await this.checkMessage(event, context);
+        if (command) {
+            let res: string | null = null
+            switch (command.op) {
+                case opType.JITA:
+                    res = await this.handlerMessageJita(command.msg);
+                    break;
+            }
+            if (res) {
                 return `[CQ:at,qq=${context.user_id}]\n${res}`
             }
         }
     }
-    async handlerMessageJita(message: string):Promise<string> {
+    async handlerMessageJita(message: string): Promise<string | null> {
         console.log(message);
         let items = this.itemdb.search(message)
         if (items.length > 0 && items.length <= 5) {
