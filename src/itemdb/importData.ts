@@ -12,7 +12,7 @@ export interface itemDataType {
     group5:string,
 }
 
-export function loadFromCeveMarketXLS(fileName:string){
+export function loadFromCEveMarketXLS(fileName:string){
     console.log('start import xls');
     console.time('import xls take ')
     let itemSheet = workbook.Sheets[workbook.SheetNames[0]]

@@ -1,4 +1,4 @@
-import { loadFromCeveMarketXLS } from './importData'
+import { loadFromCEveMarketXLS } from './importData'
 import { filter, map, words, join, compact } from 'lodash';
 import { commonNameTransfer } from './commonName';
 
@@ -16,7 +16,7 @@ export class cItemdb {
     readonly itemDataUpwell: tItemData[]
     readonly itemDataNormal: tItemData[]
     constructor(readonly dataXlsName: string) {
-        let rawData = loadFromCeveMarketXLS(dataXlsName);
+        let rawData = loadFromCEveMarketXLS(dataXlsName);
 
         this.itemData = rawData.map(data => {
             return {
