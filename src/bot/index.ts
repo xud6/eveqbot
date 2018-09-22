@@ -98,7 +98,10 @@ export class cQQBot {
         }
 
         let items = this.itemdb.search(message)
-        if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
+        if (items.length = 0) {
+            console.log(`找不到 ${message}`)
+            return '找不到该物品'
+        } else if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
             console.log("搜索结果为：" + join(map(items, item => {
                 return item.name
             }), "/"))
@@ -110,12 +113,9 @@ export class cQQBot {
         } else if (items.length < this.jita.resultNameListLimit) {
             console.log(`搜索结果过多: ${items.length}`)
             return `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n` + formatItemNames(items);
-        } else if (items.length > 0) {
+        } else {
             console.log(`搜索结果过多: ${items.length}`)
             return `共有${items.length}种物品符合该条件，请给出更明确的物品名称`
-        } else {
-            console.log(`找不到 ${message}`)
-            return '找不到该物品'
         }
     }
 }
