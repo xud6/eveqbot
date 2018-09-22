@@ -1,0 +1,1 @@
+console.log(Number('113214323.32').toLocaleString())

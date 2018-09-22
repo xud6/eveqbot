@@ -5,7 +5,7 @@ import { startsWith, trim, replace, map, join, forEach } from "lodash";
 import { itemDataType } from "../itemdb/importData";
 
 enum opType {
-    JITA='.jita'
+    JITA = '.jita'
 }
 
 interface tCommand {
@@ -26,10 +26,10 @@ function formatItemNames(items: itemDataType[], div: number = 5) {
     let d = 0;
     return join(map(items, item => {
         d++;
-        if(d>div){
-            d=0
+        if (d > div) {
+            d = 0
             return item.name + '\n'
-        }else{
+        } else {
             return item.name
         }
     }), " | ")
@@ -37,6 +37,11 @@ function formatItemNames(items: itemDataType[], div: number = 5) {
 
 export class cQQBot {
     readonly bot: CQWebSocket
+    readonly jita = {
+        searchContentLimit: 30,
+        resultPriceListLimit: 5,
+        resultNameListLimit: 50
+    }
     constructor(
         config: Partial<CQWebSocketOption>,
         readonly itemdb: cItemdb,
@@ -78,7 +83,7 @@ export class cQQBot {
             console.log(`Command [${command.op}] with [${command.msg}] from [${context.user_id}]`);
             switch (command.op) {
                 case opType.JITA:
-                    res = await this.handlerMessageJita(command.msg,context);
+                    res = await this.handlerMessageJita(command.msg, context);
                     break;
             }
             if (res) {
@@ -86,14 +91,14 @@ export class cQQBot {
             }
         }
     }
-    async handlerMessageJita(message: string,context: Record<string, any>): Promise<string | null> {
-        if(message.length > 30){
+    async handlerMessageJita(message: string, context: Record<string, any>): Promise<string | null> {
+        if (message.length > this.jita.searchContentLimit) {
             console.log(`search content too long from [${context.user_id}]`)
-            return `查询内容过长，当前共${message.length}个字符`
+            return `查询内容过长，当前共${message.length}个字符，最大${this.jita.searchContentLimit}`
         }
 
         let items = this.itemdb.search(message)
-        if (items.length > 0 && items.length <= 5) {
+        if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
             console.log("搜索结果为：" + join(map(items, item => {
                 return item.name
             }), "/"))
@@ -102,10 +107,10 @@ export class cQQBot {
                 return `${item.name} --- ${market}`;
             }))
             return join(marketdata, "\n");
-        } else if (items.length < 50) {
+        } else if (items.length < this.jita.resultNameListLimit) {
             console.log(`搜索结果过多: ${items.length}`)
             return `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n` + formatItemNames(items);
-        } else if (items.length > 5) {
+        } else if (items.length > 0) {
             console.log(`搜索结果过多: ${items.length}`)
             return `共有${items.length}种物品符合该条件，请给出更明确的物品名称`
         } else {
