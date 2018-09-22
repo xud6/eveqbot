@@ -43,7 +43,7 @@ export class cCEVEMarketApi {
         return res;
     }
     getMarketString(data: apiMarketResponse) {
-        return `最高收价:${data.buy.max} / 最低卖价:${data.sell.min} | 总挂单量:(${data.all.volume})`
+        return `最高收价:${data.buy.max} / 最低卖价:${data.sell.min} | 总挂单量:${data.all.volume}`
     }
     async searchName(name: string):Promise<apiSearchNameResponse[]> {
         const url = `${this.baseUrl}searchname`;
