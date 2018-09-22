@@ -1,7 +1,7 @@
 import CQWebSocketFactory, { CQWebSocket, CQWebSocketOption, CQEvent } from "cq-websocket";
 import { cItemdb, tItemData } from "../itemdb";
 import { cCEVEMarketApi } from "../CEveMarketApi";
-import { startsWith, trim, replace, map, join, forEach } from "lodash";
+import { startsWith, trim, replace, map, join, forEach, take } from "lodash";
 
 enum opType {
     JITA = '.jita',
@@ -122,12 +122,14 @@ export class cQQBot {
                 return `${item.name} --- ${market}`;
             }))
             return join(marketdata, "\n");
-        } else if (items.length < this.jita.resultNameListLimit) {
-            console.log(`搜索结果过多: ${items.length}`)
-            return `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n` + formatItemNames(items);
         } else {
+            let front = take(items, this.jita.resultNameListLimit);
             console.log(`搜索结果过多: ${items.length}`)
-            return `共有${items.length}种物品符合该条件，请给出更明确的物品名称`
+            let res = `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n` + formatItemNames(front);
+            if (items.length > this.jita.resultNameListLimit) {
+                res = res + '\n......'
+            }
+            return res
         }
     }
     async handlerMessageAddr(message: string, context: Record<string, any>): Promise<string | null> {

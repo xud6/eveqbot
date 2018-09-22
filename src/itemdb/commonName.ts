@@ -15,6 +15,7 @@ const commonNameTable: commonNameTableObj[] = [
     { o: "脑浆", t: "技能注入器" },
     { o: "PLEX", t: "飞行员执照" },
     { o: "全抗", t: "适应" },
+    { o: "女装", t: "女式" },
 ]
 
 export function commonNameTransfer(name: string): string {
