@@ -32,7 +32,7 @@ function formatItemNames(items: itemDataType[], div: number = 5) {
         }else{
             return item.name
         }
-    }), " / ")
+    }), " | ")
 }
 
 export class cQQBot {
