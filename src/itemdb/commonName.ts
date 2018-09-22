@@ -8,6 +8,7 @@ interface commonNameTableObj {
 const commonNameTable:commonNameTableObj[]=[
     {o:"微曲",t:"微型跃迁推进器"},
     {o:"反跳",t:"跃迁扰断器"},
+    {o:"重反",t:"重型跃迁扰断器"},
     {o:"网子",t:"停滞缠绕光束"},
     {o:"跳刀",t:"微型跳跃"},
     {o:"T2",t:"II"},
