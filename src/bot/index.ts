@@ -109,7 +109,6 @@ export class cQQBot {
         }
 
         let items = this.itemdb.search(message)
-        console.log(items)
         if (items.length == 0) {
             console.log(`找不到 ${message}`)
             return '找不到该物品'
@@ -125,6 +124,9 @@ export class cQQBot {
         } else {
             let front = take(items, this.jita.resultNameListLimit);
             console.log(`搜索结果过多: ${items.length}`)
+            console.log("搜索结果为：" + join(map(items, item => {
+                return item.name
+            }), "/"))
             let res = `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n` + formatItemNames(front);
             if (items.length > this.jita.resultNameListLimit) {
                 res = res + '\n......'
