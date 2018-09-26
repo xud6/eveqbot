@@ -16,7 +16,7 @@ interface tCommand {
 
 function checkStartWith(msg: string, tags: string[]): string | null {
     for (let tag of tags) {
-        if (startsWith(msg, tag) || (msg === tag)) {
+        if (startsWith(msg, tag)) {
             return trim(replace(msg, tag, ''));
         }
     }
@@ -84,7 +84,7 @@ export class cQQBot {
             }
         }
         let help = checkStartWith(context.message, ['.help', '。help', '.帮助', '。帮助']);
-        if (help) {
+        if (help || help === '') {
             return {
                 op: opType.HELP,
                 msg: help
