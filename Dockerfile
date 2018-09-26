@@ -28,7 +28,7 @@ USER appDeploy
 
 ENV PM2_PUBLIC_KEY ''
 ENV PM2_SECRET_KEY ''
-ENV coolq_host 'coolq'
+ENV coolq_host 'localhost'
 ENV coolq_port '6700'
 ENV coolq_access_token ''
 
