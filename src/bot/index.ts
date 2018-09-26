@@ -117,7 +117,7 @@ export class cQQBot {
                 return item.name
             }), "/"))
             let marketdata: string[] = await Promise.all(items.map(async item => {
-                let market = this.CEVEMarketApi.getMarketString(await this.CEVEMarketApi.marketRegion(item.itemId.toString()))
+                let market = await this.CEVEMarketApi.getMarketString(item.itemId.toString())
                 return `${item.name} --- ${market}`;
             }))
             return join(marketdata, "\n");

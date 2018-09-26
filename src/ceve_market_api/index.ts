@@ -50,9 +50,10 @@ export class cCEVEMarketApi {
         console.timeEnd(`get market api call for ${itemId} end in `)
         return res;
     }
-    getMarketString(data: apiMarketResponse) {
-        let buyHigh = numberFormat(Number(data.buy.max),2);
-        let sellLow = numberFormat(Number(data.sell.min),2);
+    async getMarketString(itemId: string, regionId?: string) {
+        let data = await this.marketRegion(itemId, regionId)
+        let buyHigh = numberFormat(Number(data.buy.max), 2);
+        let sellLow = numberFormat(Number(data.sell.min), 2);
         let buyAmount = numberFormat(Number(data.buy.volume));
         let sellAmount = numberFormat(Number(data.sell.volume));
         return `最高收价: ${buyHigh} / 最低卖价: ${sellLow} | 挂单量: ${buyAmount} / ${sellAmount}`
