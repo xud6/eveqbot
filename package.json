@@ -1,6 +1,6 @@
 {
   "name": "@xdq/eveqbot",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "qq bot for eve market",
   "main": "dist/index.js",
   "repository": "https://github.com/xud6/eveqbot.git",
