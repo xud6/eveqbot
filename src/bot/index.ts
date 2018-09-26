@@ -16,7 +16,7 @@ interface tCommand {
 
 function checkStartWith(msg: string, tags: string[]): string | null {
     for (let tag of tags) {
-        if (startsWith(msg, tag)) {
+        if (startsWith(msg, tag) || (msg === tag)) {
             return trim(replace(msg, tag, ''));
         }
     }
@@ -173,7 +173,7 @@ export class cQQBot {
         } else if (message == "version") {
             let pkg: any = require('./../../package.json')
             return `版本号:${pkg.version}`
-        }else{
+        } else {
             return null
         }
     }
