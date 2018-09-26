@@ -1,5 +1,6 @@
 import request from 'request'
 import { includes } from 'lodash';
+import { isString } from 'util';
 
 export interface apiMarketResponse {
     sell: {
@@ -59,13 +60,22 @@ export class cCEVEMarketApi {
         console.timeEnd(`get market api call for ${itemId} end in `)
         return res;
     }
-    async getMarketString(itemId: string, regionId?: string) {
-        let data = await this.marketRegion(itemId, regionId)
-        let buyHigh = numberFormat(Number(data.buy.max), 2);
-        let sellLow = numberFormat(Number(data.sell.min), 2);
-        let buyAmount = numberFormat(Number(data.buy.volume));
-        let sellAmount = numberFormat(Number(data.sell.volume));
-        return `最高收价: ${buyHigh} / 最低卖价: ${sellLow} | 挂单量: ${buyAmount} / ${sellAmount}`
+    async getMarketString(itemId: string, regionId?: string): Promise<string> {
+        try{
+            let data = await this.marketRegion(itemId, regionId)
+            let buyHigh = numberFormat(Number(data.buy.max), 2);
+            let sellLow = numberFormat(Number(data.sell.min), 2);
+            let buyAmount = numberFormat(Number(data.buy.volume));
+            let sellAmount = numberFormat(Number(data.sell.volume));
+            return `最高收价: ${buyHigh} / 最低卖价: ${sellLow} | 挂单量: ${buyAmount} / ${sellAmount}`
+        }catch(e){
+            if(isString(e)){
+                return e;
+            }else{
+                console.log(e)
+                return '内部错误'
+            }
+        }
     }
     async searchName(name: string): Promise<apiSearchNameResponse[]> {
         const url = `${this.baseUrl}searchname`;
