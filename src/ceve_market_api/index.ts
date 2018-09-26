@@ -1,4 +1,5 @@
 import request from 'request'
+import { includes } from 'lodash';
 
 export interface apiMarketResponse {
     sell: {
@@ -44,7 +45,15 @@ export class cCEVEMarketApi {
                     reject(error);
                 }
                 console.log('get market api  successful! ', JSON.stringify(body));
-                resolve(body);
+                if (body.buy && body.sell && body.all) {
+                    resolve(body);
+                } else {
+                    if (includes(body, '502')) {
+                        reject('市场中心暂时失联，原因(502)')
+                    } else {
+                        reject('市场中心暂时失联，原因(返回格式错误)')
+                    }
+                }
             })
         })
         console.timeEnd(`get market api call for ${itemId} end in `)
