@@ -5,7 +5,8 @@ import { startsWith, trim, replace, map, join, forEach, take } from "lodash";
 
 enum opType {
     JITA = '.jita',
-    ADDR = '.addr'
+    ADDR = '.addr',
+    HELP = '.help'
 }
 
 interface tCommand {
@@ -53,7 +54,7 @@ export class cQQBot {
         this.bot = new CQWebSocketFactory(config);
         this.bot.on('socket.connecting', function (wsType: WebsocketType, attempts: number) {
             console.log(`attemp to connect ${wsType} No.${attempts} started`)
-        }).on('socket.connect', function (wsType: WebsocketType, sock:any, attempts: number) {
+        }).on('socket.connect', function (wsType: WebsocketType, sock: any, attempts: number) {
             console.log(`attemp to connect ${wsType} No.${attempts} success`)
         }).on('socket.failed', function (wsType: WebsocketType, attempts: number) {
             console.log(`attemp to connect ${wsType} No.${attempts} failed`)
@@ -82,6 +83,13 @@ export class cQQBot {
                 msg: addr
             }
         }
+        let help = checkStartWith(context.message, ['.help', '。help', '.帮助', '。帮助']);
+        if (help) {
+            return {
+                op: opType.HELP,
+                msg: help
+            }
+        }
         return null
     }
     async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | void> {
@@ -95,6 +103,9 @@ export class cQQBot {
                     break;
                 case opType.ADDR:
                     res = await this.handlerMessageAddr(command.msg, context);
+                    break;
+                case opType.HELP:
+                    res = await this.handlerMessageHelp(command.msg, context);
                     break;
             }
             if (res) {
@@ -153,6 +164,17 @@ export class cQQBot {
             return `https://www.ceve-market.org/home/`
         } else {
             return `我理解不了`
+        }
+    }
+    async handlerMessageHelp(message: string, context: Record<string, any>): Promise<string | null> {
+        if (message.length == 0) {
+            return ".jita (.吉他) 查询市场信息\n"
+                + ".addr (.地址) 查询常用网址 [出勤积分|KB|旗舰导航|市场|5度|合同分析]\n"
+        } else if (message == "version") {
+            let pkg: any = require('./../../package.json')
+            return `版本号:${pkg.version}`
+        }else{
+            return null
         }
     }
 }
