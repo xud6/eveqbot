@@ -95,7 +95,7 @@ export class cItemdb {
     searchByWord(searchQuery: string, itemData: tItemData[]) {
         console.time('Word search complete in ')
         let result = itemData
-        let eWords = words(searchQuery, /(\d+)|(\w+)|[^(?:,&\u000A\u000B\u000C\u000D\u0085\u2028\u2029)]/g);
+        let eWords = compact(words(searchQuery, /(\d+)|(\w+)|[^(?:,&\u000A\u000B\u000C\u000D\u0085\u2028\u2029)]/g));
         console.log('word explode result :' + join(eWords, '|'))
         map(eWords, word => {
             result = filter(result, d => {
