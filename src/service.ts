@@ -1,7 +1,7 @@
 import { cItemdb } from './itemdb/index';
 import { cCEVEMarketApi } from './ceve_market_api/index';
 import { cQQBot } from './bot/index';
-import { CQWebSocketOption } from 'cq-websocket';
+import { CQWebSocketOption } from '@xud6/cq-websocket';
 
 let cqwebConfig:Partial<CQWebSocketOption> = {}
 if(process.env.coolq_host){
@@ -13,9 +13,9 @@ if(process.env.coolq_host){
         cqwebConfig.port = 6700
     }
     if(process.env.coolq_access_token){
-        cqwebConfig.access_token = process.env.coolq_access_token
+        cqwebConfig.accessToken = process.env.coolq_access_token
     }else{
-        cqwebConfig.access_token = ''
+        cqwebConfig.accessToken = ''
     }
 }else{
     console.log('read config from config.json')

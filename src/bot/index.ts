@@ -1,4 +1,4 @@
-import CQWebSocketFactory, { CQWebSocket, CQWebSocketOption, CQEvent, WebsocketType } from "cq-websocket";
+import { CQWebSocket, CQWebSocketOption, CQEvent, WebSocketType } from "@xud6/cq-websocket";
 import { cItemdb, tItemData } from "../itemdb/index";
 import { cCEVEMarketApi } from "../ceve_market_api/index";
 import { startsWith, trim, replace, map, join, forEach, take } from "lodash";
@@ -37,7 +37,7 @@ function formatItemNames(items: tItemData[], div: number = 5) {
 }
 
 export class cQQBot {
-    readonly bot: any //should be CQWebSocket
+    readonly bot: CQWebSocket
     readonly jita = {
         searchContentLimit: 30,
         resultPriceListLimit: 5,
@@ -51,12 +51,12 @@ export class cQQBot {
         readonly itemdb: cItemdb,
         readonly CEVEMarketApi: cCEVEMarketApi
     ) {
-        this.bot = new CQWebSocketFactory(config);
-        this.bot.on('socket.connecting', function (wsType: WebsocketType, attempts: number) {
+        this.bot = new CQWebSocket(config);
+        this.bot.on('socket.connecting', function (wsType: WebSocketType, attempts: number) {
             console.log(`attemp to connect ${wsType} No.${attempts} started`)
-        }).on('socket.connect', function (wsType: WebsocketType, sock: any, attempts: number) {
+        }).on('socket.connect', function (wsType: WebSocketType, sock: any, attempts: number) {
             console.log(`attemp to connect ${wsType} No.${attempts} success`)
-        }).on('socket.failed', function (wsType: WebsocketType, attempts: number) {
+        }).on('socket.failed', function (wsType: WebSocketType, attempts: number) {
             console.log(`attemp to connect ${wsType} No.${attempts} failed`)
         })
 
