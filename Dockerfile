@@ -1,35 +1,33 @@
-# use a node base image
-FROM node:8
+FROM node:12 as builder
+WORKDIR /builder/
+RUN npm config set registry https://repo.hzky.xyz/repository/npm/
+COPY package-lock.json package.json ./
+RUN npm install
+COPY gulpfile.js tsconfig.json ./
+COPY src ./src
+RUN npm run dist
 
-# set maintainer
-LABEL maintainer "email@xdq.me"
-
+FROM node:12-alpine
+ENV NODE_ENV production
 RUN mkdir -p /app
-RUN useradd -rm appDeploy
+RUN addgroup -S appDeploy && adduser -S appDeploy -G appDeploy
 RUN chown -R appDeploy:appDeploy /app
-
 USER appDeploy
-WORKDIR /app
+WORKDIR /app/
+COPY --from=builder /builder/dist ./
+COPY itemdb.xls /builder/dist ./
 
-COPY package.json /app/
-COPY package-lock.json /app/
+ENV KY_DCONENET_WEBSERVER_PORT ''
+ENV KY_DCONENET_WEBSERVER_PREFIX ''
+ENV KY_DCONENET_SENSOR_DATA_CACHE_TIME ''
+ENV KY_DCONENET_NODEID ''
+ENV KY_MQTT_CLIENTS ''
+ENV KY_MQTTC_HOST ''
+ENV KY_MQTTC_PORT ''
+ENV KY_MQTTC_BASETOPIC ''
+ENV KY_MQTTC_USERNAME ''
+ENV KY_MQTTC_PASSWORD ''
 
-RUN npm install --production && npm cache clean --force
+EXPOSE 38001
 
-USER root
-
-RUN npm install pm2 -g && npm cache clean --force
-
-COPY itemdb.xls /app/
-COPY dist /app/dist/
-RUN chown -R appDeploy:appDeploy /app
-
-USER appDeploy
-
-ENV PM2_PUBLIC_KEY ''
-ENV PM2_SECRET_KEY ''
-ENV coolq_host 'localhost'
-ENV coolq_port '6700'
-ENV coolq_access_token ''
-
-CMD ["pm2-runtime", "dist/index.js"]
+CMD npm start
