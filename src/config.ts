@@ -18,7 +18,7 @@ let config: tConfig = {
         username: 'dev',
         password: 'dev',
         host: 'localhost',
-        port: 5432,
+        port: 3306,
         logging: ["error", "schema", "warn", "info", "log"]
     }
 }

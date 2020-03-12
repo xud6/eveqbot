@@ -15,7 +15,7 @@ export default async function connectdb(config: tDatabaseConfig, name?: string):
         ConnectionOption = {
             name: name,
             url: config.url,
-            type: "postgres",
+            type: "mysql",
             entities: [__dirname + "/entity/*{.js,.ts}"],
             migrations: [__dirname + "/migration/*{.js,.ts}"],
             migrationsRun: true,
@@ -28,7 +28,7 @@ export default async function connectdb(config: tDatabaseConfig, name?: string):
     } else {
         ConnectionOption = {
             name: name,
-            type: "postgres",
+            type: "mysql",
             host: config.host,
             port: config.port,
             username: config.username,
