@@ -15,7 +15,7 @@ RUN chown -R appDeploy:appDeploy /app
 USER appDeploy
 WORKDIR /app/
 COPY --from=builder /builder/dist ./
-COPY itemdb.xls /builder/dist ./
+COPY itemdb.xls ./
 
 ENV COOLQ_HOST ''
 ENV COOLQ_PORT ''
