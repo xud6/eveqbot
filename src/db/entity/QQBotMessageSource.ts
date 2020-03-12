@@ -12,7 +12,7 @@ export class QQBotMessageSource {
     source_type: string
 
     @Column({
-        type: "int"
+        type: "bigint"
     })
     source_id: number
 

@@ -12,7 +12,7 @@ export class QQBotMessageLog {
     message: string
 
     @Column({
-        type: "int"
+        type: "bigint"
     })
     message_id: number
 
@@ -23,7 +23,7 @@ export class QQBotMessageLog {
     message_type: string
 
     @Column({
-        type: "int",
+        type: "bigint",
         nullable: true
     })
     group_id: number
@@ -35,7 +35,7 @@ export class QQBotMessageLog {
     atMe: boolean
 
     @Column({
-        type: "int"
+        type: "bigint"
     })
     sender_user_id: number
 
@@ -46,7 +46,7 @@ export class QQBotMessageLog {
     sender_nickname: string
 
     @Column({
-        type: "int"
+        type: "bigint"
     })
     self_id: number
 
