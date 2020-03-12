@@ -4,6 +4,7 @@ import { cCEVEMarketApi } from "../ceve_market_api/index";
 import { startsWith, trim, replace, map, join, forEach, take, toString, toInteger, find } from "lodash";
 import { tLogger } from "tag-tree-logger";
 import { modelQQBotMessageLog } from "../models/modelQQBotMessageLog";
+import { modelQQBotMessageSource } from "../models/modelQQBotMessageSource";
 
 enum opType {
     JITA = '.jita',
@@ -83,10 +84,13 @@ export interface tCQQBotCfg {
     cqwebConfig: Partial<CQWebSocketOption>
 }
 
-export class cQQBotExtService {
-    readonly itemdb: cItemdb
-    readonly CEVEMarketApi: cCEVEMarketApi
-    readonly modelQQBotMessageLog: modelQQBotMessageLog
+export interface cQQBotExtService {
+    itemdb: cItemdb
+    CEVEMarketApi: cCEVEMarketApi
+    models: {
+        modelQQBotMessageLog: modelQQBotMessageLog
+        modelQQBotMessageSource: modelQQBotMessageSource
+    }
 }
 
 export class cQQBot {
@@ -117,8 +121,9 @@ export class cQQBot {
 
         this.bot.on('message', async (event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> => {
             let messageInfo = genMessageInfo(event, context, tags);
+            let messageSource = await this.extService.models.modelQQBotMessageSource.getQQBotMessageSource(messageInfo)
             let pHandlerMessage = this.handlerMessage(event, context)
-            let pMessageLog = this.extService.modelQQBotMessageLog.appendQQBotMessageLog(messageInfo, event, context, tags);
+            let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageInfo, event, context, tags);
             let result = await pHandlerMessage;
             await pMessageLog;
             return result

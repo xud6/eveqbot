@@ -23,7 +23,7 @@ export class eveqbot {
         this.models = new cModels(this.logger, { db: this.db }, {})
         this.itemdb = new cItemdb('itemdb.xls');
         this.CEVEMarketApi = new cCEVEMarketApi();
-        this.bot = new cQQBot(this.logger, { itemdb: this.itemdb, CEVEMarketApi: this.CEVEMarketApi, modelQQBotMessageLog: this.models.modelQQBotMessageLog }, this.config.QQBot);
+        this.bot = new cQQBot(this.logger, { itemdb: this.itemdb, CEVEMarketApi: this.CEVEMarketApi, models: this.models }, this.config.QQBot);
     }
     async startup() {
         await this.db.startup()
