@@ -1,7 +1,8 @@
-import { CQWebSocket, CQWebSocketOption, CQEvent, WebSocketType } from "@xud6/cq-websocket";
+import { CQWebSocket, CQWebSocketOption, CQEvent, WebSocketType, CQTag } from "@xud6/cq-websocket";
 import { cItemdb, tItemData } from "../itemdb/index";
 import { cCEVEMarketApi } from "../ceve_market_api/index";
 import { startsWith, trim, replace, map, join, forEach, take } from "lodash";
+import { tLogger } from "tag-tree-logger";
 
 enum opType {
     JITA = '.jita',
@@ -37,6 +38,7 @@ function formatItemNames(items: tItemData[], div: number = 5) {
 }
 
 export class cQQBot {
+    readonly logger: tLogger
     readonly bot: CQWebSocket
     readonly jita = {
         searchContentLimit: 30,
@@ -47,20 +49,23 @@ export class cQQBot {
         searchContentLimit: 10
     }
     constructor(
+        readonly parentLogger: tLogger, 
         config: Partial<CQWebSocketOption>,
         readonly itemdb: cItemdb,
         readonly CEVEMarketApi: cCEVEMarketApi
     ) {
+        this.logger = parentLogger.logger(["QQBot"])
         this.bot = new CQWebSocket(config);
         this.bot.on('socket.connecting', function (wsType: WebSocketType, attempts: number) {
-            console.log(`attemp to connect ${wsType} No.${attempts} started`)
+            this.logger.info(`attemp to connect ${wsType} No.${attempts} started`)
         }).on('socket.connect', function (wsType: WebSocketType, sock: any, attempts: number) {
-            console.log(`attemp to connect ${wsType} No.${attempts} success`)
+            this.logger.info(`attemp to connect ${wsType} No.${attempts} success`)
         }).on('socket.failed', function (wsType: WebSocketType, attempts: number) {
-            console.log(`attemp to connect ${wsType} No.${attempts} failed`)
+            this.logger.info(`attemp to connect ${wsType} No.${attempts} failed`)
         })
 
-        this.bot.on('message', async (event: CQEvent, context: Record<string, any>): Promise<string | void> => {
+        this.bot.on('message', async (event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> => {
+            
             return await this.handlerMessage(event, context)
         })
     }
@@ -96,7 +101,7 @@ export class cQQBot {
         let command = await this.checkMessage(event, context);
         if (command) {
             let res: string | null = null
-            console.log(`Command [${command.op}] with [${command.msg}] from [${context.user_id}]`);
+            this.logger.info(`Command [${command.op}] with [${command.msg}] from [${context.user_id}]`);
             switch (command.op) {
                 case opType.JITA:
                     res = await this.handlerMessageJita(command.msg, context);
@@ -115,16 +120,16 @@ export class cQQBot {
     }
     async handlerMessageJita(message: string, context: Record<string, any>): Promise<string | null> {
         if (message.length > this.jita.searchContentLimit) {
-            console.log(`search content too long from [${context.user_id}]`)
+            this.logger.info(`search content too long from [${context.user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.jita.searchContentLimit}`
         }
 
         let items = this.itemdb.search(message)
         if (items.length == 0) {
-            console.log(`找不到 ${message}`)
+            this.logger.info(`找不到 ${message}`)
             return '找不到该物品'
         } else if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
-            console.log("搜索结果为：" + join(map(items, item => {
+            this.logger.info("搜索结果为：" + join(map(items, item => {
                 return item.name
             }), "/"))
             let marketdata: string[] = await Promise.all(items.map(async item => {
@@ -134,8 +139,8 @@ export class cQQBot {
             return join(marketdata, "\n");
         } else {
             let front = take(items, this.jita.resultNameListLimit);
-            console.log(`搜索结果过多: ${items.length}`)
-            console.log("搜索结果为：" + join(map(items, item => {
+            this.logger.info(`搜索结果过多: ${items.length}`)
+            this.logger.info("搜索结果为：" + join(map(items, item => {
                 return item.name
             }), "/"))
             let res = `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n` + formatItemNames(front);
@@ -147,7 +152,7 @@ export class cQQBot {
     }
     async handlerMessageAddr(message: string, context: Record<string, any>): Promise<string | null> {
         if (message.length > this.addr.searchContentLimit) {
-            console.log(`search content too long from [${context.user_id}]`)
+            this.logger.info(`search content too long from [${context.user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.addr.searchContentLimit}`
         }
         if (message.includes('出勤') || message.includes('积分')) {

@@ -12,18 +12,20 @@ export interface eveqbotExtService {
 
 }
 export class eveqbot {
+    readonly logger: tLogger
     itemdb: cItemdb
     CEVEMarketApi: cCEVEMarketApi
     bot: cQQBot
     constructor(readonly parentLogger: tLogger, readonly extService: eveqbotExtService, readonly config: tEveqbotConfig) {
+        this.logger = parentLogger.logger(["eveqbot"])
         this.itemdb = new cItemdb('itemdb.xls');
         this.CEVEMarketApi = new cCEVEMarketApi();
-        this.bot = new cQQBot(this.config.cqwebConfig, this.itemdb, this.CEVEMarketApi);
+        this.bot = new cQQBot(this.logger, this.config.cqwebConfig, this.itemdb, this.CEVEMarketApi);
     }
-    async startup(){
+    async startup() {
         await this.bot.startup()
     }
-    async shutdown(){
+    async shutdown() {
 
     }
 }
