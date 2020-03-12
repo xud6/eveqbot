@@ -29,6 +29,12 @@ export class QQBotMessageLog {
     group_id: number
 
     @Column({
+        type: "boolean",
+        default: false
+    })
+    atMe: boolean
+
+    @Column({
         type: "int"
     })
     sender_user_id: number

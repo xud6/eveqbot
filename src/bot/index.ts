@@ -1,7 +1,7 @@
 import { CQWebSocket, CQWebSocketOption, CQEvent, WebSocketType, CQTag } from "@xud6/cq-websocket";
 import { cItemdb, tItemData } from "../itemdb/index";
 import { cCEVEMarketApi } from "../ceve_market_api/index";
-import { startsWith, trim, replace, map, join, forEach, take, toString, toInteger } from "lodash";
+import { startsWith, trim, replace, map, join, forEach, take, toString, toInteger, find } from "lodash";
 import { tLogger } from "tag-tree-logger";
 import { modelQQBotMessageLog } from "../models/modelQQBotMessageLog";
 
@@ -46,6 +46,24 @@ export interface tMessageInfo {
     sender_user_id: number
     sender_nickname: string
     self_id: number
+    atMe: boolean
+}
+
+function genMessageInfoAtMe(event: CQEvent, context: Record<string, any>, tags: CQTag[]): boolean {
+    let self_id = toInteger(context.self_id);
+    let at = find(tags, function (tag) {
+        if (tag.tagName === "at") {
+            if (tag.data.qq === self_id) {
+                return true
+            }
+        }
+        return false
+    })
+    if (at) {
+        return true
+    } else {
+        return false
+    }
 }
 
 function genMessageInfo(event: CQEvent, context: Record<string, any>, tags: CQTag[]): tMessageInfo {
@@ -56,7 +74,8 @@ function genMessageInfo(event: CQEvent, context: Record<string, any>, tags: CQTa
         group_id: context.group_id ? toInteger(context.group_id) : undefined,
         sender_user_id: toInteger(context.sender.user_id),
         sender_nickname: toString(context.sender.nickname),
-        self_id: toInteger(context.self_id)
+        self_id: toInteger(context.self_id),
+        atMe: genMessageInfoAtMe(event, context, tags)
     }
 }
 

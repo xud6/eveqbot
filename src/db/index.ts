@@ -23,7 +23,8 @@ export default async function connectdb(config: tDatabaseConfig, name?: string):
             //entityPrefix: "test_",
             synchronize: false,
             entityPrefix: config.prefix,
-            logging: config.logging
+            logging: config.logging,
+            charset: "utf8mb4_unicode_ci"
         }
     } else {
         ConnectionOption = {
@@ -41,7 +42,8 @@ export default async function connectdb(config: tDatabaseConfig, name?: string):
             //entityPrefix: "test_",
             synchronize: false,
             entityPrefix: config.prefix,
-            logging: config.logging
+            logging: config.logging,
+            charset: "utf8mb4_unicode_ci"
         }
     }
 
