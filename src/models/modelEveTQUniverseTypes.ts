@@ -89,6 +89,31 @@ export class modelEveTQUniverseTypes implements tModelBase {
                 id: id
             }
             let changed = false;
+
+            if (record.graphic_id !== en_raw.graphic_id || null) {
+                record.graphic_id = en_raw.graphic_id || null;
+                changed = true;
+            }
+            if (record.group_id !== en_raw.group_id) {
+                record.group_id = en_raw.group_id;
+                changed = true;
+            }
+            if (record.icon_id !== en_raw.icon_id || null) {
+                record.icon_id = en_raw.icon_id || null;
+                changed = true;
+            }
+            if (record.market_group_id !== en_raw.market_group_id || null) {
+                record.market_group_id = en_raw.market_group_id || null;
+                changed = true;
+            }
+            if (record.published !== en_raw.published) {
+                record.published = en_raw.published;
+                changed = true;
+            }
+            if (record.type_id !== en_raw.type_id) {
+                record.type_id = en_raw.type_id;
+                changed = true;
+            }
             if (record.en_name !== en_raw.name) {
                 record.en_name = en_raw.name;
                 changed = true;
