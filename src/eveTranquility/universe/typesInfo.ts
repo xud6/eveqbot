@@ -76,7 +76,7 @@ export class eveTypesInfo {
             }
             if (currentPageIds) {
                 if (currentPageIds.length > 0) {
-                    ids.concat(currentPageIds);
+                    ids = ids.concat(currentPageIds);
                     currentPage++;
                     processContinuse = true;
                 }
