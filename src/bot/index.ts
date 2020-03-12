@@ -49,23 +49,25 @@ export class cQQBot {
         searchContentLimit: 10
     }
     constructor(
-        readonly parentLogger: tLogger, 
+        readonly parentLogger: tLogger,
         config: Partial<CQWebSocketOption>,
         readonly itemdb: cItemdb,
         readonly CEVEMarketApi: cCEVEMarketApi
     ) {
         this.logger = parentLogger.logger(["QQBot"])
         this.bot = new CQWebSocket(config);
-        this.bot.on('socket.connecting', function (wsType: WebSocketType, attempts: number) {
+        this.bot.on('socket.connecting', (wsType: WebSocketType, attempts: number) => {
             this.logger.info(`attemp to connect ${wsType} No.${attempts} started`)
-        }).on('socket.connect', function (wsType: WebSocketType, sock: any, attempts: number) {
+        }).on('socket.connect', (wsType: WebSocketType, sock: any, attempts: number) => {
             this.logger.info(`attemp to connect ${wsType} No.${attempts} success`)
-        }).on('socket.failed', function (wsType: WebSocketType, attempts: number) {
+        }).on('socket.failed', (wsType: WebSocketType, attempts: number) => {
             this.logger.info(`attemp to connect ${wsType} No.${attempts} failed`)
         })
 
         this.bot.on('message', async (event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> => {
-            
+            this.logger.info(event)
+            this.logger.info(context)
+            this.logger.info(tags)
             return await this.handlerMessage(event, context)
         })
     }
