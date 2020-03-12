@@ -102,22 +102,36 @@ export class eveTypesInfo {
         let ids = await this.retry(() => {
             return this.apiGetTypeId(page)
         }, this.apiRetry)
+
+        let processedId = -1;
+        try {
+            let record = await this.extService.models.modelKvs.get('runTaskUpdateTypeInfosProcessedId')
+            if (record) {
+                processedId = parseInt(record)
+            }
+        } catch (e) { }
+
         for (let id of ids) {
-            try {
-                this.logger.info(`process data for type ${id}`)
-                let enData = await this.retry(() => {
-                    return this.apiGetTypeData(id, "en-us");
-                }, this.apiRetry)
-                let cnData = await this.retry(() => {
-                    return this.apiGetTypeData(id, "zh");
-                }, this.apiRetry)
-                this.extService.models.modelEveTQUniverseTypes.set(
-                    id,
-                    enData.name, enData.description, enData,
-                    cnData.name, cnData.description, cnData
-                )
-            } catch (e) {
-                this.logger.warn(e)
+            if (id > processedId) {
+                try {
+                    this.logger.info(`process data for type ${id}`)
+                    let enData = await this.retry(() => {
+                        return this.apiGetTypeData(id, "en-us");
+                    }, this.apiRetry)
+                    let cnData = await this.retry(() => {
+                        return this.apiGetTypeData(id, "zh");
+                    }, this.apiRetry)
+                    this.extService.models.modelEveTQUniverseTypes.set(
+                        id,
+                        enData.name, enData.description, enData,
+                        cnData.name, cnData.description, cnData
+                    )
+                    this.extService.models.modelKvs.set('runTaskUpdateTypeInfosProcessedId', id.toString())
+                } catch (e) {
+                    this.logger.warn(e)
+                }
+            } else {
+                this.logger.info(`skip process data for type ${id}, bacause it's less than ${processedId}`)
             }
         }
         this.logger.info(`${opId}| finish process type page ${page}`)
