@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from "typeorm";
 import { CQTag, CQEvent } from "@xud6/cq-websocket";
 
 @Entity()
@@ -14,4 +14,7 @@ export class QQBotMessageLog {
 
     @Column("simple-json")
     raw_tags: CQTag[]
+
+    @UpdateDateColumn()
+    updateDate: Date;
 }
