@@ -57,10 +57,10 @@ export class eveTypesInfo {
             this.timerTaskUpdateTypeInfosLock = true
             try {
                 let runTaskUpdateTypeInfos = await this.extService.models.modelKvs.get("runTaskUpdateTypeInfos");
-                if (runTaskUpdateTypeInfos === "SCHEDULE" || runTaskUpdateTypeInfos === "FAILED" || runTaskUpdateTypeInfos === "YES" || runTaskUpdateTypeInfos === null) {
+                if (runTaskUpdateTypeInfos === "SCHEDULE" || runTaskUpdateTypeInfos === "YES" || runTaskUpdateTypeInfos === null) {
                     this.logger.info(`TaskUpdateTypeInfos started`)
                     await this.populateTypesDatabase()
-                    this.extService.models.modelKvs.set("runTaskUpdateTypeInfos", "FAILED")
+                    this.extService.models.modelKvs.set("runTaskUpdateTypeInfos", "SUCCESS")
                 }
             } catch (e) {
                 this.logger.error(e)
@@ -126,14 +126,24 @@ export class eveTypesInfo {
     async populateTypesDatabase() {
         let inProcess = true;
         let currentPage = 1;
+        try {
+            let record = await this.extService.models.modelKvs.get('runTaskUpdateTypeInfosProcessedPage')
+            if (record) {
+                currentPage = parseInt(record) + 1;
+            }
+        } catch (e) { }
+
         while (inProcess) {
             inProcess = false;
             let ids = await this.retry(() => {
                 return this.processTypesPage(currentPage)
             }, 3)
             if (ids.length > 0) {
+                await this.extService.models.modelKvs.set('runTaskUpdateTypeInfosProcessedPage', currentPage.toString())
                 currentPage++;
                 inProcess = true;
+            } else {
+                await this.extService.models.modelKvs.set('runTaskUpdateTypeInfosProcessedPage', null)
             }
         }
     }
