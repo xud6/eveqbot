@@ -14,14 +14,6 @@ export class eveTQUniverseTypes {
     en_name: string
 
     @Column({
-        type: "text"
-    })
-    en_description: string
-
-    @Column("simple-json")
-    en_raw: any
-
-    @Column({
         type: "varchar",
         length: 200
     })
@@ -30,7 +22,15 @@ export class eveTQUniverseTypes {
     @Column({
         type: "text"
     })
+    en_description: string
+
+    @Column({
+        type: "text"
+    })
     cn_description: string
+
+    @Column("simple-json")
+    en_raw: any
 
     @Column("simple-json")
     cn_raw: any
