@@ -24,7 +24,8 @@ export class QQBotMessageLog {
 
     @Column({
         type: "bigint",
-        nullable: true
+        nullable: true,
+        default: null
     })
     group_id: number
 
