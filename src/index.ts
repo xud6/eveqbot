@@ -1,5 +1,5 @@
-import { cItemdb } from './itemdb/index';
-import { cCEVEMarketApi } from './ceve_market_api/index';
+import { cItemdb } from './eveSerenity/itemdb/index';
+import { cCEVEMarketApi } from './eveSerenity/ceve_market_api/index';
 import { cQQBot } from './bot/index';
 import { CQWebSocketOption } from '@xud6/cq-websocket';
 import { tLogger } from "tag-tree-logger";

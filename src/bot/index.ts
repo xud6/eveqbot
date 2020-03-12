@@ -1,6 +1,6 @@
 import { CQWebSocket, CQWebSocketOption, CQEvent, WebSocketType, CQTag } from "@xud6/cq-websocket";
-import { cItemdb, tItemData } from "../itemdb/index";
-import { cCEVEMarketApi } from "../ceve_market_api/index";
+import { cItemdb, tItemData } from "../eveSerenity/itemdb/index";
+import { cCEVEMarketApi } from "../eveSerenity/ceve_market_api/index";
 import { startsWith, trim, replace, map, join, forEach, take, toString, toInteger, find } from "lodash";
 import { tLogger } from "tag-tree-logger";
 import { modelQQBotMessageLog } from "../models/modelQQBotMessageLog";
