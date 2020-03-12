@@ -2,9 +2,9 @@
    "type": "mysql",
    "host": "localhost",
    "port": 3306,
-   "username": "test",
-   "password": "test",
-   "database": "test",
+   "username": "dev",
+   "password": "dev",
+   "database": "dev-eveqbot",
    "synchronize": true,
    "logging": false,
    "entities": [
