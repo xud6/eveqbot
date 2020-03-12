@@ -36,11 +36,11 @@ export class eveTypesInfo {
         if (this.timerTaskUpdateTypeInfosLock === false) {
             this.timerTaskUpdateTypeInfosLock = true
             let runTaskUpdateTypeInfos = await this.extService.models.modelKvs.get("runTaskUpdateTypeInfos");
-            if (runTaskUpdateTypeInfos === "SCHEDULE" || runTaskUpdateTypeInfos === "YES" || runTaskUpdateTypeInfos === null) {
+            if (runTaskUpdateTypeInfos === "SCHEDULE" || runTaskUpdateTypeInfos === "FAILED" || runTaskUpdateTypeInfos === "YES" || runTaskUpdateTypeInfos === null) {
                 this.logger.info(`TaskUpdateTypeInfos started`)
                 let ids = await this.getTypeIds()
                 this.logger.info(ids)
-                // this.extService.models.modelKvs.set("runTaskUpdateTypeInfos", "IDLE")
+                this.extService.models.modelKvs.set("runTaskUpdateTypeInfos", "FAILED")
             }
 
             this.timerTaskUpdateTypeInfosLock = false
