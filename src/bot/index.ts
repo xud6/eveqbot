@@ -3,6 +3,7 @@ import { cItemdb, tItemData } from "../itemdb/index";
 import { cCEVEMarketApi } from "../ceve_market_api/index";
 import { startsWith, trim, replace, map, join, forEach, take } from "lodash";
 import { tLogger } from "tag-tree-logger";
+import { modelQQBotMessageLog } from "../models/modelQQBotMessageLog";
 
 enum opType {
     JITA = '.jita',
@@ -44,6 +45,7 @@ export interface tCQQBotCfg {
 export class cQQBotExtService {
     readonly itemdb: cItemdb
     readonly CEVEMarketApi: cCEVEMarketApi
+    readonly modelQQBotMessageLog: modelQQBotMessageLog
 }
 
 export class cQQBot {
@@ -73,13 +75,11 @@ export class cQQBot {
         })
 
         this.bot.on('message', async (event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> => {
-            this.logger.info("event")
-            this.logger.info(event)
-            this.logger.info("context")
-            this.logger.info(context)
-            this.logger.info("tags")
-            this.logger.info(tags)
-            return await this.handlerMessage(event, context)
+            let pHandlerMessage = this.handlerMessage(event, context)
+            let pMessageLog = this.extService.modelQQBotMessageLog.appendQQBotMessageLog(event, context, tags);
+            let result = await pHandlerMessage;
+            await pMessageLog;
+            return result
         })
     }
     async startup() {
