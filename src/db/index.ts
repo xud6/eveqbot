@@ -1,21 +1,85 @@
 import "reflect-metadata";
-import {createConnection} from "typeorm";
-import {User} from "./entity/User";
+import { createConnection, Connection, ObjectType, Repository, EntitySchema, ConnectionOptions } from "typeorm";
+import { v1 as uuidv1 } from 'uuid';
+import { tLogger } from 'tag-tree-logger';
+import { tDatabaseConfig } from "../types";
 
-createConnection().then(async connection => {
+export default async function connectdb(config: tDatabaseConfig, name?: string): Promise<Connection> {
+    if (!name) {
+        name = uuidv1();
+    }
 
-    console.log("Inserting a new user into the database...");
-    const user = new User();
-    user.firstName = "Timber";
-    user.lastName = "Saw";
-    user.age = 25;
-    await connection.manager.save(user);
-    console.log("Saved a new user with id: " + user.id);
+    let ConnectionOption: ConnectionOptions
 
-    console.log("Loading users from the database...");
-    const users = await connection.manager.find(User);
-    console.log("Loaded users: ", users);
+    if (config.url) {
+        ConnectionOption = {
+            name: name,
+            url: config.url,
+            type: "postgres",
+            entities: [__dirname + "/entity/*{.js,.ts}"],
+            migrations: [__dirname + "/migration/*{.js,.ts}"],
+            migrationsRun: true,
+            // cache: true,
+            //entityPrefix: "test_",
+            synchronize: false,
+            entityPrefix: config.prefix,
+            logging: config.logging
+        }
+    } else {
+        ConnectionOption = {
+            name: name,
+            type: "postgres",
+            host: config.host,
+            port: config.port,
+            username: config.username,
+            password: config.password,
+            database: config.database,
+            entities: [__dirname + "/entity/*{.js,.ts}"],
+            migrations: [__dirname + "/migration/*{.js,.ts}"],
+            migrationsRun: true,
+            // cache: true,
+            //entityPrefix: "test_",
+            synchronize: false,
+            entityPrefix: config.prefix,
+            logging: config.logging
+        }
+    }
 
-    console.log("Here you can setup and run express/koa/any other framework.");
+    return await createConnection(ConnectionOption)
+}
 
-}).catch(error => console.log(error));
+export class typeormdb {
+    readonly logger: tLogger
+    readonly pConnection: Promise<Connection>
+    private resolveGetConnection: ((value?: Connection | PromiseLike<Connection> | undefined) => void) | null = null
+    constructor(readonly parentLogger: tLogger, readonly config: tDatabaseConfig) {
+        this.logger = parentLogger.logger(["typeormdb"])
+        this.pConnection = new Promise((resolve) => {
+            this.resolveGetConnection = resolve
+        })        //connectdb(config);
+    }
+    async startup() {
+        let conn = await connectdb(this.config);
+        if (this.resolveGetConnection === null) {
+            this.logger.fault("db init error")
+            throw new Error("db init error")
+        }
+        this.resolveGetConnection(conn)
+    }
+    readonly getConnection = async (): Promise<Connection> => {
+        return await this.pConnection
+    }
+    /**
+     * safe to pass directly
+     */
+    readonly getRepository = async <Entity>(repo: ObjectType<Entity> | EntitySchema<Entity> | string): Promise<Repository<Entity>> => {
+        let connection = await this.pConnection
+        return await connection.getRepository(repo)
+    }
+    /**
+     * safe to pass directly
+     */
+    readonly inited = (): Promise<Connection> => {
+        return this.pConnection
+    }
+}

@@ -37,6 +37,10 @@ function formatItemNames(items: tItemData[], div: number = 5) {
     }), " | ")
 }
 
+export interface tCQQBotCfg {
+    cqwebConfig: Partial<CQWebSocketOption>
+}
+
 export class cQQBotExtService {
     readonly itemdb: cItemdb
     readonly CEVEMarketApi: cCEVEMarketApi
@@ -56,10 +60,10 @@ export class cQQBot {
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: cQQBotExtService,
-        readonly config: Partial<CQWebSocketOption>,
+        readonly config: tCQQBotCfg,
     ) {
         this.logger = parentLogger.logger(["QQBot"])
-        this.bot = new CQWebSocket(config);
+        this.bot = new CQWebSocket(config.cqwebConfig);
         this.bot.on('socket.connecting', (wsType: WebSocketType, attempts: number) => {
             this.logger.info(`attemp to connect ${wsType} No.${attempts} started`)
         }).on('socket.connect', (wsType: WebSocketType, sock: any, attempts: number) => {
@@ -69,8 +73,11 @@ export class cQQBot {
         })
 
         this.bot.on('message', async (event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> => {
+            this.logger.info("event")
             this.logger.info(event)
+            this.logger.info("context")
             this.logger.info(context)
+            this.logger.info("tags")
             this.logger.info(tags)
             return await this.handlerMessage(event, context)
         })

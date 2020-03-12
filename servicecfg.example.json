@@ -1,9 +1,12 @@
 {
-    "eveqbot": {
+    "QQBot": {
         "cqwebConfig": {
-            "host": "127.0.0.1",
-            "port": 6700,
+            "host": "localhost",
+            "port": 6900,
             "accessToken": ""
         }
+    },
+    "db": {
+        "host": "localhost"
     }
 }

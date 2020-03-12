@@ -53,7 +53,7 @@ async function startNode() {
             }
         }
         globalLogger.info('--------collector is starting--------');
-        bot = new eveqbot(sLogger, {}, config.eveqbot)
+        bot = new eveqbot(sLogger, {}, config)
         await bot.startup()
         globalLogger.info('--------collector start success--------');
     } catch (e) {
