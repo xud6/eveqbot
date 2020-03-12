@@ -31,8 +31,10 @@
   },
   "dependencies": {
     "@xud6/cq-websocket": "^2.1.2",
+    "@xud6/dump-to-file-sync": "^2.0.1",
     "lodash": "^4.17.11",
     "request": "^2.88.0",
+    "tag-tree-logger": "^1.2.0",
     "xlsx": "^0.14.0"
   }
 }

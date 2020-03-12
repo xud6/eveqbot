@@ -1,29 +1,66 @@
-import { cItemdb } from './itemdb/index';
-import { cCEVEMarketApi } from './ceve_market_api/index';
-import { cQQBot } from './bot/index';
-import { CQWebSocketOption } from '@xud6/cq-websocket';
+import { logger, logDriverConsole } from 'tag-tree-logger';
 
-let cqwebConfig:Partial<CQWebSocketOption> = {}
-if(process.env.coolq_host){
-    console.log('read config from env')
-    cqwebConfig.host = process.env.coolq_host;
-    if(process.env.coolq_port){
-        cqwebConfig.port = parseInt(process.env.coolq_port)
-    }else{
-        cqwebConfig.port = 6700
+let sLogger = new logger([new logDriverConsole()], []);
+let globalLogger = sLogger.logger(['global'])
+
+globalLogger.info(`======Finish init logging system======`)
+
+import dumpToFileSync from '@xud6/dump-to-file-sync'
+import util from 'util'
+process.on('unhandledRejection', (reason, p) => {
+    dumpToFileSync((new Date).toISOString() + "\n----------\n" + util.format(reason) + "\n----------\n" + util.format(p), 'unhandledRejection')
+    globalLogger.error('Unhandled Rejection ' + util.format(reason));
+    globalLogger.error(util.format(p))
+    // application specific logging, throwing an error, or other logic here
+});
+
+globalLogger.info(`======loading config======`)
+
+import config from './config'
+
+globalLogger.info(`===  current config  ===`)
+globalLogger.info(config)
+globalLogger.info(`========================`)
+
+globalLogger.info(`======loading modules======`)
+
+import { eveqbot } from './index';
+
+let bot: eveqbot | undefined
+
+process.on('SIGINT', async function () {
+    globalLogger.info("\ngracefully shutting down from SIGINT (Crtl-C)")
+    setTimeout(() => {
+        console.log("force shutdown after timeout")
+        process.exit()
+    }, 1000 * 10)
+    if (bot) {
+        await bot.shutdown()
+        globalLogger.info("node successfuly shutdown");
     }
-    if(process.env.coolq_access_token){
-        cqwebConfig.accessToken = process.env.coolq_access_token
-    }else{
-        cqwebConfig.accessToken = ''
+    process.exit()
+})
+
+async function startNode() {
+    try {
+        globalLogger.info('--------set logger tags--------');
+        for (let logTagCfg of config.logger) {
+            globalLogger.info(config)
+            if (logTagCfg.state) {
+                sLogger.logEnable([logTagCfg.name])
+            } else {
+                sLogger.logDisable([logTagCfg.name])
+            }
+        }
+        globalLogger.info('--------collector is starting--------');
+        bot = new eveqbot(sLogger, {}, config.eveqbot)
+        await bot.startup()
+        globalLogger.info('--------collector start success--------');
+    } catch (e) {
+        globalLogger.error(e);
+        dumpToFileSync((new Date).toISOString() + "\n----------\n" + util.format(e), 'Collector-Crash')
+        globalLogger.fault('collector startup failed!!!!!!');
     }
-}else{
-    console.log('read config from config.json')
-    cqwebConfig = require('./../config.json')
 }
 
-console.log(cqwebConfig)
-let itemdb = new cItemdb('itemdb.xls');
-let CEVEMarketApi = new cCEVEMarketApi();
-let bot = new cQQBot(cqwebConfig, itemdb, CEVEMarketApi);
-bot.startup();
+startNode();

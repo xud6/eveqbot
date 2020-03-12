@@ -64,7 +64,7 @@ export class cQQBot {
             return await this.handlerMessage(event, context)
         })
     }
-    startup() {
+    async startup() {
         this.bot.connect()
     }
 
