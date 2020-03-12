@@ -5,7 +5,7 @@
    "username": "dev",
    "password": "dev",
    "database": "dev-eveqbot",
-   "synchronize": true,
+   "synchronize": false,
    "logging": false,
    "entities": [
       "src/db/entity/**/*.ts"
