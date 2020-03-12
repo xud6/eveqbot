@@ -49,7 +49,7 @@ export class eveTypesInfo {
     async apiGetTypeId(page: number) {
         let url = `https://esi.evetech.net/v1/universe/types/?datasource=${this.datasource}&page=${page}`
         this.logger.info(`read TypeId page ${page} | ${url}`)
-        let result = await fetch(url)
+        let result = await fetch(url, { timeout: 1000 * 20 })
         if (result.ok) {
             return result.json()
         } else {
