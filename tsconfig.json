@@ -1,9 +1,11 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "noImplicitAny": true,
-        "target": "es2015",
-        "esModuleInterop":true,
-        "strictNullChecks":true
-    }
+   "compilerOptions": {
+      "module": "commonjs",
+      "noImplicitAny": true,
+      "target": "es2015",
+      "esModuleInterop": true,
+      "strictNullChecks": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+   }
 }
