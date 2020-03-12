@@ -1,6 +1,5 @@
 FROM node:12 as builder
 WORKDIR /builder/
-RUN npm config set registry https://repo.hzky.xyz/repository/npm/
 COPY package-lock.json package.json ./
 RUN npm install
 COPY gulpfile.js tsconfig.json ./
