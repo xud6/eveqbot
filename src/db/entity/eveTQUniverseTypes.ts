@@ -8,6 +8,23 @@ export class eveTQUniverseTypes {
     id: number;
 
     @Column({
+        type: "bigint"
+    })
+    group_id: number
+
+    @Column({
+        type: "bigint",
+        nullable: true,
+        default: null
+    })
+    market_group_id: number
+
+    @Column({
+        type: "boolean",
+    })
+    published: boolean
+
+    @Column({
         type: "varchar",
         length: 200
     })
@@ -34,4 +51,23 @@ export class eveTQUniverseTypes {
 
     @Column("simple-json")
     cn_raw: any
+
+    @Column({
+        type: "bigint",
+        nullable: true,
+        default: null
+    })
+    graphic_id: number | null
+
+    @Column({
+        type: "bigint",
+        nullable: true,
+        default: null
+    })
+    icon_id: number | null
+
+    @Column({
+        type: "bigint",
+    })
+    type_id: number
 }

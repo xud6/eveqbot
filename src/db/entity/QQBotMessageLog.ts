@@ -27,7 +27,7 @@ export class QQBotMessageLog {
         nullable: true,
         default: null
     })
-    group_id: number
+    group_id: number | null
 
     @Column({
         type: "boolean",

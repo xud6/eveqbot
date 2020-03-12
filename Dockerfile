@@ -1,6 +1,5 @@
 FROM node:12 as builder
 WORKDIR /builder/
-RUN npm config set registry https://repo.hzky.xyz/repository/npm/
 COPY package-lock.json package.json ./
 RUN npm install
 COPY gulpfile.js tsconfig.json ./
@@ -15,7 +14,7 @@ RUN chown -R appDeploy:appDeploy /app
 USER appDeploy
 WORKDIR /app/
 COPY --from=builder /builder/dist ./
-COPY itemdb.xls /builder/dist ./
+COPY itemdb.xls ./
 
 ENV COOLQ_HOST ''
 ENV COOLQ_PORT ''
