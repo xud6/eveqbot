@@ -20,7 +20,7 @@ export class eveqbot {
         this.logger = parentLogger.logger(["eveqbot"])
         this.itemdb = new cItemdb('itemdb.xls');
         this.CEVEMarketApi = new cCEVEMarketApi();
-        this.bot = new cQQBot(this.logger, this.config.cqwebConfig, this.itemdb, this.CEVEMarketApi);
+        this.bot = new cQQBot(this.logger, { itemdb: this.itemdb, CEVEMarketApi: this.CEVEMarketApi }, this.config.cqwebConfig);
     }
     async startup() {
         await this.bot.startup()

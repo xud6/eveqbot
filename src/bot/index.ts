@@ -37,6 +37,11 @@ function formatItemNames(items: tItemData[], div: number = 5) {
     }), " | ")
 }
 
+export class cQQBotExtService {
+    readonly itemdb: cItemdb
+    readonly CEVEMarketApi: cCEVEMarketApi
+}
+
 export class cQQBot {
     readonly logger: tLogger
     readonly bot: CQWebSocket
@@ -50,9 +55,8 @@ export class cQQBot {
     }
     constructor(
         readonly parentLogger: tLogger,
-        config: Partial<CQWebSocketOption>,
-        readonly itemdb: cItemdb,
-        readonly CEVEMarketApi: cCEVEMarketApi
+        readonly extService: cQQBotExtService,
+        readonly config: Partial<CQWebSocketOption>,
     ) {
         this.logger = parentLogger.logger(["QQBot"])
         this.bot = new CQWebSocket(config);
@@ -126,7 +130,7 @@ export class cQQBot {
             return `查询内容过长，当前共${message.length}个字符，最大${this.jita.searchContentLimit}`
         }
 
-        let items = this.itemdb.search(message)
+        let items = this.extService.itemdb.search(message)
         if (items.length == 0) {
             this.logger.info(`找不到 ${message}`)
             return '找不到该物品'
@@ -135,7 +139,7 @@ export class cQQBot {
                 return item.name
             }), "/"))
             let marketdata: string[] = await Promise.all(items.map(async item => {
-                let market = await this.CEVEMarketApi.getMarketString(item.itemId.toString())
+                let market = await this.extService.CEVEMarketApi.getMarketString(item.itemId.toString())
                 return `${item.name} --- ${market}`;
             }))
             return join(marketdata, "\n");
