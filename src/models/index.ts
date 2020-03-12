@@ -4,6 +4,7 @@ import { tModelsExtService, tModelsConfig } from "./types";
 import { modelQQBotMessageLog } from "./modelQQBotMessageLog";
 import { modelQQBotMessageSource } from "./modelQQBotMessageSource";
 import { modelKvs } from "./modelKvs";
+import { modelEveTQUniverseTypes } from "./modelEveTQUniverseTypes";
 
 export class cModels {
     readonly logger: tLogger
@@ -11,6 +12,7 @@ export class cModels {
     modelQQBotMessageLog: modelQQBotMessageLog
     modelQQBotMessageSource: modelQQBotMessageSource
     modelKvs: modelKvs
+    modelEveTQUniverseTypes: modelEveTQUniverseTypes
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
@@ -24,6 +26,8 @@ export class cModels {
         this.models.push(this.modelQQBotMessageSource)
         this.modelKvs = new modelKvs(this.logger, this.extService);
         this.models.push(this.modelKvs)
+        this.modelEveTQUniverseTypes = new modelEveTQUniverseTypes(this.logger, this.extService);
+        this.models.push(this.modelEveTQUniverseTypes)
     }
     async startup() {
         for (let model of this.models) {
