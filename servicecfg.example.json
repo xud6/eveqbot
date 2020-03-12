@@ -7,6 +7,6 @@
         }
     },
     "db": {
-        "host": "localhost"
+        "url": "mysql://dev:dev@localhost/dev_eveqbot"
     }
 }

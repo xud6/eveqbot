@@ -14,7 +14,7 @@ let config: tConfig = {
         }
     },
     db: {
-        database: 'dev-eveqbot',
+        database: 'dev_eveqbot',
         username: 'dev',
         password: 'dev',
         host: 'localhost',
@@ -56,4 +56,8 @@ if (process.env.COOLQ_ACCESS_TOKEN && (process.env.COOLQ_ACCESS_TOKEN.length > 0
     console.log(`read COOLQ_ACCESS_TOKEN from env`);
 }
 
+if (process.env.DB_URL && (process.env.DB_URL.length > 0)) {
+    config.db.url = process.env.DB_URL;
+    console.log(`read DB_URL from env`);
+}
 export default config;
