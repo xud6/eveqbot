@@ -1,7 +1,7 @@
 import { CQWebSocket, CQWebSocketOption, CQEvent, WebSocketType, CQTag } from "@xud6/cq-websocket";
 import { cItemdb, tItemData } from "../itemdb/index";
 import { cCEVEMarketApi } from "../ceve_market_api/index";
-import { startsWith, trim, replace, map, join, forEach, take } from "lodash";
+import { startsWith, trim, replace, map, join, forEach, take, toString, toInteger } from "lodash";
 import { tLogger } from "tag-tree-logger";
 import { modelQQBotMessageLog } from "../models/modelQQBotMessageLog";
 
@@ -36,6 +36,28 @@ function formatItemNames(items: tItemData[], div: number = 5) {
             return item.name
         }
     }), " | ")
+}
+
+export interface tMessageInfo {
+    message: string
+    message_id: number
+    message_type: string
+    group_id?: number
+    sender_user_id: number
+    sender_nickname: string
+    self_id: number
+}
+
+function genMessageInfo(event: CQEvent, context: Record<string, any>, tags: CQTag[]): tMessageInfo {
+    return {
+        message: toString(context.message),
+        message_id: toInteger(context.message_id),
+        message_type: toString(context.message_type),
+        group_id: context.group_id ? toInteger(context.group_id) : undefined,
+        sender_user_id: toInteger(context.sender.user_id),
+        sender_nickname: toString(context.sender.nickname),
+        self_id: toInteger(context.self_id)
+    }
 }
 
 export interface tCQQBotCfg {
@@ -75,8 +97,9 @@ export class cQQBot {
         })
 
         this.bot.on('message', async (event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> => {
+            let messageInfo = genMessageInfo(event, context, tags);
             let pHandlerMessage = this.handlerMessage(event, context)
-            let pMessageLog = this.extService.modelQQBotMessageLog.appendQQBotMessageLog(event, context, tags);
+            let pMessageLog = this.extService.modelQQBotMessageLog.appendQQBotMessageLog(messageInfo, event, context, tags);
             let result = await pHandlerMessage;
             await pMessageLog;
             return result

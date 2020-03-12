@@ -6,6 +6,44 @@ export class QQBotMessageLog {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({
+        type: "text"
+    })
+    message: string
+
+    @Column({
+        type: "int"
+    })
+    message_id: number
+
+    @Column({
+        type: "varchar",
+        length: 200
+    })
+    message_type: string
+
+    @Column({
+        type: "int",
+        nullable: true
+    })
+    group_id: number
+
+    @Column({
+        type: "int"
+    })
+    sender_user_id: number
+
+    @Column({
+        type: "varchar",
+        length: 200
+    })
+    sender_nickname: string
+
+    @Column({
+        type: "int"
+    })
+    self_id: number
+
     @Column("simple-json")
     raw_event: CQEvent
 
