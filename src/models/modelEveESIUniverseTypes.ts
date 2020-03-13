@@ -71,14 +71,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
     async RefreshData(forceRefresh: boolean = false) {
         let inProcess = true;
         let currentPage = 1;
-        try {
-            let refreshProgressPageRecord = await this.models.modelKvs.get("modelEveESIUniverseTypes_refreshProgressPage");
-            if (refreshProgressPageRecord) {
-                currentPage = parseInt(refreshProgressPageRecord) + 1;
-                this.logger.info(`continuse last transaction from page ${currentPage}`)
-            }
-        } catch (e) { }
-
+        
         while (inProcess) {
             inProcess = false;
             this.logger.info(`start refresh page ${currentPage}`)
@@ -94,11 +87,9 @@ export class modelEveESIUniverseTypes implements tModelBase {
                         this.logger.error(e);
                     }
                 }
-                await this.models.modelKvs.set("modelEveESIUniverseTypes_refreshProgressPage", currentPage.toString());
                 currentPage++;
                 inProcess = true
             } else {
-                await this.models.modelKvs.set("modelEveESIUniverseTypes_refreshProgressPage", null);
                 this.logger.info(`refresh complete`)
             }
         }

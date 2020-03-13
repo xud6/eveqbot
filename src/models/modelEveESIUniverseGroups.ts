@@ -54,13 +54,6 @@ export class modelEveESIUniverseGroups implements tModelBase {
     async RefreshData(forceRefresh: boolean = false) {
         let inProcess = true;
         let currentPage = 1;
-        try {
-            let refreshProgressPageRecord = await this.models.modelKvs.get("modelEveESIUniverseGroups_refreshProgressPage");
-            if (refreshProgressPageRecord) {
-                currentPage = parseInt(refreshProgressPageRecord) + 1;
-                this.logger.info(`continuse last transaction from page ${currentPage}`)
-            }
-        } catch (e) { }
 
         while (inProcess) {
             inProcess = false;
@@ -77,11 +70,9 @@ export class modelEveESIUniverseGroups implements tModelBase {
                         this.logger.error(e);
                     }
                 }
-                await this.models.modelKvs.set("modelEveESIUniverseGroups_refreshProgressPage", currentPage.toString());
                 currentPage++;
                 inProcess = true
             } else {
-                await this.models.modelKvs.set("modelEveESIUniverseGroups_refreshProgressPage", null);
                 this.logger.info(`refresh complete`)
             }
         }
