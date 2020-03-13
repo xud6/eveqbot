@@ -153,6 +153,7 @@ export class eveTypesInfo {
                 currentPage++;
                 inProcess = true;
             } else {
+                await this.extService.models.modelKvs.set('runTaskUpdateTypeInfosProcessedId', null)
                 await this.extService.models.modelKvs.set('runTaskUpdateTypeInfosProcessedPage', null)
             }
         }
