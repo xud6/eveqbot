@@ -21,12 +21,15 @@ export class modelEveESIUniverseGroups implements tModelBase {
         let result = (await repo.findByIds([id]))[0];
         if (result === undefined || forceRefresh) {
             this.logger.info(`update ${id} because of ${result ? "" : "data not exist"}|${forceRefresh ? "force refresh" : ""}`)
-            
-            let enData = await this.extService.eveESI.universe.groups.getById(id, "en-us");
-            let cnData = await this.extService.eveESI.universe.groups.getById(id, "zh");
+
+            let enDataP = this.extService.eveESI.universe.groups.getById(id, "en-us");
+            let cnDataP = this.extService.eveESI.universe.groups.getById(id, "zh");
+            let enData = await enDataP;
+            let cnData = await cnDataP;
+
             if (result === undefined) {
                 result = repo.create()
-                result.id = id
+                result.id = id;
             }
             // result.category_id = enData.category_id
             let category = await this.models.modelEveESIUniverseCategories.get(enData.category_id);
