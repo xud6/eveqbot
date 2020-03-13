@@ -10,6 +10,8 @@ export interface tEveESICfg {
     fetchTimeout: number
 }
 
+export type tEveESILanguange = "en-us" | "zh"
+
 export const eveESICfgDefault: tEveESICfg = {
     esiUrl: "https://esi.evetech.net",
     datasource: "tranquility",

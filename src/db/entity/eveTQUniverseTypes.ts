@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryColumn } from "typeorm";
+import { tTypesGetByIdResult } from "../../eveESI/universe/types";
 
 @Entity()
 export class eveTQUniverseTypes {
@@ -17,7 +18,7 @@ export class eveTQUniverseTypes {
         nullable: true,
         default: null
     })
-    market_group_id: number
+    market_group_id: number | null
 
     @Column({
         type: "boolean",
@@ -47,10 +48,10 @@ export class eveTQUniverseTypes {
     cn_description: string
 
     @Column("simple-json")
-    en_raw: any
+    en_raw: tTypesGetByIdResult
 
     @Column("simple-json")
-    cn_raw: any
+    cn_raw: tTypesGetByIdResult
 
     @Column({
         type: "bigint",

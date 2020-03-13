@@ -59,17 +59,6 @@ export class eveTypesInfo {
             this.timerTaskUpdateTypeInfosLock = false
         }
     }
-    async apiGetTypeData(id: number, language: "en-us" | "zh") {
-        let opId = this.opId++;
-        let url = `${this.esiUrl}/v3/universe/types/${id}/?datasource=${this.datasource}&language=${language}`
-        this.logger.info(`${opId}| read TypeData id[${id}] lang[${language}] | ${url}`)
-        let result = await fetch(url, { timeout: this.fetchTimeout })
-        if (result.ok) {
-            return result.json()
-        } else {
-            throw new Error(`${opId}| api access error: ${result.statusText}`)
-        }
-    }
     async processTypesPage(page: number) {
         let opId = this.opId++;
         this.logger.info(`${opId}| process type page ${page}`)
@@ -90,10 +79,10 @@ export class eveTypesInfo {
                 try {
                     this.logger.info(`process data for type ${id}`)
                     let enData = await this.retry(() => {
-                        return this.apiGetTypeData(id, "en-us");
+                        return this.extService.eveESI.universe.types.getById(id, "en-us");
                     }, this.apiRetry)
                     let cnData = await this.retry(() => {
-                        return this.apiGetTypeData(id, "zh");
+                        return this.extService.eveESI.universe.types.getById(id, "zh");
                     }, this.apiRetry)
                     await this.extService.models.modelEveTQUniverseTypes.set(id, enData, cnData)
                     await this.extService.models.modelKvs.set('runTaskUpdateTypeInfosProcessedId', id.toString())

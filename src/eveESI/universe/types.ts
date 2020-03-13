@@ -1,11 +1,33 @@
 import { tLogger } from "tag-tree-logger"
-import { tEveESIExtService, tEveESICfg } from "./../types"
+import { tEveESIExtService, tEveESICfg, tEveESILanguange } from "./../types"
 import * as t from 'io-ts'
 import fetch from "node-fetch"
 import { isRight } from "fp-ts/lib/Either"
 import { PathReporter } from 'io-ts/lib/PathReporter'
 
-export const typesGetIdsResult = t.array(t.number)
+export const vTypesGetIdsResult = t.array(t.number)
+export const vTypesGetByIdResultRequired = t.type({
+    description: t.string,
+    group_id: t.Int,
+    name: t.string,
+    published: t.boolean,
+    type_id: t.Int,
+})
+export const vTypesGetByIdResultOptional = t.partial({
+    capacity: t.number,
+    dogma_attributes: t.any,
+    dogma_effects: t.any,
+    graphic_id: t.Int,
+    icon_id: t.Int,
+    market_group_id: t.Int,
+    mass: t.number,
+    packaged_volume: t.number,
+    portion_size: t.Int,
+    radius: t.number,
+    volume: t.number
+})
+export const vTypesGetByIdResult = t.intersection([vTypesGetByIdResultRequired, vTypesGetByIdResultOptional])
+export interface tTypesGetByIdResult extends t.TypeOf<typeof vTypesGetByIdResult> { }
 
 export class types {
     readonly logger: tLogger
@@ -23,10 +45,27 @@ export class types {
         let result = await fetch(url, { timeout: this.config.fetchTimeout })
         if (result.ok) {
             let data = await result.json();
-            let validator = typesGetIdsResult.decode(data)
+            let validator = vTypesGetIdsResult.decode(data)
             if (isRight(validator)) {
                 return validator.right
             } else {
+                throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
+            }
+        } else {
+            throw new Error(`${opId}| api access error: ${result.statusText}`)
+        }
+    }
+    async getById(id: number, language: tEveESILanguange) {
+        let opId = this.extService.opId.getId()
+        let url = `${this.config.esiUrl}/v3/universe/types/${id}/?datasource=${this.config.datasource}&language=${language}`
+        this.logger.log(`${opId}| read TypeData id[${id}] lang[${language}] | ${url}`)
+        let result = await fetch(url, { timeout: this.config.fetchTimeout })
+        if (result.ok) {
+            let data = await result.json();
+            let validator = vTypesGetByIdResult.decode(data)
+            if(isRight(validator)){
+                return validator.right
+            }else{
                 throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
         } else {

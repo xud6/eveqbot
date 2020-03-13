@@ -3,6 +3,7 @@ import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { eveTQUniverseTypes } from "../db/entity/eveTQUniverseTypes";
 import { DeepPartial } from "typeorm";
+import { tTypesGetByIdResult } from "../eveESI/universe/types";
 
 export class modelEveTQUniverseTypes implements tModelBase {
     readonly name = "modelEveTQUniverseTypes"
@@ -25,7 +26,7 @@ export class modelEveTQUniverseTypes implements tModelBase {
         }
     }
     async set(
-        id: number, en_raw: any, cn_raw: any,
+        id: number, en_raw: tTypesGetByIdResult, cn_raw: tTypesGetByIdResult,
     ) {
         let repo = await this.extService.db.getRepository(eveTQUniverseTypes);
         let record = await repo.findOne(id);
