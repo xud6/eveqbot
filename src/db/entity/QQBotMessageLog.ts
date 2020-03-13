@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, ManyToOne, JoinColumn, Index } from "typeorm";
 import { CQTag, CQEvent } from "@xud6/cq-websocket";
+import { QQBotMessageSource } from "./QQBotMessageSource";
 
 @Entity()
 export class QQBotMessageLog {
@@ -50,6 +51,24 @@ export class QQBotMessageLog {
         type: "bigint"
     })
     self_id: number
+
+    @Index()
+    @Column({
+        type: "int",
+        nullable: true,
+        default: null
+    })
+    sourceId: number;
+
+    @ManyToOne(
+        type => QQBotMessageSource,
+        source => source.messageLog,
+        {
+            onDelete: "CASCADE"
+        }
+    )
+    @JoinColumn()
+    source: QQBotMessageSource;
 
     @Column("simple-json")
     raw_event: CQEvent

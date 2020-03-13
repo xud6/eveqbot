@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { QQBotMessageLog } from "./QQBotMessageLog";
 
 @Entity()
 export class QQBotMessageSource {
@@ -21,4 +22,7 @@ export class QQBotMessageSource {
         default: false
     })
     enable: boolean
+
+    @OneToMany(type => QQBotMessageLog, messageLog => messageLog.source)
+    messageLog: QQBotMessageLog[];
 }
