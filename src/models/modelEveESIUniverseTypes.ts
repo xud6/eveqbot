@@ -23,7 +23,9 @@ export class modelEveESIUniverseTypes implements tModelBase {
         let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let result = (await repo.findByIds([id]))[0];
         if (result === undefined || forceRefresh) {
-            this.logger.info(`update data for ${id}`)
+            if (result === undefined) { this.logger.info(`data for ${id} not exist`) }
+            if (forceRefresh) { this.logger.info(`force refresh ${id}`) }
+
             let enData = await this.extService.eveESI.universe.types.getById(id, "en-us");
             let cnData = await this.extService.eveESI.universe.types.getById(id, "zh");
             if (result === undefined) {
@@ -65,10 +67,13 @@ export class modelEveESIUniverseTypes implements tModelBase {
             let refreshProgressPageRecord = await this.models.modelKvs.get("modelEveESIUniverseTypes_refreshProgressPage");
             if (refreshProgressPageRecord) {
                 currentPage = parseInt(refreshProgressPageRecord) + 1;
-                let refreshProgressIdRecord = await this.models.modelKvs.get("modelEveESIUniverseTypes_refreshProgressId");
-                if (refreshProgressIdRecord) {
-                    processedId = parseInt(refreshProgressIdRecord);
-                }
+                this.logger.info(`continuse last transaction from page ${currentPage}`)
+            }
+
+            let refreshProgressIdRecord = await this.models.modelKvs.get("modelEveESIUniverseTypes_refreshProgressId");
+            if (refreshProgressIdRecord) {
+                processedId = parseInt(refreshProgressIdRecord);
+                this.logger.info(`continuse last transaction from id ${processedId}`)
             }
         } catch (e) { }
 
