@@ -27,7 +27,7 @@ export class modelEveESIUniverseGroups implements tModelBase {
                 result.id = id
             }
             // result.category_id = enData.category_id
-            let category = await this.models.modelEveESIUniverseCategories.get(result.category_id);
+            let category = await this.models.modelEveESIUniverseCategories.get(enData.category_id);
             if (category) {
                 result.category = category
             }else{
