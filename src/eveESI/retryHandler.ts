@@ -17,5 +17,5 @@ export async function retryHandler<T>(func: () => Promise<T>, cnt: number = 1, l
 }
 
 
-// return await retry(async () => {
+// return await retryHandler(async () => {
 // }, this.config.fetchRetry, (e) => { this.logger.warn(e) })
