@@ -51,15 +51,15 @@ export class modelEveESIUniverseTypes implements tModelBase {
             return null
         }
     }
-    async RefreshData(kvs: modelKvs) {
+    async RefreshData() {
         let inProcess = true;
         let currentPage = 1;
         let processedId = -1;
         try {
-            let refreshProgressPageRecord = await kvs.get("modelEveESIUniverseTypes_refreshProgressPage");
+            let refreshProgressPageRecord = await this.models.modelKvs.get("modelEveESIUniverseTypes_refreshProgressPage");
             if (refreshProgressPageRecord) {
                 currentPage = parseInt(refreshProgressPageRecord) + 1;
-                let refreshProgressIdRecord = await kvs.get("modelEveESIUniverseTypes_refreshProgressPage");
+                let refreshProgressIdRecord = await this.models.modelKvs.get("modelEveESIUniverseTypes_refreshProgressId");
                 if (refreshProgressIdRecord) {
                     processedId = parseInt(refreshProgressIdRecord);
                 }
@@ -75,7 +75,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
                 for (let id of ids) {
                     if (id > processedId) {
                         try {
-                            this.logger.info(`update data for UniverseCategorie ${id} |P${currentPage} ${cnt++}/${ids.length}`);
+                            this.logger.info(`update data for UniverseTypes ${id} |P${currentPage} ${cnt++}/${ids.length}`);
                             await this.get(id, true);
                         } catch (e) {
                             this.logger.error(e);
@@ -85,8 +85,8 @@ export class modelEveESIUniverseTypes implements tModelBase {
                     }
                 }
             } else {
-                await kvs.set("modelEveESIUniverseTypes_refreshProgressPage", null);
-                await kvs.set("modelEveESIUniverseTypes_refreshProgressId", null);
+                await this.models.modelKvs.set("modelEveESIUniverseTypes_refreshProgressPage", null);
+                await this.models.modelKvs.set("modelEveESIUniverseTypes_refreshProgressId", null);
             }
         }
     }
