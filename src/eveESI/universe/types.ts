@@ -4,6 +4,7 @@ import * as t from 'io-ts'
 import fetch from "node-fetch"
 import { isRight } from "fp-ts/lib/Either"
 import { PathReporter } from 'io-ts/lib/PathReporter'
+import { retryHandler } from "../retryHandler"
 
 export const vTypesGetIdsResult = t.array(t.number)
 export const vTypesGetByIdResultRequired = t.type({
@@ -42,34 +43,39 @@ export class types {
         let opId = this.extService.opId.getId()
         let url = `${this.config.esiUrl}/v1/universe/types/?datasource=${this.config.datasource}&page=${page}`
         this.logger.log(`${opId}| read TypeId page ${page} | ${url}`)
-        let result = await fetch(url, { timeout: this.config.fetchTimeout })
-        if (result.ok) {
-            let data = await result.json();
-            let validator = vTypesGetIdsResult.decode(data)
-            if (isRight(validator)) {
-                return validator.right
+        return await retryHandler(async () => {
+            let result = await fetch(url, { timeout: this.config.fetchTimeout })
+            if (result.ok) {
+                let data = await result.json();
+                let validator = vTypesGetIdsResult.decode(data)
+                if (isRight(validator)) {
+                    return validator.right
+                } else {
+                    throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
+                }
             } else {
-                throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
+                throw new Error(`${opId}| api access error: ${result.statusText}`)
             }
-        } else {
-            throw new Error(`${opId}| api access error: ${result.statusText}`)
-        }
+        }, this.config.fetchRetry, (e) => { this.logger.warn(e) })
+
     }
     async getById(id: number, language: tEveESILanguange) {
         let opId = this.extService.opId.getId()
         let url = `${this.config.esiUrl}/v3/universe/types/${id}/?datasource=${this.config.datasource}&language=${language}`
         this.logger.log(`${opId}| read TypeData id[${id}] lang[${language}] | ${url}`)
-        let result = await fetch(url, { timeout: this.config.fetchTimeout })
-        if (result.ok) {
-            let data = await result.json();
-            let validator = vTypesGetByIdResult.decode(data)
-            if(isRight(validator)){
-                return validator.right
-            }else{
-                throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
+        return await retryHandler(async () => {
+            let result = await fetch(url, { timeout: this.config.fetchTimeout })
+            if (result.ok) {
+                let data = await result.json();
+                let validator = vTypesGetByIdResult.decode(data)
+                if (isRight(validator)) {
+                    return validator.right
+                } else {
+                    throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
+                }
+            } else {
+                throw new Error(`${opId}| api access error: ${result.statusText}`)
             }
-        } else {
-            throw new Error(`${opId}| api access error: ${result.statusText}`)
-        }
+        }, this.config.fetchRetry, (e) => { this.logger.warn(e) })
     }
 }

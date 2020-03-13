@@ -9,8 +9,6 @@ export class eveTypesInfo {
     timerTaskUpdateTypeInfosLock: boolean = false
     datasource = "tranquility"
     esiUrl = "https://esi.evetech.net"
-    fetchTimeout = 1000 * 20
-    apiRetry = 5
     opId = 0;
     constructor(
         readonly parentLogger: tLogger,
@@ -27,20 +25,6 @@ export class eveTypesInfo {
             clearInterval(this.timerTaskUpdateTypeInfos)
             this.timerTaskUpdateTypeInfos = undefined
         }
-    }
-    async retry<T>(func: () => Promise<T>, cnt: number = 1): Promise<T> {
-        if (cnt < 1) {
-            cnt = 1
-        }
-        while (cnt-- > 0) {
-            try {
-                let result = await func()
-                return result
-            } catch (e) {
-                this.logger.warn(e)
-            }
-        }
-        throw new Error(`max retry reached`);
     }
     async TaskUpdateTypeInfos() {
         if (this.timerTaskUpdateTypeInfosLock === false) {
@@ -62,9 +46,7 @@ export class eveTypesInfo {
     async processTypesPage(page: number) {
         let opId = this.opId++;
         this.logger.info(`${opId}| process type page ${page}`)
-        let ids = await this.retry(() => {
-            return this.extService.eveESI.universe.types.getIds(page)
-        }, this.apiRetry)
+        let ids = await this.extService.eveESI.universe.types.getIds(page)
 
         let processedId = -1;
         try {
@@ -78,12 +60,8 @@ export class eveTypesInfo {
             if (id > processedId) {
                 try {
                     this.logger.info(`process data for type ${id}`)
-                    let enData = await this.retry(() => {
-                        return this.extService.eveESI.universe.types.getById(id, "en-us");
-                    }, this.apiRetry)
-                    let cnData = await this.retry(() => {
-                        return this.extService.eveESI.universe.types.getById(id, "zh");
-                    }, this.apiRetry)
+                    let enData = await this.extService.eveESI.universe.types.getById(id, "en-us");
+                    let cnData = await this.extService.eveESI.universe.types.getById(id, "zh");
                     await this.extService.models.modelEveESIUniverseTypes.set(id, enData, cnData)
                     await this.extService.models.modelKvs.set('runTaskUpdateTypeInfosProcessedId', id.toString())
                 } catch (e) {
@@ -108,9 +86,7 @@ export class eveTypesInfo {
 
         while (inProcess) {
             inProcess = false;
-            let ids = await this.retry(() => {
-                return this.processTypesPage(currentPage)
-            }, 3)
+            let ids = await this.processTypesPage(currentPage)
             if (ids.length > 0) {
                 await this.extService.models.modelKvs.set('runTaskUpdateTypeInfosProcessedPage', currentPage.toString())
                 currentPage++;
