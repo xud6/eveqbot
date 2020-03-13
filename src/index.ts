@@ -23,7 +23,7 @@ export class eveqbot {
     eveTranquility: eveTranquility
     itemdb: cItemdb
     CEVEMarketApi: cCEVEMarketApi
-    bot: cQQBot
+    bot: cQQBot | null
     constructor(readonly parentLogger: tLogger, readonly extService: eveqbotExtService, readonly config: tConfig) {
         this.logger = parentLogger.logger(["eveqbot"])
         this.opId = new opId()
@@ -33,12 +33,18 @@ export class eveqbot {
         this.eveTranquility = new eveTranquility(this.logger, { models: this.models, eveESI: this.eveESI })
         this.itemdb = new cItemdb('itemdb.xls');
         this.CEVEMarketApi = new cCEVEMarketApi();
-        this.bot = new cQQBot(this.logger, { itemdb: this.itemdb, CEVEMarketApi: this.CEVEMarketApi, models: this.models }, this.config.QQBot);
+        if (this.config.service.QQBot) {
+            this.bot = new cQQBot(this.logger, { itemdb: this.itemdb, CEVEMarketApi: this.CEVEMarketApi, models: this.models }, this.config.QQBot);
+        } else {
+            this.bot = null
+        }
     }
     async startup() {
         await this.db.startup()
         await this.eveTranquility.startup()
-        await this.bot.startup()
+        if (this.bot) {
+            await this.bot.startup()
+        }
     }
     async shutdown() {
 

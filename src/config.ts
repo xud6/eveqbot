@@ -20,6 +20,9 @@ let config: tConfig = {
         host: 'localhost',
         port: 3306,
         logging: ["error", "schema", "warn", "info", "log"]
+    },
+    service: {
+        QQBot: true
     }
 }
 

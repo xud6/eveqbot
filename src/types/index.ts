@@ -18,8 +18,13 @@ export interface tDatabaseConfig {
     logging: LoggerOptions
 }
 
+export interface tServiceCfg {
+    QQBot: boolean
+}
+
 export interface tConfig {
     logger: tLogConfig[]
     QQBot: tCQQBotCfg
-    db: tDatabaseConfig
+    db: tDatabaseConfig,
+    service: tServiceCfg
 }
