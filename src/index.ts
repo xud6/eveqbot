@@ -7,12 +7,14 @@ import { typeormdb } from './db';
 import { tConfig } from './types';
 import { cModels } from './models';
 import { eveTranquility } from './eveTranquility';
+import { opId } from './opId';
 
 export interface eveqbotExtService {
 
 }
 export class eveqbot {
     readonly logger: tLogger
+    opId:opId
     db: typeormdb
     models: cModels
     eveTranquility: eveTranquility
@@ -21,6 +23,7 @@ export class eveqbot {
     bot: cQQBot
     constructor(readonly parentLogger: tLogger, readonly extService: eveqbotExtService, readonly config: tConfig) {
         this.logger = parentLogger.logger(["eveqbot"])
+        this.opId = new opId()
         this.db = new typeormdb(this.logger, this.config.db)
         this.models = new cModels(this.logger, { db: this.db }, {})
         this.eveTranquility = new eveTranquility(this.logger, { models: this.models })
