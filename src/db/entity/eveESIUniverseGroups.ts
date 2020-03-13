@@ -10,6 +10,7 @@ export class eveESIUniverseGroups {
     })
     id: number;
 
+    @Index()
     @Column({
         type: "bigint"
     })

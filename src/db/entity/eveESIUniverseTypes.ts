@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, UpdateDateColumn, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryColumn, UpdateDateColumn, JoinColumn, ManyToOne, Index } from "typeorm";
 import { tTypesGetByIdResult } from "../../eveESI/universe/types";
 import { eveESIUniverseGroups } from "./eveESIUniverseGroups";
 
@@ -9,6 +9,7 @@ export class eveESIUniverseTypes {
     })
     id: number;
 
+    @Index()
     @Column({
         type: "bigint"
     })
