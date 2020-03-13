@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { tTypesGetByIdResult } from "../../eveESI/universe/types";
 
 @Entity()
@@ -71,4 +71,7 @@ export class eveTQUniverseTypes {
         type: "bigint",
     })
     type_id: number
+    
+    @UpdateDateColumn()
+    updateDate: Date;
 }
