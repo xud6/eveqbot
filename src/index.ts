@@ -28,7 +28,7 @@ export class eveqbot {
         this.logger = parentLogger.logger(["eveqbot"])
         this.opId = new opId()
         this.db = new typeormdb(this.logger, this.config.db)
-        this.models = new cModels(this.logger, { db: this.db }, {})
+        this.models = new cModels(this.logger, { db: this.db, eveESI: this.eveESI }, {})
         this.eveESI = new eveESI(this.logger, { opId: this.opId }, eveESICfgDefault)
         this.eveTranquility = new eveTranquility(this.logger, { models: this.models, eveESI: this.eveESI })
         this.itemdb = new cItemdb('itemdb.xls');
