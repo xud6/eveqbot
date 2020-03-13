@@ -44,7 +44,7 @@ export class types {
         let url = `${this.config.esiUrl}/v1/universe/types/?datasource=${this.config.datasource}&page=${page}`
         this.logger.log(`${opId}| read TypeId page ${page} | ${url}`)
         return await retryHandler(async () => {
-            let result = await fetch(url, { timeout: this.config.fetchTimeout })
+            let result = await fetch(url, { timeout: this.config.fetchTimeout * 5 })
             if (result.ok) {
                 let data = await result.json();
                 let validator = vTypesGetIdsResult.decode(data)

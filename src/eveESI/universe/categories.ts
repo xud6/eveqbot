@@ -29,7 +29,7 @@ export class categories {
         let url = `${this.config.esiUrl}/v1/universe/categories/?datasource=${this.config.datasource}`
         this.logger.log(`${opId}| read universe/categories | ${url}`)
         return await retryHandler(async () => {
-            let result = await fetch(url, { timeout: this.config.fetchTimeout })
+            let result = await fetch(url, { timeout: this.config.fetchTimeout * 5 })
             if (result.ok) {
                 let data = await result.json();
                 let validator = vCategoriesGetIdsResult.decode(data)
