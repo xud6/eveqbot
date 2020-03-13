@@ -49,4 +49,14 @@ export class eveqbot {
     async shutdown() {
 
     }
+    async refreshData() {
+        if ((await this.models.modelKvs.get("refreshData.isFresh.EveESIUniverseCategories")) !== "Y") {
+            await this.models.modelEveESIUniverseCategories.RefreshData()
+            await this.models.modelKvs.set("refreshData.isFresh.EveESIUniverseCategories", "Y")
+        }
+        if ((await this.models.modelKvs.get("refreshData.isFresh.EveESIUniverseTypes")) !== "Y") {
+            await this.models.modelEveESIUniverseTypes.RefreshData(this.models.modelKvs)
+            await this.models.modelKvs.set("refreshData.isFresh.EveESIUniverseTypes", "Y")
+        }
+    }
 }
