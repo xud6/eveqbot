@@ -74,6 +74,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
 
         while (inProcess) {
             inProcess = false;
+            this.logger.info(`start refresh page ${currentPage}`)
             let ids = await this.extService.eveESI.universe.types.getIds(currentPage);
 
             if (ids.length > 0) {
@@ -83,6 +84,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
                         try {
                             this.logger.info(`update data for UniverseTypes ${id} |P${currentPage} ${cnt++}/${ids.length}`);
                             await this.get(id, true);
+                            await this.models.modelKvs.set("modelEveESIUniverseTypes_refreshProgressId", id.toString());
                         } catch (e) {
                             this.logger.error(e);
                         }
@@ -90,9 +92,13 @@ export class modelEveESIUniverseTypes implements tModelBase {
                         await this.get(id);
                     }
                 }
+                await this.models.modelKvs.set("modelEveESIUniverseTypes_refreshProgressPage", currentPage.toString());
+                currentPage++;
+                inProcess = true
             } else {
                 await this.models.modelKvs.set("modelEveESIUniverseTypes_refreshProgressPage", null);
                 await this.models.modelKvs.set("modelEveESIUniverseTypes_refreshProgressId", null);
+                this.logger.info(`refresh complete`)
             }
         }
     }

@@ -30,7 +30,7 @@ export class modelEveESIUniverseGroups implements tModelBase {
             let category = await this.models.modelEveESIUniverseCategories.get(enData.category_id);
             if (category) {
                 result.category = category
-            }else{
+            } else {
                 throw new Error(`Category ${result.category_id} not found for group ${id}`)
             }
             result.group_id = enData.group_id
@@ -64,6 +64,7 @@ export class modelEveESIUniverseGroups implements tModelBase {
 
         while (inProcess) {
             inProcess = false;
+            this.logger.info(`start refresh page ${currentPage}`)
             let ids = await this.extService.eveESI.universe.groups.getIds(currentPage);
 
             if (ids.length > 0) {
@@ -73,6 +74,7 @@ export class modelEveESIUniverseGroups implements tModelBase {
                         try {
                             this.logger.info(`update data for UniverseGroups ${id} |P${currentPage} ${cnt++}/${ids.length}`);
                             await this.get(id, true);
+                            await this.models.modelKvs.set("modelEveESIUniverseGroups_refreshProgressId", id.toString());
                         } catch (e) {
                             this.logger.error(e);
                         }
@@ -80,9 +82,13 @@ export class modelEveESIUniverseGroups implements tModelBase {
                         await this.get(id);
                     }
                 }
+                await this.models.modelKvs.set("modelEveESIUniverseGroups_refreshProgressPage", currentPage.toString());
+                currentPage++;
+                inProcess = true
             } else {
                 await this.models.modelKvs.set("modelEveESIUniverseGroups_refreshProgressPage", null);
                 await this.models.modelKvs.set("modelEveESIUniverseGroups_refreshProgressId", null);
+                this.logger.info(`refresh complete`)
             }
         }
     }
