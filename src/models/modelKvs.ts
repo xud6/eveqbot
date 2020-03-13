@@ -3,6 +3,7 @@ import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { kvs } from "../db/entity/kvs";
 import { tMessageInfo } from "../bot";
+import { cModels } from ".";
 
 interface tMessageSourceInfo {
     source_type: string,
@@ -16,6 +17,7 @@ export class modelKvs implements tModelBase {
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
+        readonly models: cModels
     ) {
         this.logger = parentLogger.logger(["modelKvs"])
     }

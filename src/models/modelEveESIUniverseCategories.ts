@@ -2,6 +2,7 @@ import { tModelBase } from "./modelBase";
 import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { eveESIUniverseCategories } from "../db/entity/eveESIUniverseCategories";
+import { cModels } from ".";
 
 export class modelEveESIUniverseCategories implements tModelBase {
     readonly name = "modelEveESIUniverseCategories"
@@ -9,12 +10,13 @@ export class modelEveESIUniverseCategories implements tModelBase {
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
+        readonly models: cModels
     ) {
         this.logger = parentLogger.logger(["modelEveESIUniverseCategories"])
     }
     async startup() { }
     async shutdown() { }
-    async get(id: number, forceRefresh: boolean): Promise<eveESIUniverseCategories | null> {
+    async get(id: number, forceRefresh: boolean = false): Promise<eveESIUniverseCategories | null> {
         let repo = await this.extService.db.getRepository(eveESIUniverseCategories);
         let result = (await repo.findByIds([id]))[0];
         if (result === undefined || forceRefresh) {

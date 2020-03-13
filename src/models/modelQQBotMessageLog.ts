@@ -4,6 +4,7 @@ import { tModelsExtService } from "./types";
 import { CQEvent, CQTag } from "@xud6/cq-websocket";
 import { QQBotMessageLog } from "../db/entity/QQBotMessageLog";
 import { tMessageInfo } from "../bot";
+import { cModels } from ".";
 
 export class modelQQBotMessageLog implements tModelBase {
     readonly name = "QQBotMessageLog"
@@ -11,6 +12,7 @@ export class modelQQBotMessageLog implements tModelBase {
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
+        readonly models: cModels
     ) {
         this.logger = parentLogger.logger(["modelQQBotMessageLog"])
     }

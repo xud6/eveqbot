@@ -5,6 +5,7 @@ import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
 import { DeepPartial } from "typeorm";
 import { tTypesGetByIdResult } from "../eveESI/universe/types";
 import { modelKvs } from "./modelKvs";
+import { cModels } from ".";
 
 export class modelEveESIUniverseTypes implements tModelBase {
     readonly name = "modelEveESIUniverseTypes"
@@ -12,6 +13,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
+        readonly models: cModels
     ) {
         this.logger = parentLogger.logger(["modelEveESIUniverseTypes"])
     }
