@@ -28,8 +28,8 @@ export class eveqbot {
         this.logger = parentLogger.logger(["eveqbot"])
         this.opId = new opId()
         this.db = new typeormdb(this.logger, this.config.db)
-        this.models = new cModels(this.logger, { db: this.db, eveESI: this.eveESI }, {})
         this.eveESI = new eveESI(this.logger, { opId: this.opId }, eveESICfgDefault)
+        this.models = new cModels(this.logger, { db: this.db, eveESI: this.eveESI }, {})
         this.eveTranquility = new eveTranquility(this.logger, { models: this.models, eveESI: this.eveESI })
         this.itemdb = new cItemdb('itemdb.xls');
         this.CEVEMarketApi = new cCEVEMarketApi();
@@ -45,6 +45,7 @@ export class eveqbot {
         if (this.bot) {
             await this.bot.startup()
         }
+        this.refreshData()
     }
     async shutdown() {
 
