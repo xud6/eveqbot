@@ -25,9 +25,10 @@ export class modelEveESIUniverseCategories implements tModelBase {
             }
             result.id = id
             result.category_id = enData.category_id
+            result.published = enData.published
             result.en_name = enData.name
-            result.en_raw = enData
             result.cn_name = cnData.name
+            result.en_raw = enData
             await repo.save(result)
             result = (await repo.findByIds([id]))[0];
         }
