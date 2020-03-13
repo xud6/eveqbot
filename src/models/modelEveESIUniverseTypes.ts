@@ -30,7 +30,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
                 result = repo.create()
                 result.id = id;
             }
-            result.group_id = enData.group_id;
+            // result.group_id = enData.group_id;
             let group = await this.models.modelEveESIUniverseGroups.get(result.group_id)
             if (group) {
                 result.group = group;

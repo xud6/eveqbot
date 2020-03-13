@@ -22,7 +22,7 @@ export class eveESIUniverseTypes {
             nullable: false
         }
     )
-    @JoinColumn()
+    @JoinColumn({ name: "group_id" })
     group: eveESIUniverseGroups;
 
     @Column({

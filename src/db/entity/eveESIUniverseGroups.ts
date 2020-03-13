@@ -23,7 +23,7 @@ export class eveESIUniverseGroups {
             nullable: false
         }
     )
-    @JoinColumn()
+    @JoinColumn({ name: "category_id" })
     category: eveESIUniverseCategories;
 
     @Column({
