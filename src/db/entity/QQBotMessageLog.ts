@@ -4,7 +4,9 @@ import { QQBotMessageSource } from "./QQBotMessageSource";
 
 @Entity()
 export class QQBotMessageLog {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        type: "bigint"
+    })
     id: number;
 
     @Column({
