@@ -37,7 +37,7 @@ export class modelEveESIUniverseCategories implements tModelBase {
             return null
         }
     }
-    async updateData() {
+    async RefreshData() {
         let ids = await this.extService.eveESI.universe.categories.getIds();
         let cnt = ids.length;
         for (let id of ids) {
