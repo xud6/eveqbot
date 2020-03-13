@@ -49,9 +49,6 @@ export class eveESIUniverseGroups {
     })
     published: boolean
 
-    @Column("simple-json")
-    en_raw: tGroupsGetByIdResult
-
     @UpdateDateColumn()
     updateDate: Date;
 

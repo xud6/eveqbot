@@ -60,12 +60,6 @@ export class eveESIUniverseTypes {
     })
     cn_description: string
 
-    @Column("simple-json")
-    en_raw: tTypesGetByIdResult
-
-    @Column("simple-json")
-    cn_raw: tTypesGetByIdResult
-
     @Column({
         type: "bigint",
         nullable: true,
@@ -84,6 +78,67 @@ export class eveESIUniverseTypes {
         type: "bigint",
     })
     type_id: number
+
+    @Column({
+        type: "float",
+        nullable: true,
+        default: null,
+        precision: 12
+    })
+    capacity: number | null
+
+    @Column({
+        type: "float",
+        nullable: true,
+        default: null,
+        precision: 12
+    })
+    mass: number | null
+
+    @Column({
+        type: "float",
+        nullable: true,
+        default: null,
+        precision: 12
+    })
+    packaged_volume: number | null
+
+    @Column({
+        type: "bigint",
+        nullable: true,
+        default: null
+    })
+    portion_size: number | null
+
+    @Column({
+        type: "float",
+        nullable: true,
+        default: null,
+        precision: 12
+    })
+    radius: number | null
+
+    @Column({
+        type: "float",
+        nullable: true,
+        default: null,
+        precision: 12
+    })
+    volume: number | null
+
+    @Column({
+        type: "simple-json",
+        nullable: true,
+        default: null
+    })
+    dogma_attributes: any
+
+    @Column({
+        type: "simple-json",
+        nullable: true,
+        default: null
+    })
+    dogma_effects: any
 
     @UpdateDateColumn()
     updateDate: Date;

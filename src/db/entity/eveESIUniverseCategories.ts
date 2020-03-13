@@ -32,9 +32,6 @@ export class eveESIUniverseCategories {
     })
     cn_name: string
 
-    @Column("simple-json")
-    en_raw: tCategoriesGetByIdResult
-
     @UpdateDateColumn()
     updateDate: Date;
 

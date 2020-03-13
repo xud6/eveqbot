@@ -47,11 +47,18 @@ export class modelEveESIUniverseTypes implements tModelBase {
             result.cn_name = cnData.name;
             result.en_description = enData.description;
             result.cn_description = cnData.description;
-            result.en_raw = enData;
-            result.cn_raw = cnData;
             result.graphic_id = enData.graphic_id || null;
             result.icon_id = enData.icon_id || null;
             result.type_id = enData.type_id;
+            result.capacity = enData.capacity || null;
+            result.mass = enData.mass || null;
+            result.packaged_volume = enData.packaged_volume || null;
+            result.portion_size = enData.portion_size || null;
+            result.radius = enData.radius || null;
+            result.volume = enData.volume || null;
+            result.dogma_attributes = enData.dogma_attributes || null;
+            result.dogma_effects = enData.dogma_effects || null;
+
             await repo.save(result);
             result = (await repo.findByIds([id]))[0];
         }
