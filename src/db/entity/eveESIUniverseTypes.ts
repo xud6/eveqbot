@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { tTypesGetByIdResult } from "../../eveESI/universe/types";
 
 @Entity()
-export class eveTQUniverseTypes {
+export class eveESIUniverseTypes {
     @PrimaryColumn({
         type: "bigint"
     })

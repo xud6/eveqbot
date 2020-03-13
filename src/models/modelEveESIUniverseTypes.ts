@@ -1,23 +1,23 @@
 import { tModelBase } from "./modelBase";
 import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
-import { eveTQUniverseTypes } from "../db/entity/eveTQUniverseTypes";
+import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
 import { DeepPartial } from "typeorm";
 import { tTypesGetByIdResult } from "../eveESI/universe/types";
 
-export class modelEveTQUniverseTypes implements tModelBase {
-    readonly name = "modelEveTQUniverseTypes"
+export class modelEveESIUniverseTypes implements tModelBase {
+    readonly name = "modelEveESIUniverseTypes"
     readonly logger: tLogger
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
     ) {
-        this.logger = parentLogger.logger(["modelEveTQUniverseTypes"])
+        this.logger = parentLogger.logger(["modelEveESIUniverseTypes"])
     }
     async startup() { }
     async shutdown() { }
-    async get(id: number): Promise<eveTQUniverseTypes | null> {
-        let repo = await this.extService.db.getRepository(eveTQUniverseTypes);
+    async get(id: number): Promise<eveESIUniverseTypes | null> {
+        let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let result = await repo.findOne(id);
         if (result) {
             return result
@@ -28,7 +28,7 @@ export class modelEveTQUniverseTypes implements tModelBase {
     async set(
         id: number, en_raw: tTypesGetByIdResult, cn_raw: tTypesGetByIdResult,
     ) {
-        let repo = await this.extService.db.getRepository(eveTQUniverseTypes);
+        let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let record = await repo.findOne(id);
         if (record) {
             let changed = false;
@@ -86,7 +86,7 @@ export class modelEveTQUniverseTypes implements tModelBase {
                 await repo.save(record);
             }
         } else {
-            let record: DeepPartial<eveTQUniverseTypes> = {
+            let record: DeepPartial<eveESIUniverseTypes> = {
                 id: id
             }
             let changed = false;

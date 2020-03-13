@@ -84,7 +84,7 @@ export class eveTypesInfo {
                     let cnData = await this.retry(() => {
                         return this.extService.eveESI.universe.types.getById(id, "zh");
                     }, this.apiRetry)
-                    await this.extService.models.modelEveTQUniverseTypes.set(id, enData, cnData)
+                    await this.extService.models.modelEveESIUniverseTypes.set(id, enData, cnData)
                     await this.extService.models.modelKvs.set('runTaskUpdateTypeInfosProcessedId', id.toString())
                 } catch (e) {
                     this.logger.warn(e)
