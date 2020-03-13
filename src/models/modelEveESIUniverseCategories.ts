@@ -40,10 +40,10 @@ export class modelEveESIUniverseCategories implements tModelBase {
     }
     async RefreshData() {
         let ids = await this.extService.eveESI.universe.categories.getIds();
-        let cnt = ids.length;
+        let cnt = 1;
         for (let id of ids) {
             try {
-                this.logger.info(`update data for UniverseCategorie ${id} | ${cnt--} remain`);
+                this.logger.info(`update data for UniverseCategorie ${id} | ${cnt++}/${ids.length}`);
                 await this.get(id, true);
             } catch (e) {
                 this.logger.error(e);
