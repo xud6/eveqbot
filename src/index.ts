@@ -51,35 +51,11 @@ export class eveqbot {
 
     }
     async refreshData() {
-        if ((await this.models.modelKvs.get("refreshData.isFresh.EveESIUniverseCategories")) !== "Y") {
-            try {
-                this.logger.info("start refresh EveESIUniverseCategories")
-                await this.models.modelEveESIUniverseCategories.RefreshData()
-                await this.models.modelKvs.set("refreshData.isFresh.EveESIUniverseCategories", "Y")
-                this.logger.info("finish refresh EveESIUniverseCategories")
-            } catch (e) {
-
-            }
-        }
-        if ((await this.models.modelKvs.get("refreshData.isFresh.EveESIUniverseGroups")) !== "Y") {
-            try {
-                this.logger.info("start refresh EveESIUniverseGroups")
-                await this.models.modelEveESIUniverseGroups.RefreshData()
-                await this.models.modelKvs.set("refreshData.isFresh.EveESIUniverseGroups", "Y")
-                this.logger.info("finish refresh EveESIUniverseGroups")
-            } catch (e) {
-
-            }
-        }
-        if ((await this.models.modelKvs.get("refreshData.isFresh.EveESIUniverseTypes")) !== "Y") {
-            try {
-                this.logger.info("start refresh EveESIUniverseTypes")
-                await this.models.modelEveESIUniverseTypes.RefreshData()
-                await this.models.modelKvs.set("refreshData.isFresh.EveESIUniverseTypes", "Y")
-                this.logger.info("finish refresh EveESIUniverseTypes")
-            } catch (e) {
-
-            }
-        }
+        this.logger.info("start refresh EveESIUniverseCategories")
+        await this.models.modelEveESIUniverseCategories.RefreshData()
+        this.logger.info("start refresh EveESIUniverseGroups")
+        await this.models.modelEveESIUniverseGroups.RefreshData()
+        this.logger.info("start refresh EveESIUniverseTypes")
+        await this.models.modelEveESIUniverseTypes.RefreshData()
     }
 }
