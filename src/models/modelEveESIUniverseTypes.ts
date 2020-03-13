@@ -23,13 +23,13 @@ export class modelEveESIUniverseTypes implements tModelBase {
         let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let result = (await repo.findByIds([id]))[0];
         if (result === undefined || forceRefresh) {
-            this.logger.info(`update ${id} because of ${result ? "" : "data not exist"}|${forceRefresh ? "force refresh" : ""}`)
+            this.logger.info(`update ${id} because of |${result ? "" : "data not exist"}|${forceRefresh ? "force refresh" : ""}|`)
 
             let enDataP = this.extService.eveESI.universe.types.getById(id, "en-us");
             let cnDataP = this.extService.eveESI.universe.types.getById(id, "zh");
             let enData = await enDataP;
             let cnData = await cnDataP;
-            
+
             if (result === undefined) {
                 result = repo.create()
                 result.id = id;

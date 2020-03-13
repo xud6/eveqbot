@@ -20,7 +20,7 @@ export class modelEveESIUniverseGroups implements tModelBase {
         let repo = await this.extService.db.getRepository(eveESIUniverseGroups);
         let result = (await repo.findByIds([id]))[0];
         if (result === undefined || forceRefresh) {
-            this.logger.info(`update ${id} because of ${result ? "" : "data not exist"}|${forceRefresh ? "force refresh" : ""}`)
+            this.logger.info(`update ${id} because of |${result ? "" : "data not exist"}|${forceRefresh ? "force refresh" : ""}|`)
 
             let enDataP = this.extService.eveESI.universe.groups.getById(id, "en-us");
             let cnDataP = this.extService.eveESI.universe.groups.getById(id, "zh");
