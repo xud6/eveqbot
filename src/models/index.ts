@@ -6,6 +6,7 @@ import { modelQQBotMessageSource } from "./modelQQBotMessageSource";
 import { modelKvs } from "./modelKvs";
 import { modelEveESIUniverseTypes } from "./modelEveESIUniverseTypes";
 import { modelEveESIUniverseCategories } from "./modelEveESIUniverseCategories";
+import { modelEveESIUniverseGroups } from "./modelEveESIUniverseGroups";
 
 export class cModels {
     readonly logger: tLogger
@@ -13,8 +14,9 @@ export class cModels {
     modelQQBotMessageLog: modelQQBotMessageLog
     modelQQBotMessageSource: modelQQBotMessageSource
     modelKvs: modelKvs
-    modelEveESIUniverseTypes: modelEveESIUniverseTypes
     modelEveESIUniverseCategories: modelEveESIUniverseCategories
+    modelEveESIUniverseGroups:modelEveESIUniverseGroups
+    modelEveESIUniverseTypes: modelEveESIUniverseTypes
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
@@ -22,16 +24,18 @@ export class cModels {
     ) {
         this.logger = parentLogger.logger(["models"]);
         this.models = [];
-        this.modelQQBotMessageLog = new modelQQBotMessageLog(this.logger, this.extService);
+        this.modelQQBotMessageLog = new modelQQBotMessageLog(this.logger, this.extService, this);
         this.models.push(this.modelQQBotMessageLog)
-        this.modelQQBotMessageSource = new modelQQBotMessageSource(this.logger, this.extService);
+        this.modelQQBotMessageSource = new modelQQBotMessageSource(this.logger, this.extService, this);
         this.models.push(this.modelQQBotMessageSource)
-        this.modelKvs = new modelKvs(this.logger, this.extService);
+        this.modelKvs = new modelKvs(this.logger, this.extService, this);
         this.models.push(this.modelKvs)
-        this.modelEveESIUniverseTypes = new modelEveESIUniverseTypes(this.logger, this.extService);
-        this.models.push(this.modelEveESIUniverseTypes)
-        this.modelEveESIUniverseCategories = new modelEveESIUniverseCategories(this.logger, this.extService);
+        this.modelEveESIUniverseCategories = new modelEveESIUniverseCategories(this.logger, this.extService, this);
         this.models.push(this.modelEveESIUniverseCategories)
+        this.modelEveESIUniverseGroups = new modelEveESIUniverseGroups(this.logger, this.extService, this);
+        this.models.push(this.modelEveESIUniverseGroups)
+        this.modelEveESIUniverseTypes = new modelEveESIUniverseTypes(this.logger, this.extService, this);
+        this.models.push(this.modelEveESIUniverseTypes)
     }
     async startup() {
         for (let model of this.models) {

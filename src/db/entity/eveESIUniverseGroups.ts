@@ -1,6 +1,7 @@
-import { Entity, PrimaryColumn, Column, UpdateDateColumn, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryColumn, Column, UpdateDateColumn, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { eveESIUniverseCategories } from "./eveESIUniverseCategories";
 import { tGroupsGetByIdResult } from "../../eveESI/universe/groups";
+import { eveESIUniverseTypes } from "./eveESIUniverseTypes";
 
 @Entity()
 export class eveESIUniverseGroups {
@@ -51,4 +52,7 @@ export class eveESIUniverseGroups {
 
     @UpdateDateColumn()
     updateDate: Date;
+    
+    @OneToMany(type => eveESIUniverseTypes, types => types.group)
+    types: eveESIUniverseTypes[];
 }

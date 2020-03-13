@@ -31,6 +31,12 @@ export class modelEveESIUniverseTypes implements tModelBase {
                 result.id = id;
             }
             result.group_id = enData.group_id;
+            let group = await this.models.modelEveESIUniverseGroups.get(result.group_id)
+            if (group) {
+                result.group = group;
+            } else {
+                throw new Error(`group ${result.group_id} not find for type ${id}`)
+            }
             result.market_group_id = enData.market_group_id || null;
             result.published = enData.published;
             result.en_name = enData.name;

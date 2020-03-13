@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn, UpdateDateColumn, JoinColumn, ManyToOne } from "typeorm";
 import { tTypesGetByIdResult } from "../../eveESI/universe/types";
+import { eveESIUniverseGroups } from "./eveESIUniverseGroups";
 
 @Entity()
 export class eveESIUniverseTypes {
@@ -12,6 +13,16 @@ export class eveESIUniverseTypes {
         type: "bigint"
     })
     group_id: number
+
+    @ManyToOne(
+        type => eveESIUniverseGroups,
+        group => group.types,
+        {
+            onDelete: "CASCADE"
+        }
+    )
+    @JoinColumn()
+    group: eveESIUniverseGroups;
 
     @Column({
         type: "bigint",
