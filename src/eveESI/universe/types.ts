@@ -6,7 +6,7 @@ import { isRight } from "fp-ts/lib/Either"
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { retryHandler } from "../retryHandler"
 
-export const vTypesGetIdsResult = t.array(t.number)
+export const vTypesGetIdsResult = t.array(t.Int)
 export const vTypesGetByIdResultRequired = t.type({
     description: t.string,
     group_id: t.Int,
