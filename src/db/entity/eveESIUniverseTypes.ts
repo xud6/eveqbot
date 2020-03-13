@@ -18,7 +18,8 @@ export class eveESIUniverseTypes {
         type => eveESIUniverseGroups,
         group => group.types,
         {
-            onDelete: "CASCADE"
+            onDelete: "CASCADE",
+            nullable: false
         }
     )
     @JoinColumn()
@@ -82,7 +83,7 @@ export class eveESIUniverseTypes {
         type: "bigint",
     })
     type_id: number
-    
+
     @UpdateDateColumn()
     updateDate: Date;
 }

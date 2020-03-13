@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, UpdateDateColumn, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Entity, PrimaryColumn, Column, UpdateDateColumn, JoinColumn, ManyToOne, OneToMany, Index } from "typeorm";
 import { eveESIUniverseCategories } from "./eveESIUniverseCategories";
 import { tGroupsGetByIdResult } from "../../eveESI/universe/groups";
 import { eveESIUniverseTypes } from "./eveESIUniverseTypes";
@@ -19,7 +19,8 @@ export class eveESIUniverseGroups {
         type => eveESIUniverseCategories,
         category => category.groups,
         {
-            onDelete: "CASCADE"
+            onDelete: "CASCADE",
+            nullable: false
         }
     )
     @JoinColumn()
@@ -52,7 +53,7 @@ export class eveESIUniverseGroups {
 
     @UpdateDateColumn()
     updateDate: Date;
-    
+
     @OneToMany(type => eveESIUniverseTypes, types => types.group)
     types: eveESIUniverseTypes[];
 }
