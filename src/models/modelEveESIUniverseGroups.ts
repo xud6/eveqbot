@@ -3,6 +3,7 @@ import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { eveESIUniverseGroups } from "../db/entity/eveESIUniverseGroups";
 import { cModels } from ".";
+import PQueue from "p-queue";
 
 export class modelEveESIUniverseGroups implements tModelBase {
     readonly name = "modelEveESIUniverseGroups"
@@ -51,24 +52,30 @@ export class modelEveESIUniverseGroups implements tModelBase {
             return null
         }
     }
-    async RefreshData(forceRefresh: boolean = false) {
+    async RefreshData(forceRefresh: boolean = false, concurrency: number = 5) {
         let inProcess = true;
         let currentPage = 1;
 
+        const queue = new PQueue({ concurrency: concurrency });
+        let total = 0;
+        let complete = 1;
         while (inProcess) {
             inProcess = false;
             this.logger.info(`start refresh page ${currentPage}`)
             let ids = await this.extService.eveESI.universe.groups.getIds(currentPage);
-
             if (ids.length > 0) {
-                let cnt = 1;
+                total += ids.length;
                 for (let id of ids) {
-                    try {
-                        this.logger.info(`update data for UniverseGroups ${id} |P${currentPage} ${cnt++}/${ids.length}`);
-                        await this.get(id, forceRefresh);
-                    } catch (e) {
-                        this.logger.error(e);
-                    }
+                    (async () => {
+                        try {
+                            await queue.add(async () => {
+                                await this.get(id, forceRefresh);
+                            });
+                            this.logger.info(`complete update data for UniverseGroups ${id} |${complete++}/${total}`);
+                        } catch (e) {
+                            this.logger.error(e);
+                        }
+                    })();
                 }
                 currentPage++;
                 inProcess = true
@@ -76,5 +83,7 @@ export class modelEveESIUniverseGroups implements tModelBase {
                 this.logger.info(`refresh complete`)
             }
         }
+        await queue.onIdle();
+        this.logger.info(`update data for UniverseGroups complete`)
     }
 }

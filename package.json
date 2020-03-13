@@ -42,6 +42,7 @@
     "lodash": "^4.17.11",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.0",
+    "p-queue": "^6.3.0",
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.0",
     "tag-tree-logger": "^1.2.0",

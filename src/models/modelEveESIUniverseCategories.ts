@@ -3,6 +3,7 @@ import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { eveESIUniverseCategories } from "../db/entity/eveESIUniverseCategories";
 import { cModels } from ".";
+import PQueue from "p-queue";
 
 export class modelEveESIUniverseCategories implements tModelBase {
     readonly name = "modelEveESIUniverseCategories"
@@ -39,16 +40,25 @@ export class modelEveESIUniverseCategories implements tModelBase {
             return null
         }
     }
-    async RefreshData(forceRefresh: boolean = false) {
+    async RefreshData(forceRefresh: boolean = false, concurrency: number = 5) {
+        const queue = new PQueue({ concurrency: concurrency });
         let ids = await this.extService.eveESI.universe.categories.getIds();
         let cnt = 1;
+        let total = ids.length;
+        let complete = 1;
         for (let id of ids) {
-            try {
-                this.logger.info(`update data for UniverseCategorie ${id} | ${cnt++}/${ids.length}`);
-                await this.get(id, forceRefresh);
-            } catch (e) {
-                this.logger.error(e);
-            }
+            (async () => {
+                try {
+                    await queue.add(async () => {
+                        await this.get(id, forceRefresh);
+                    });
+                    this.logger.info(`complete update data for UniverseCategorie ${id} |${complete++}/${total}`);
+                } catch (e) {
+                    this.logger.error(e);
+                }
+            })();
         }
+        await queue.onIdle();
+        this.logger.info(`update data for UniverseCategorie complete`)
     }
 }

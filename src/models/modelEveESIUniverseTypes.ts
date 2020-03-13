@@ -6,6 +6,7 @@ import { DeepPartial } from "typeorm";
 import { tTypesGetByIdResult } from "../eveESI/universe/types";
 import { modelKvs } from "./modelKvs";
 import { cModels } from ".";
+import PQueue from "p-queue";
 
 export class modelEveESIUniverseTypes implements tModelBase {
     readonly name = "modelEveESIUniverseTypes"
@@ -68,24 +69,30 @@ export class modelEveESIUniverseTypes implements tModelBase {
             return null
         }
     }
-    async RefreshData(forceRefresh: boolean = false) {
+    async RefreshData(forceRefresh: boolean = false, concurrency: number = 5) {
         let inProcess = true;
         let currentPage = 1;
-        
+
+        const queue = new PQueue({ concurrency: concurrency });
+        let total = 0;
+        let complete = 1;
         while (inProcess) {
             inProcess = false;
             this.logger.info(`start refresh page ${currentPage}`)
             let ids = await this.extService.eveESI.universe.types.getIds(currentPage);
-
             if (ids.length > 0) {
-                let cnt = 1;
+                total += ids.length;
                 for (let id of ids) {
-                    try {
-                        this.logger.info(`update data for UniverseTypes ${id} |P${currentPage} ${cnt++}/${ids.length}`);
-                        await this.get(id, forceRefresh);
-                    } catch (e) {
-                        this.logger.error(e);
-                    }
+                    (async () => {
+                        try {
+                            await queue.add(async () => {
+                                await this.get(id, forceRefresh);
+                            });
+                            this.logger.info(`complete update data for UniverseTypes ${id} |${complete++}/${total}`);
+                        } catch (e) {
+                            this.logger.error(e);
+                        }
+                    })();
                 }
                 currentPage++;
                 inProcess = true
@@ -93,5 +100,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
                 this.logger.info(`refresh complete`)
             }
         }
+        await queue.onIdle();
+        this.logger.info(`update data for UniverseTypes complete`)
     }
 }
