@@ -22,8 +22,8 @@ export class modelEveESIUniverseCategories implements tModelBase {
             let cnData = await this.extService.eveESI.universe.categories.getById(id, "zh");
             if (result === undefined) {
                 result = repo.create()
+                result.id = id
             }
-            result.id = id
             result.category_id = enData.category_id
             result.published = enData.published
             result.en_name = enData.name

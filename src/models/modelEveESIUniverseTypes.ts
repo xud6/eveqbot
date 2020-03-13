@@ -26,8 +26,8 @@ export class modelEveESIUniverseTypes implements tModelBase {
             let cnData = await this.extService.eveESI.universe.types.getById(id, "zh");
             if (result === undefined) {
                 result = repo.create()
+                result.id = id;
             }
-            result.id = id;
             result.group_id = enData.group_id;
             result.market_group_id = enData.market_group_id || null;
             result.published = enData.published;
