@@ -23,7 +23,8 @@ let config: tConfig = {
     },
     service: {
         QQBot: true
-    }
+    },
+    dataLoadConcurrency: 5
 }
 
 try {
@@ -63,4 +64,16 @@ if (process.env.DB_URL && (process.env.DB_URL.length > 0)) {
     config.db.url = process.env.DB_URL;
     console.log(`read DB_URL from env`);
 }
+
+if (process.env.DATA_LOAD_CONCURRENT && (process.env.DATA_LOAD_CONCURRENT.length > 0)) {
+    try {
+        let DATA_LOAD_CONCURRENT = parseInt(process.env.DATA_LOAD_CONCURRENT);
+        if (DATA_LOAD_CONCURRENT > 0) {
+            config.dataLoadConcurrency = DATA_LOAD_CONCURRENT
+            console.log(`read DATA_LOAD_CONCURRENT from env`);
+        }
+    } catch (e) {
+    }
+}
+
 export default config;

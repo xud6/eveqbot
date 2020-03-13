@@ -26,5 +26,6 @@ export interface tConfig {
     logger: tLogConfig[]
     QQBot: tCQQBotCfg
     db: tDatabaseConfig,
-    service: tServiceCfg
+    service: tServiceCfg,
+    dataLoadConcurrency: number
 }
