@@ -1,18 +1,14 @@
 import { tLogger } from "tag-tree-logger"
-import { cModels } from "../../models";
 import { eveTypesInfo } from "./typesInfo";
+import { eveTranquilityExtService } from "../types";
 
-
-export interface eveUniverseExtService {
-    models: cModels
-}
 
 export class eveUniverse {
     readonly logger: tLogger
     typesInfo: eveTypesInfo
     constructor(
         readonly parentLogger: tLogger,
-        readonly extService: eveUniverseExtService
+        readonly extService: eveTranquilityExtService
     ) {
         this.logger = parentLogger.logger(["universe"])
         this.typesInfo = new eveTypesInfo(this.logger, this.extService)

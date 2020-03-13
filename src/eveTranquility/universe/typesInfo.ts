@@ -1,17 +1,7 @@
-import { modelKvs } from "../../models/modelKvs"
 import { tLogger } from "tag-tree-logger"
 import { isArray } from "lodash"
 import fetch from "node-fetch"
-import { modelEveTQUniverseTypes } from "../../models/modelEveTQUniverseTypes"
-
-export interface eveTQTypesInfoExtService {
-    models: {
-        modelKvs: modelKvs,
-        modelEveTQUniverseTypes: modelEveTQUniverseTypes
-    }
-}
-
-
+import { eveTranquilityExtService } from "../types"
 
 export class eveTypesInfo {
     readonly logger: tLogger
@@ -24,7 +14,7 @@ export class eveTypesInfo {
     opId = 0;
     constructor(
         readonly parentLogger: tLogger,
-        readonly extService: eveTQTypesInfoExtService
+        readonly extService: eveTranquilityExtService
     ) {
         this.logger = parentLogger.logger(["typesInfo"])
     }
@@ -69,22 +59,6 @@ export class eveTypesInfo {
             this.timerTaskUpdateTypeInfosLock = false
         }
     }
-    async apiGetTypeId(page: number): Promise<number[]> {
-        let opId = this.opId++;
-        let url = `${this.esiUrl}/v1/universe/types/?datasource=${this.datasource}&page=${page}`
-        this.logger.info(`${opId}| read TypeId page ${page} | ${url}`)
-        let result = await fetch(url, { timeout: this.fetchTimeout })
-        if (result.ok) {
-            let data = await result.json();
-            if (isArray(data)) {
-                return data
-            } else {
-                throw new Error(`${opId}| api access error result unexpected ${data}`)
-            }
-        } else {
-            throw new Error(`${opId}| api access error: ${result.statusText}`)
-        }
-    }
     async apiGetTypeData(id: number, language: "en-us" | "zh") {
         let opId = this.opId++;
         let url = `${this.esiUrl}/v3/universe/types/${id}/?datasource=${this.datasource}&language=${language}`
@@ -100,7 +74,7 @@ export class eveTypesInfo {
         let opId = this.opId++;
         this.logger.info(`${opId}| process type page ${page}`)
         let ids = await this.retry(() => {
-            return this.apiGetTypeId(page)
+            return this.extService.eveESI.universe.types.getIds(page)
         }, this.apiRetry)
 
         let processedId = -1;

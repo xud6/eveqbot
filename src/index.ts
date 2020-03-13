@@ -8,14 +8,17 @@ import { tConfig } from './types';
 import { cModels } from './models';
 import { eveTranquility } from './eveTranquility';
 import { opId } from './opId';
+import { eveESI } from './eveESI';
+import { eveESICfgDefault } from './eveESI/types';
 
 export interface eveqbotExtService {
 
 }
 export class eveqbot {
     readonly logger: tLogger
-    opId:opId
+    opId: opId
     db: typeormdb
+    eveESI: eveESI
     models: cModels
     eveTranquility: eveTranquility
     itemdb: cItemdb
@@ -26,7 +29,8 @@ export class eveqbot {
         this.opId = new opId()
         this.db = new typeormdb(this.logger, this.config.db)
         this.models = new cModels(this.logger, { db: this.db }, {})
-        this.eveTranquility = new eveTranquility(this.logger, { models: this.models })
+        this.eveESI = new eveESI(this.logger, { opId: this.opId }, eveESICfgDefault)
+        this.eveTranquility = new eveTranquility(this.logger, { models: this.models, eveESI: this.eveESI })
         this.itemdb = new cItemdb('itemdb.xls');
         this.CEVEMarketApi = new cCEVEMarketApi();
         this.bot = new cQQBot(this.logger, { itemdb: this.itemdb, CEVEMarketApi: this.CEVEMarketApi, models: this.models }, this.config.QQBot);

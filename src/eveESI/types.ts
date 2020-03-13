@@ -1,0 +1,17 @@
+import { opId } from "../opId";
+
+export interface tEveESIExtService {
+    opId: opId
+}
+
+export interface tEveESICfg {
+    esiUrl: string,
+    datasource: string,
+    fetchTimeout: number
+}
+
+export const eveESICfgDefault: tEveESICfg = {
+    esiUrl: "https://esi.evetech.net",
+    datasource: "tranquility",
+    fetchTimeout: 1000 * 20,
+}
