@@ -26,12 +26,20 @@ export class modelQQBotMessageLog implements tModelBase {
             message_id: messageInfo.message_id,
             message_type: messageInfo.message_type,
             group_id: messageInfo.group_id,
+            discuss_id: messageInfo.discuss_id,
+            atMe: messageInfo.atMe,
             sender_user_id: messageInfo.sender_user_id,
             sender_nickname: messageInfo.sender_nickname,
+            sender_card: messageInfo.sender_card,
+            sender_area: messageInfo.sender_area,
+            sender_level: messageInfo.sender_level,
+            sender_role: messageInfo.sender_role,
+            sender_title: messageInfo.sender_title,
             self_id: messageInfo.self_id,
-            atMe: messageInfo.atMe,
+            time: messageInfo.time,
+            sub_type: messageInfo.sub_type,
+            anonymous: messageInfo.anonymous,
             source: source,
-            raw_context: context,
             raw_tags: tags
         })
         return await repo.save(messageLogEntry)

@@ -33,6 +33,13 @@ export class QQBotMessageLog {
     group_id: number | null
 
     @Column({
+        type: "bigint",
+        nullable: true,
+        default: null
+    })
+    discuss_id: number | null
+
+    @Column({
         type: "boolean",
         default: false
     })
@@ -50,9 +57,69 @@ export class QQBotMessageLog {
     sender_nickname: string
 
     @Column({
+        type: "varchar",
+        length: 200,
+        nullable: true,
+        default: null
+    })
+    sender_card: string | null
+
+    @Column({
+        type: "varchar",
+        length: 200,
+        nullable: true,
+        default: null
+    })
+    sender_area: string | null
+
+    @Column({
+        type: "varchar",
+        length: 200,
+        nullable: true,
+        default: null
+    })
+    sender_level: string | null
+
+    @Column({
+        type: "varchar",
+        length: 200,
+        nullable: true,
+        default: null
+    })
+    sender_role: string | null
+
+    @Column({
+        type: "varchar",
+        length: 200,
+        nullable: true,
+        default: null
+    })
+    sender_title: string | null
+
+    @Column({
         type: "bigint"
     })
     self_id: number
+
+    @Column({
+        type: "bigint"
+    })
+    time: number
+
+    @Column({
+        type: "varchar",
+        length: 200,
+        nullable: true,
+        default: null
+    })
+    sub_type: string | null
+
+    @Column({
+        type: "simple-json",
+        nullable: true,
+        default: null
+    })
+    anonymous: any
 
     @Index()
     @Column({
@@ -72,10 +139,6 @@ export class QQBotMessageLog {
     @JoinColumn()
     source: QQBotMessageSource;
 
-    @Column("simple-json")
-    raw_context: Record<string, any>
-
-    @Column("simple-json")
     raw_tags: CQTag[]
 
     @UpdateDateColumn()
