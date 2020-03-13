@@ -43,7 +43,7 @@ export class modelEveESIUniverseCategories implements tModelBase {
         for (let id of ids) {
             try {
                 this.logger.info(`update data for UniverseCategorie ${id} | ${cnt--} remain`);
-                this.get(id, true);
+                await this.get(id, true);
             } catch (e) {
                 this.logger.error(e);
             }

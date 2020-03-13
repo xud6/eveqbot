@@ -74,12 +74,12 @@ export class modelEveESIUniverseTypes implements tModelBase {
                     if (id > processedId) {
                         try {
                             this.logger.info(`update data for UniverseCategorie ${id} |P${currentPage} ${cnt++}/${ids.length}`);
-                            this.get(id, true);
+                            await this.get(id, true);
                         } catch (e) {
                             this.logger.error(e);
                         }
                     } else {
-                        this.get(id);
+                        await this.get(id);
                     }
                 }
             } else {

@@ -52,10 +52,12 @@ export class eveqbot {
     }
     async refreshData() {
         if ((await this.models.modelKvs.get("refreshData.isFresh.EveESIUniverseCategories")) !== "Y") {
+            this.logger.info("start refresh EveESIUniverseCategories")
             await this.models.modelEveESIUniverseCategories.RefreshData()
             await this.models.modelKvs.set("refreshData.isFresh.EveESIUniverseCategories", "Y")
         }
         if ((await this.models.modelKvs.get("refreshData.isFresh.EveESIUniverseTypes")) !== "Y") {
+            this.logger.info("start refresh EveESIUniverseTypes")
             await this.models.modelEveESIUniverseTypes.RefreshData(this.models.modelKvs)
             await this.models.modelKvs.set("refreshData.isFresh.EveESIUniverseTypes", "Y")
         }
