@@ -37,6 +37,8 @@
   "dependencies": {
     "@xud6/cq-websocket": "^2.1.2",
     "@xud6/dump-to-file-sync": "^2.0.1",
+    "fp-ts": "^2.5.3",
+    "io-ts": "^2.1.2",
     "lodash": "^4.17.11",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.0",
