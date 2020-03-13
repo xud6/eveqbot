@@ -61,10 +61,20 @@ export class eveqbot {
 
             }
         }
+        if ((await this.models.modelKvs.get("refreshData.isFresh.EveESIUniverseGroups")) !== "Y") {
+            try {
+                this.logger.info("start refresh EveESIUniverseGroups")
+                await this.models.modelEveESIUniverseGroups.RefreshData()
+                await this.models.modelKvs.set("refreshData.isFresh.EveESIUniverseGroups", "Y")
+                this.logger.info("finish refresh EveESIUniverseGroups")
+            } catch (e) {
+
+            }
+        }
         if ((await this.models.modelKvs.get("refreshData.isFresh.EveESIUniverseTypes")) !== "Y") {
             try {
                 this.logger.info("start refresh EveESIUniverseTypes")
-                await this.models.modelEveESIUniverseTypes.RefreshData(this.models.modelKvs)
+                await this.models.modelEveESIUniverseTypes.RefreshData()
                 await this.models.modelKvs.set("refreshData.isFresh.EveESIUniverseTypes", "Y")
                 this.logger.info("finish refresh EveESIUniverseTypes")
             } catch (e) {
