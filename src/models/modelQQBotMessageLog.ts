@@ -31,7 +31,6 @@ export class modelQQBotMessageLog implements tModelBase {
             self_id: messageInfo.self_id,
             atMe: messageInfo.atMe,
             source: source,
-            raw_event: event,
             raw_context: context,
             raw_tags: tags
         })

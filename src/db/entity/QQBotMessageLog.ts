@@ -73,9 +73,6 @@ export class QQBotMessageLog {
     source: QQBotMessageSource;
 
     @Column("simple-json")
-    raw_event: CQEvent
-
-    @Column("simple-json")
     raw_context: Record<string, any>
 
     @Column("simple-json")
