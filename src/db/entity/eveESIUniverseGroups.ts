@@ -1,6 +1,5 @@
 import { Entity, PrimaryColumn, Column, UpdateDateColumn, JoinColumn, ManyToOne, OneToMany, Index } from "typeorm";
 import { eveESIUniverseCategories } from "./eveESIUniverseCategories";
-import { tGroupsGetByIdResult } from "../../eveESI/universe/groups";
 import { eveESIUniverseTypes } from "./eveESIUniverseTypes";
 
 @Entity()
