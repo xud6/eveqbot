@@ -1,5 +1,5 @@
 import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
-import { tMessageInfo } from "..";
+import { tMessageInfo } from "../qqMessage";
 
 export interface tCommandBase {
     name: string,

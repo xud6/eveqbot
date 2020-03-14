@@ -2,7 +2,6 @@ import { tModelBase } from "./modelBase";
 import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { kvs } from "../db/entity/kvs";
-import { tMessageInfo } from "../bot";
 import { cModels } from ".";
 
 interface tMessageSourceInfo {

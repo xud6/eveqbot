@@ -1,10 +1,11 @@
 import { tCommandBase } from "./tCommandBase";
 import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
-import { tMessageInfo, cQQBotExtService } from "..";
+import { cQQBotExtService } from "..";
 import { tLogger } from "tag-tree-logger";
 import { eveMarketApi, eveServerInfo, eveMarketApiInfo } from "../../types";
 import { join } from "lodash";
 import { itemNameDisp, formatItemNames } from "../../utils/eveFuncs";
+import { tMessageInfo } from "../qqMessage";
 
 export class commandJita implements tCommandBase {
     readonly logger: tLogger

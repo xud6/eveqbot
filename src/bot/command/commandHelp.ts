@@ -1,7 +1,8 @@
 import { tCommandBase } from "./tCommandBase";
 import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
-import { tMessageInfo, cQQBotExtService } from "..";
+import { cQQBotExtService } from "..";
 import { tLogger } from "tag-tree-logger";
+import { tMessageInfo } from "../qqMessage";
 
 export class commandHelp implements tCommandBase {
     readonly logger: tLogger

@@ -3,8 +3,8 @@ import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { CQEvent, CQTag } from "@xud6/cq-websocket";
 import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
-import { tMessageInfo } from "../bot";
 import { cModels } from ".";
+import { tMessageInfo } from "../bot/qqMessage";
 
 interface tMessageSourceInfo {
     source_type: string,
