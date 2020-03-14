@@ -25,6 +25,12 @@ export class QQBotMessageSource {
     enable: boolean
 
     @Column({
+        type: "boolean",
+        default: true
+    })
+    production: boolean
+
+    @Column({
         type: "int",
         default: eveServer.serenity
     })
