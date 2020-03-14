@@ -30,6 +30,13 @@ export class QQBotMessageSource {
     })
     eve_server: eveServer
 
+    @Column({
+        type: "varchar",
+        length: 200,
+        default: ""
+    })
+    comment: string
+
     @OneToMany(type => QQBotMessageLog, messageLog => messageLog.source)
     messageLog: QQBotMessageLog[];
 }
