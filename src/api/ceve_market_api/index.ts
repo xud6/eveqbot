@@ -35,8 +35,8 @@ function numberFormat(num: number, minimumFractionDigits: number = 0) {
     }
 }
 
-export interface cCEVEMarketApiCfg {
-
+export interface tCEVEMarketApiCfg {
+    httpTimeout: number
 }
 
 export interface cCEVEMarketApiExtSrv {
@@ -51,7 +51,7 @@ export class cCEVEMarketApi {
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: cCEVEMarketApiExtSrv,
-        readonly config: cCEVEMarketApiCfg
+        readonly config: tCEVEMarketApiCfg
     ) {
         this.logger = parentLogger.logger(["CEVEMarketApi"])
     }

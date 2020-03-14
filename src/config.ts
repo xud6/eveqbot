@@ -26,6 +26,9 @@ let config: tConfig = {
         QQBot: true,
         reloadData: true
     },
+    CEVEMarketApi: {
+        httpTimeout: 1000 * 20
+    },
     dataLoadConcurrency: 5
 }
 
