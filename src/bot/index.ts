@@ -77,9 +77,9 @@ export class cQQBot {
         }
         return null
     }
-    async checkMessage(messageInfo: tMessageInfo): Promise<{ command: tCommandBase, msg: string } | null> {
+    async checkMessage(message: string): Promise<{ command: tCommandBase, msg: string } | null> {
         for (let command of this.commands) {
-            let msg = this.checkStartWith(messageInfo.message, command.commandPrefix)
+            let msg = this.checkStartWith(message, command.commandPrefix)
             if (msg !== null) {
                 return {
                     command: command,
@@ -90,7 +90,11 @@ export class cQQBot {
         return null
     }
     async handlerMessage(messageSource: QQBotMessageSource, messageInfo: tMessageInfo): Promise<string | void> {
-        let commandMsg = await this.checkMessage(messageInfo);
+        let message = messageInfo.message
+        if (messageInfo.atMe) {
+            message = replace(message, `[CQ:at,qq=${messageInfo.self_id}]`, '')
+        }
+        let commandMsg = await this.checkMessage(messageInfo.message);
         if (commandMsg) {
             if (messageSource.enable) {
                 if (this.config.nonProductionSourceOnly) {
