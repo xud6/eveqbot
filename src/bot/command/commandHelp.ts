@@ -41,7 +41,7 @@ export class commandHelp implements tCommandBase {
             let result = ""
             result = result + join(this.QQBot.commands.map((c) => {
                 if (c.adminOnly) {
-                    if (messagePacket.isAdmin) {
+                    if (messagePacket.isAdmin && messagePacket.atMe) {
                         return c.helpStr
                     } else {
                         return ""
@@ -50,9 +50,9 @@ export class commandHelp implements tCommandBase {
                 return c.helpStr
             }), "")
 
-            if (messageSource.links) {
+            if (messageSource.info) {
                 result = result + "---Links---\n"
-                result = result + messageSource.links
+                result = result + messageSource.info
                 result = result + "\n"
             }
 

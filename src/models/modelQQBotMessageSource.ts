@@ -66,13 +66,13 @@ export class modelQQBotMessageSource implements tModelBase {
     isAdmin(messageInfo: tMessageInfo, messageSource: QQBotMessageSource) {
         return indexOf(messageSource.admins, `${messageInfo.sender_user_id}`) >= 0
     }
-    async setLinks(id: number, links: string) {
+    async setInfo(id: number, info: string) {
         let repo = await this.extService.db.getRepository(QQBotMessageSource);
         let source = await repo.findOne({
             id: id
         })
         if (source) {
-            source.links = links;
+            source.info = info;
             await repo.save(source)
             return repo.findOne({
                 id: id

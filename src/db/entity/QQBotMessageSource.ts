@@ -52,7 +52,7 @@ export class QQBotMessageSource {
     @Column({
         type: "text"
     })
-    links: string
+    info: string
 
     @Column({
         type: "simple-array"
