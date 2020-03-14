@@ -196,24 +196,26 @@ export class cQQBot {
     async handlerMessage(messageSource: QQBotMessageSource, event: CQEvent, context: Record<string, any>): Promise<string | void> {
         let command = await this.checkMessage(event, context);
         if (command) {
-            let res: string | null = null
-            this.logger.info(`Command [${command.op}] with [${command.msg}] from [${context.user_id}]`);
-            switch (command.op) {
-                case opType.JITA:
-                    res = await this.handlerMessageJita(messageSource, command.msg, context);
-                    break;
-                case opType.ADDR:
-                    res = await this.handlerMessageAddr(messageSource, command.msg, context);
-                    break;
-                case opType.HELP:
-                    res = await this.handlerMessageHelp(messageSource, command.msg, context);
-                    break;
-                case opType.ITEM:
-                    res = await this.handlerMessageItem(messageSource, command.msg, context);
-                    break;
-            }
-            if (res) {
-                return `[CQ:at,qq=${context.user_id}]\n${res}`
+            if(messageSource.enable){
+                let res: string | null = null
+                this.logger.info(`Command [${command.op}] with [${command.msg}] from [${context.user_id}]`);
+                switch (command.op) {
+                    case opType.JITA:
+                        res = await this.handlerMessageJita(messageSource, command.msg, context);
+                        break;
+                    case opType.ADDR:
+                        res = await this.handlerMessageAddr(messageSource, command.msg, context);
+                        break;
+                    case opType.HELP:
+                        res = await this.handlerMessageHelp(messageSource, command.msg, context);
+                        break;
+                    case opType.ITEM:
+                        res = await this.handlerMessageItem(messageSource, command.msg, context);
+                        break;
+                }
+                if (res) {
+                    return `[CQ:at,qq=${context.user_id}]\n${res}`
+                }
             }
         }
     }
