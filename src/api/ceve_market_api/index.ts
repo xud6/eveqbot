@@ -1,6 +1,7 @@
 import request from 'request'
 import { includes } from 'lodash';
 import { isString } from 'util';
+import { eveServer } from '../../types';
 
 export interface apiMarketResponse {
     sell: {
@@ -34,11 +35,17 @@ function numberFormat(num: number, minimumFractionDigits: number = 0) {
 }
 
 export class cCEVEMarketApi {
-    readonly baseUrl = 'https://www.ceve-market.org/api/'
-    async marketRegion(itemId: string, regionId: string = '10000002'): Promise<apiMarketResponse> {
+    readonly urlBase = 'https://www.ceve-market.org'
+    readonly urlPathSerenity = '/api'
+    readonly urlPathTranquility = '/tqapi'
+    async marketRegion(itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002'): Promise<apiMarketResponse> {
         console.log(`make get market api call for ${itemId}`);
         console.time(`get market api call for ${itemId} end in `)
-        const url = `${this.baseUrl}market/region/${regionId}/type/${itemId}.json`
+        let apiPath = this.urlPathSerenity;
+        if (server === eveServer.tranquility) {
+            apiPath = this.urlPathTranquility
+        }
+        const url = `${this.urlBase}${apiPath}/market/region/${regionId}/type/${itemId}.json`
         let res = await new Promise<apiMarketResponse>((resolve, reject) => {
             request.get(url, { json: true }, (error, response, body) => {
                 if (error) {
@@ -52,6 +59,8 @@ export class cCEVEMarketApi {
                     if (includes(body, '502')) {
                         reject('市场中心暂时失联，原因(502)')
                     } else {
+                        console.error('市场中心暂时失联，原因(返回格式错误)')
+                        console.error(body)
                         reject('市场中心暂时失联，原因(返回格式错误)')
                     }
                 }
@@ -60,25 +69,29 @@ export class cCEVEMarketApi {
         console.timeEnd(`get market api call for ${itemId} end in `)
         return res;
     }
-    async getMarketString(itemId: string, regionId?: string): Promise<string> {
-        try{
-            let data = await this.marketRegion(itemId, regionId)
+    async getMarketString(itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002'): Promise<string> {
+        try {
+            let data = await this.marketRegion(itemId, server, regionId)
             let buyHigh = numberFormat(Number(data.buy.max), 2);
             let sellLow = numberFormat(Number(data.sell.min), 2);
             let buyAmount = numberFormat(Number(data.buy.volume));
             let sellAmount = numberFormat(Number(data.sell.volume));
             return `最高收价: ${buyHigh} / 最低卖价: ${sellLow} | 挂单量: ${buyAmount} / ${sellAmount}`
-        }catch(e){
-            if(isString(e)){
+        } catch (e) {
+            if (isString(e)) {
                 return e;
-            }else{
+            } else {
                 console.log(e)
                 return '内部错误'
             }
         }
     }
-    async searchName(name: string): Promise<apiSearchNameResponse[]> {
-        const url = `${this.baseUrl}searchname`;
+    async searchName(name: string, server: eveServer = eveServer.serenity): Promise<apiSearchNameResponse[]> {
+        let apiPath = this.urlPathSerenity;
+        if (server === eveServer.tranquility) {
+            apiPath = this.urlPathTranquility
+        }
+        const url = `${this.urlBase}${apiPath}/searchname`;
         return await new Promise<apiSearchNameResponse[]>((resolve, reject) => {
             request.post(url, { json: true, form: { name: name } }, (error, response, body) => {
                 if (error) {
