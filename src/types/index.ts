@@ -32,6 +32,7 @@ export interface tConfig {
 }
 
 export enum eveServer {
-    tranquility = 0,
+    both = 0,
     serenity = 1,
+    tranquility = 2,
 }
