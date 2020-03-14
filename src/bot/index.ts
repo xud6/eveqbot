@@ -92,9 +92,9 @@ export class cQQBot {
     async handlerMessage(messageSource: QQBotMessageSource, messageInfo: tMessageInfo): Promise<string | void> {
         let message = messageInfo.message
         if (messageInfo.atMe) {
-            message = replace(message, `[CQ:at,qq=${messageInfo.self_id}]`, '')
+            message = trim(replace(message, `[CQ:at,qq=${messageInfo.self_id}]`, ''))
         }
-        let commandMsg = await this.checkMessage(messageInfo.message);
+        let commandMsg = await this.checkMessage(message);
         if (commandMsg) {
             if (messageSource.enable) {
                 if (this.config.nonProductionSourceOnly) {
