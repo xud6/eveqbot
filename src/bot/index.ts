@@ -164,7 +164,7 @@ export class cQQBot {
                 msg: jita
             }
         }
-        let addr = checkStartWith(context.message, ['.addr', '。adr', '.地址', '。地址']);
+        let addr = checkStartWith(context.message, ['.addr', '。addr', '.地址', '。地址']);
         if (addr) {
             return {
                 op: opType.ADDR,
