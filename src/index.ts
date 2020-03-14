@@ -1,4 +1,3 @@
-import { cItemdb } from './eveSerenity/itemdb/index';
 import { cCEVEMarketApi } from './eveSerenity/ceve_market_api/index';
 import { cQQBot } from './bot/index';
 import { CQWebSocketOption } from '@xud6/cq-websocket';
@@ -21,7 +20,6 @@ export class eveqbot {
     eveESI: eveESI
     models: cModels
     eveTranquility: eveTranquility
-    itemdb: cItemdb
     CEVEMarketApi: cCEVEMarketApi
     bot: cQQBot | null
     constructor(readonly parentLogger: tLogger, readonly extService: eveqbotExtService, readonly config: tConfig) {
@@ -31,10 +29,9 @@ export class eveqbot {
         this.eveESI = new eveESI(this.logger, { opId: this.opId }, eveESICfgDefault)
         this.models = new cModels(this.logger, { db: this.db, eveESI: this.eveESI, opId: this.opId }, {})
         this.eveTranquility = new eveTranquility(this.logger, { models: this.models, eveESI: this.eveESI })
-        this.itemdb = new cItemdb('itemdb.xls');
         this.CEVEMarketApi = new cCEVEMarketApi();
         if (this.config.service.QQBot) {
-            this.bot = new cQQBot(this.logger, { itemdb: this.itemdb, CEVEMarketApi: this.CEVEMarketApi, models: this.models }, this.config.QQBot);
+            this.bot = new cQQBot(this.logger, { CEVEMarketApi: this.CEVEMarketApi, models: this.models }, this.config.QQBot);
         } else {
             this.bot = null
         }

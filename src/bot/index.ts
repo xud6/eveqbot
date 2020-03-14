@@ -1,10 +1,11 @@
 import { CQWebSocket, CQWebSocketOption, CQEvent, WebSocketType, CQTag } from "@xud6/cq-websocket";
-import { cItemdb, tItemData } from "../eveSerenity/itemdb/index";
 import { cCEVEMarketApi } from "../eveSerenity/ceve_market_api/index";
 import { startsWith, trim, replace, map, join, forEach, take, toString, toInteger, find } from "lodash";
 import { tLogger } from "tag-tree-logger";
 import { modelQQBotMessageLog } from "../models/modelQQBotMessageLog";
 import { modelQQBotMessageSource } from "../models/modelQQBotMessageSource";
+import { modelEveESIUniverseTypes } from "../models/modelEveESIUniverseTypes";
+import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
 
 enum opType {
     JITA = '.jita',
@@ -26,17 +27,11 @@ function checkStartWith(msg: string, tags: string[]): string | null {
     return null
 }
 
-function formatItemNames(items: tItemData[], div: number = 5) {
+function formatItemNames(items: eveESIUniverseTypes[]) {
     let d = 0;
     return join(map(items, item => {
-        d++;
-        if (d > div) {
-            d = 0
-            return item.name + '\n'
-        } else {
-            return item.name
-        }
-    }), " | ")
+        return `${item.cn_name}/${item.en_name}|${item.group.cn_name}|${item.group.category.cn_name}`
+    }), "\n")
 }
 
 export interface tMessageInfo {
@@ -104,11 +99,11 @@ export interface tCQQBotCfg {
 }
 
 export interface cQQBotExtService {
-    itemdb: cItemdb
     CEVEMarketApi: cCEVEMarketApi
     models: {
         modelQQBotMessageLog: modelQQBotMessageLog
-        modelQQBotMessageSource: modelQQBotMessageSource
+        modelQQBotMessageSource: modelQQBotMessageSource,
+        modelEveESIUniverseTypes: modelEveESIUniverseTypes
     }
 }
 
@@ -203,26 +198,30 @@ export class cQQBot {
             return `查询内容过长，当前共${message.length}个字符，最大${this.jita.searchContentLimit}`
         }
 
-        let items = this.extService.itemdb.search(message)
+        let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(message, this.jita.resultNameListLimit + 1)
         if (items.length == 0) {
             this.logger.info(`找不到 ${message}`)
             return '找不到该物品'
         } else if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
             this.logger.info("搜索结果为：" + join(map(items, item => {
-                return item.name
+                return `${item.cn_name}(${item.en_name})`
             }), "/"))
             let marketdata: string[] = await Promise.all(items.map(async item => {
-                let market = await this.extService.CEVEMarketApi.getMarketString(item.itemId.toString())
-                return `${item.name} --- ${market}`;
+                let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString())
+                return `${item.cn_name}/${item.en_name} --- ${market}`;
             }))
             return join(marketdata, "\n");
         } else {
             let front = take(items, this.jita.resultNameListLimit);
             this.logger.info(`搜索结果过多: ${items.length}`)
             this.logger.info("搜索结果为：" + join(map(items, item => {
-                return item.name
+                return `${item.cn_name}(${item.en_name})`
             }), "/"))
-            let res = `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n` + formatItemNames(front);
+            let cntStr = `共有${items.length}种物品符合该条件`
+            if (items.length > this.jita.resultNameListLimit) {
+                cntStr = `共有超过50种物品符合该条件`
+            }
+            let res = `${cntStr}，请给出更明确的物品名称\n` + formatItemNames(front);
             if (items.length > this.jita.resultNameListLimit) {
                 res = res + '\n......'
             }
