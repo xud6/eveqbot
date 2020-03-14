@@ -7,6 +7,9 @@ import { tTypesGetByIdResult } from "../eveESI/universe/types";
 import { modelKvs } from "./modelKvs";
 import { cModels } from ".";
 import PQueue from "p-queue";
+import { eveIsSkins, eveIsBlueprint, eveCommonNameTransfer } from "../utils/eveFuncs";
+import { spliteWords } from "../utils/spliteWords";
+import { uniq } from "lodash";
 
 export class modelEveESIUniverseTypes implements tModelBase {
     readonly name = "modelEveESIUniverseTypes"
@@ -103,7 +106,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         await queue.onIdle();
         this.logger.info(`update data for UniverseTypes complete`)
     }
-    async MarketSearchByExactName(name: string, limit: number = 11) {
+    async MarketSearchByExactName(name: string, limit: number = 51) {
         let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let query = repo.createQueryBuilder("type")
             .where(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
@@ -130,7 +133,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
     }
     async MarketSearchByWord(
         word: string,
-        limit: number = 11,
+        limit: number = 51,
         skins: boolean = false,
         blueprint: boolean = false,
         apparel: boolean = false
@@ -170,7 +173,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
     }
     async MarketSearchByWords(
         words: string[],
-        limit: number = 11,
+        limit: number = 51,
         skins: boolean = false,
         blueprint: boolean = false,
         apparel: boolean = false
@@ -212,7 +215,41 @@ export class modelEveESIUniverseTypes implements tModelBase {
         query = query.limit(limit)
         return await query.getMany()
     }
-    async MarketSearch() {
-
+    private async funcMarketSearch(
+        input: string,
+        limit: number = 51
+    ) {
+        let result = await this.MarketSearchByExactName(input, limit)
+        if (result.length > 0) {
+            return result;
+        }
+        let isSkin = eveIsSkins(input);
+        let isBlueprint = eveIsBlueprint(input);
+        result = await this.MarketSearchByWord(input, limit, isSkin, isBlueprint, false)
+        if (result.length > 0) {
+            return result;
+        }
+        let inputT = eveCommonNameTransfer(input);
+        if (inputT === input) {
+            result = await this.MarketSearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false)
+        } else {
+            let pResultO = this.MarketSearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false)
+            let pResultT = this.MarketSearchByWords(spliteWords(inputT), limit, isSkin, isBlueprint, false)
+            result = uniq((await pResultO).concat(await pResultT))
+        }
+        return result;
+    }
+    async MarketSearch(
+        input: string,
+        limit: number = 51
+    ) {
+        let opid = this.extService.opId.getId();
+        this.logger.info(`${opid}| market search for ${input} in UniverseType`)
+        let records = await this.funcMarketSearch(input, limit)
+        this.logger.info(`${opid}| find ${records.length} record for ${input}`)
+        for (let r of records) {
+            this.logger.log(`${opid}| ID:${r.id}|${r.cn_name}|${r.en_name}|${r.group.cn_name}|${r.group.category.cn_name}`)
+        }
+        return records
     }
 }
