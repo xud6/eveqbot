@@ -7,7 +7,7 @@ import { modelQQBotMessageSource } from "../models/modelQQBotMessageSource";
 import { modelEveESIUniverseTypes } from "../models/modelEveESIUniverseTypes";
 import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
 import { tCommandBase } from "./command/tCommandBase";
-import { commandAddr } from "./command/commandAddr";
+import { commandLink } from "./command/commandLink";
 import { commandItem } from "./command/commandItem";
 import { commandJita } from "./command/commandJita";
 import { commandHelp } from "./command/commandHelp";
@@ -63,7 +63,7 @@ export class cQQBot {
         this.commands = [];
         this.commands.push(new commandJita(this.logger, this.extService))
         this.commands.push(new commandItem(this.logger, this.extService))
-        this.commands.push(new commandAddr(this.logger, this.extService))
+        this.commands.push(new commandLink(this.logger, this.extService))
         this.commands.push(new commandHelp(this.logger, this.extService, this))
     }
     async startup() {

@@ -5,7 +5,7 @@ import { tLogger } from "tag-tree-logger";
 import { tMessageInfo } from "../qqMessage";
 import { eveServer } from "../../types";
 
-export class commandAddr implements tCommandBase {
+export class commandLink implements tCommandBase {
     readonly logger: tLogger
     readonly name: string = "link"
     readonly helpStr: string = ".link (.地址) 查询常用网址\n"
