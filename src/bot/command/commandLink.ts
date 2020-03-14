@@ -17,7 +17,7 @@ export class commandLink implements tCommandBase {
         readonly parentLogger: tLogger,
         readonly extService: cQQBotExtService,
     ) {
-
+        this.logger = parentLogger.logger(["commandLink"])
     }
     async startup() { }
     async shutdown() { }

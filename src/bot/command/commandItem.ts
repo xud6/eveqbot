@@ -18,7 +18,7 @@ export class commandItem implements tCommandBase {
         readonly parentLogger: tLogger,
         readonly extService: cQQBotExtService,
     ) {
-
+        this.logger = parentLogger.logger(["commandItem"])
     }
     async startup() { }
     async shutdown() { }

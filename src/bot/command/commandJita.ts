@@ -21,7 +21,7 @@ export class commandJita implements tCommandBase {
         readonly parentLogger: tLogger,
         readonly extService: cQQBotExtService,
     ) {
-
+        this.logger = parentLogger.logger(["commandJita"])
     }
     async startup() { }
     async shutdown() { }

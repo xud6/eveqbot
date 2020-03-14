@@ -20,21 +20,27 @@ export class commandHelp implements tCommandBase {
         readonly extService: cQQBotExtService,
         readonly QQBot: cQQBot
     ) {
-
+        this.logger = parentLogger.logger(["commandHelp"])
     }
     async startup() { }
     async shutdown() { }
     async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
-        if (message == "version") {
-            return `版本号:${version}`
-        } else if (message === "cfg") {
-            return `Production Channel:${messageSource.production}\n当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}:${eveMarketApiInfo[messageSource.eve_marketApi].url}`
+        if (message === "cfg") {
+            let result = ""
+            result = result + `当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}:${eveMarketApiInfo[messageSource.eve_marketApi].url}`
+
+            if (this.extService.models.modelQQBotMessageSource.isAdmin(messageInfo, messageSource)) {
+                result = result + `\nProduction Channel:${messageSource.production}`
+                result = result + `\n版本号:${version}`
+            }
+            return result
         } else {
-            let commandStr = join(this.QQBot.commands.map((c) => {
+            let result = ""
+            result = result + join(this.QQBot.commands.map((c) => {
                 return c.helpStr
             }), "")
-            let systemInfo = `当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}:${eveMarketApiInfo[messageSource.eve_marketApi].url}`
-            return `${commandStr}\n${systemInfo}`
+            result = result + `当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}:${eveMarketApiInfo[messageSource.eve_marketApi].url}`
+            return result
         }
     }
 }

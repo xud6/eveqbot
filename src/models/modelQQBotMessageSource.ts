@@ -5,6 +5,7 @@ import { CQEvent, CQTag } from "@xud6/cq-websocket";
 import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
 import { cModels } from ".";
 import { tMessageInfo } from "../bot/qqMessage";
+import { indexOf } from "lodash";
 
 interface tMessageSourceInfo {
     source_type: string,
@@ -62,5 +63,7 @@ export class modelQQBotMessageSource implements tModelBase {
             }
         }
     }
-
+    isAdmin(messageInfo: tMessageInfo, messageSource: QQBotMessageSource) {
+        return indexOf(messageSource.admins, `${messageInfo.sender_user_id}`) >= 0
+    }
 }

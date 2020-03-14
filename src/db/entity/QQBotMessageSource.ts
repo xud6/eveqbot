@@ -54,6 +54,11 @@ export class QQBotMessageSource {
     })
     links: string
 
+    @Column({
+        type: "simple-array"
+    })
+    admins: string[]
+
     @OneToMany(type => QQBotMessageLog, messageLog => messageLog.source)
     messageLog: QQBotMessageLog[];
 }
