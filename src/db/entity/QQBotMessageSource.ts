@@ -49,6 +49,11 @@ export class QQBotMessageSource {
     })
     comment: string
 
+    @Column({
+        type: "text"
+    })
+    links: string
+
     @OneToMany(type => QQBotMessageLog, messageLog => messageLog.source)
     messageLog: QQBotMessageLog[];
 }

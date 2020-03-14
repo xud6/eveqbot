@@ -3,12 +3,13 @@ import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
 import { cQQBotExtService } from "..";
 import { tLogger } from "tag-tree-logger";
 import { tMessageInfo } from "../qqMessage";
+import { eveServer } from "../../types";
 
 export class commandAddr implements tCommandBase {
     readonly logger: tLogger
-    readonly name: string = "url"
-    readonly helpStr: string = ".url (.地址) 查询常用网址\n"
-    readonly commandPrefix: string[] = ['.url', '。url', '.地址', '。地址']
+    readonly name: string = "link"
+    readonly helpStr: string = ".link (.地址) 查询常用网址\n"
+    readonly commandPrefix: string[] = ['.link', '。link', '.网址', '。网址']
     readonly param = {
         searchContentLimit: 10
     }
@@ -21,24 +22,23 @@ export class commandAddr implements tCommandBase {
     async startup() { }
     async shutdown() { }
     async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
-        if (message.length > this.param.searchContentLimit) {
-            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
-            return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
+        let resultstr = ""
+        if (messageSource.eve_server === eveServer.serenity) {
+            resultstr = resultstr
+                + `KB: https://kb.ceve-market.org/` + '\n'
+                + `市场: https://www.ceve-market.org/home/` + `\n`
+                + `5度扫描: http://tools.ceve-market.org/` + `\n`
+                + `合同货柜: http://tools.ceve-market.org/contract/` + `\n`
+                + `旗舰导航: http://eve.sgfans.org/navigator/jumpLayout` + `\n`
+        } else if (messageSource.eve_server === eveServer.tranquility) {
+            resultstr = resultstr
+                + `KB: https://zkillboard.com/` + '\n'
+                + `市场: https://www.ceve-market.org/home/` + `\n`
+                + `5度扫描: http://tools.ceve-market.org/` + `\n`
+                + `合同货柜: http://tools.ceve-market.org/contract/` + `\n`
+                + `旗舰导航: http://eve.sgfans.org/navigator/jumpLayout` + `\n`
+                + `制造计算: https://eve-industry.org/calc/` + '\n'
         }
-        if (message.includes('出勤') || message.includes('积分')) {
-            return `https://eve.okzai.net/jfcx`
-        } else if (message.includes('kb') || message.includes('KB')) {
-            return `https://kb.ceve-market.org/`
-        } else if (message.includes('导航') || message.includes('旗舰')) {
-            return `http://eve.sgfans.org/navigator/jumpLayout`
-        } else if (message.includes('合同') || message.includes('货柜')) {
-            return `http://tools.ceve-market.org/contract/`
-        } else if (message.includes('扫描') || message.includes('5度')) {
-            return `http://tools.ceve-market.org/`
-        } else if (message.includes('市场')) {
-            return `https://www.ceve-market.org/home/`
-        } else {
-            return `我理解不了`
-        }
+        return resultstr
     }
 }
