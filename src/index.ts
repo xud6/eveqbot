@@ -51,11 +51,13 @@ export class eveqbot {
 
     }
     async refreshData() {
-        this.logger.info("start refresh EveESIUniverseCategories")
-        await this.models.modelEveESIUniverseCategories.RefreshData(false, this.config.dataLoadConcurrency)
-        this.logger.info("start refresh EveESIUniverseGroups")
-        await this.models.modelEveESIUniverseGroups.RefreshData(false, this.config.dataLoadConcurrency)
-        this.logger.info("start refresh EveESIUniverseTypes")
-        await this.models.modelEveESIUniverseTypes.RefreshData(false, this.config.dataLoadConcurrency)
+        if (this.config.service.reloadData) {
+            this.logger.info("start refresh EveESIUniverseCategories")
+            await this.models.modelEveESIUniverseCategories.RefreshData(false, this.config.dataLoadConcurrency)
+            this.logger.info("start refresh EveESIUniverseGroups")
+            await this.models.modelEveESIUniverseGroups.RefreshData(false, this.config.dataLoadConcurrency)
+            this.logger.info("start refresh EveESIUniverseTypes")
+            await this.models.modelEveESIUniverseTypes.RefreshData(false, this.config.dataLoadConcurrency)
+        }
     }
 }

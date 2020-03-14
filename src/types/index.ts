@@ -19,7 +19,8 @@ export interface tDatabaseConfig {
 }
 
 export interface tServiceCfg {
-    QQBot: boolean
+    QQBot: boolean,
+    reloadData: boolean
 }
 
 export interface tConfig {

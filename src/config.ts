@@ -22,7 +22,8 @@ let config: tConfig = {
         logging: ["error", "schema", "warn", "info", "log"]
     },
     service: {
-        QQBot: true
+        QQBot: true,
+        reloadData: true
     },
     dataLoadConcurrency: 5
 }
