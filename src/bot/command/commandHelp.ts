@@ -5,7 +5,8 @@ import { tLogger } from "tag-tree-logger";
 import { tMessageInfo } from "../qqMessage";
 import { join } from "lodash";
 import { eveServerInfo, eveMarketApiInfo } from "../../types";
-let version = require('./../../package.json').version
+import packageInfo from "./../../../package.json"
+let version = packageInfo.version
 
 export class commandHelp implements tCommandBase {
     readonly logger: tLogger
