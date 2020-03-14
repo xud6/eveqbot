@@ -27,10 +27,14 @@ function checkStartWith(msg: string, tags: string[]): string | null {
     return null
 }
 
+function itemNameDisp(item: eveESIUniverseTypes) {
+    return `ID:${item.id} | ${item.cn_name} / ${item.en_name} |${item.group.cn_name}|${item.group.category.cn_name}|`
+}
+
 function formatItemNames(items: eveESIUniverseTypes[]) {
     let d = 0;
     return join(map(items, item => {
-        return `${item.cn_name}/${item.en_name}|${item.group.cn_name}|${item.group.category.cn_name}`
+        return itemNameDisp(item)
     }), "\n")
 }
 
@@ -208,7 +212,7 @@ export class cQQBot {
             }), "/"))
             let marketdata: string[] = await Promise.all(items.map(async item => {
                 let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString())
-                return `${item.cn_name} / ${item.en_name} |${item.group.cn_name}|${item.group.category.cn_name} --- ${market}`;
+                return `${itemNameDisp(item)} --- ${market}`;
             }))
             return join(marketdata, "\n");
         } else {
