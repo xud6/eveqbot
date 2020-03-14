@@ -15,7 +15,3 @@ export async function retryHandler<T>(func: () => Promise<T>, cnt: number = 1, l
     }
     throw new Error(`max retry reached`);
 }
-
-
-// return await retryHandler(async () => {
-// }, this.config.fetchRetry, (e) => { this.logger.warn(e) })

@@ -1,10 +1,10 @@
 import { tLogger } from "tag-tree-logger"
 import { tEveESIExtService, tEveESICfg, tEveESILanguange } from "../types"
 import * as t from 'io-ts'
-import fetch from "node-fetch"
 import { isRight } from "fp-ts/lib/Either"
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { retryHandler } from "../retryHandler"
+import got from "got"
 
 export const vCategoriesGetIdsResult = t.array(t.Int)
 export const vCategoriesGetByIdResult = t.type({
@@ -29,37 +29,27 @@ export class categories {
         let url = `${this.config.esiUrl}/v1/universe/categories/?datasource=${this.config.datasource}`
         this.logger.log(`${opId}| read universe/categories | ${url}`)
         return await retryHandler(async () => {
-            let result = await fetch(url, { timeout: this.config.fetchTimeout * 5 })
-            if (result.ok) {
-                let data = await result.json();
-                let validator = vCategoriesGetIdsResult.decode(data)
-                if (isRight(validator)) {
-                    return validator.right
-                } else {
-                    throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
-                }
+            let result = await got(url, { timeout: this.config.httpTimeout * 5 }).json()
+            let validator = vCategoriesGetIdsResult.decode(result)
+            if (isRight(validator)) {
+                return validator.right
             } else {
-                throw new Error(`${opId}| api access error: ${result.statusText}`)
+                throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
-        }, this.config.fetchRetry, (e) => { this.logger.warn(e) })
+        }, this.config.httpRetry, (e) => { this.logger.warn(e) })
     }
     async getById(id: number, language: tEveESILanguange) {
         let opId = this.extService.opId.getId()
         let url = `${this.config.esiUrl}/v1/universe/categories/${id}/?datasource=${this.config.datasource}&language=${language}`
         this.logger.log(`${opId}| read universe/categories id[${id}] lang[${language}] | ${url}`)
         return await retryHandler(async () => {
-            let result = await fetch(url, { timeout: this.config.fetchTimeout })
-            if (result.ok) {
-                let data = await result.json();
-                let validator = vCategoriesGetByIdResult.decode(data)
-                if (isRight(validator)) {
-                    return validator.right
-                } else {
-                    throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
-                }
+            let result = await got(url, { timeout: this.config.httpTimeout }).json()
+            let validator = vCategoriesGetByIdResult.decode(result)
+            if (isRight(validator)) {
+                return validator.right
             } else {
-                throw new Error(`${opId}| api access error: ${result.statusText}`)
+                throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
-        }, this.config.fetchRetry, (e) => { this.logger.warn(e) })
+        }, this.config.httpRetry, (e) => { this.logger.warn(e) })
     }
 }

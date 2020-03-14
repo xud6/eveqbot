@@ -7,8 +7,8 @@ export interface tEveESIExtService {
 export interface tEveESICfg {
     esiUrl: string,
     datasource: string,
-    fetchTimeout: number,
-    fetchRetry: number
+    httpTimeout: number,
+    httpRetry: number
 }
 
 export type tEveESILanguange = "en-us" | "zh"
@@ -16,6 +16,6 @@ export type tEveESILanguange = "en-us" | "zh"
 export const eveESICfgDefault: tEveESICfg = {
     esiUrl: "https://esi.evetech.net",
     datasource: "tranquility",
-    fetchTimeout: 1000 * 20,
-    fetchRetry: 5
+    httpTimeout: 1000 * 20,
+    httpRetry: 5
 }

@@ -1,7 +1,7 @@
 import { tLogger } from "tag-tree-logger"
 import { tEveESIExtService, tEveESICfg, tEveESILanguange } from "../types"
 import * as t from 'io-ts'
-import fetch from "node-fetch"
+import got from "got"
 import { isRight } from "fp-ts/lib/Either"
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { retryHandler } from "../retryHandler"
@@ -30,19 +30,14 @@ export class groups {
         let url = `${this.config.esiUrl}/v1/universe/groups/?datasource=${this.config.datasource}&page=${page}`
         this.logger.log(`${opId}| read universe/groups id page ${page} | ${url}`)
         return await retryHandler(async () => {
-            let result = await fetch(url, { timeout: this.config.fetchTimeout * 5 })
-            if (result.ok) {
-                let data = await result.json();
-                let validator = vGroupsGetIdsResult.decode(data)
-                if (isRight(validator)) {
-                    return validator.right
-                } else {
-                    throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
-                }
+            let result = await got(url, { timeout: this.config.httpTimeout * 5 }).json()
+            let validator = vGroupsGetIdsResult.decode(result)
+            if (isRight(validator)) {
+                return validator.right
             } else {
-                throw new Error(`${opId}| api access error: ${result.statusText}`)
+                throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
-        }, this.config.fetchRetry, (e) => { this.logger.warn(e) })
+        }, this.config.httpRetry, (e) => { this.logger.warn(e) })
 
     }
     async getById(id: number, language: tEveESILanguange) {
@@ -50,18 +45,13 @@ export class groups {
         let url = `${this.config.esiUrl}/v1/universe/groups/${id}/?datasource=${this.config.datasource}&language=${language}`
         this.logger.log(`${opId}| read universe/groups id[${id}] lang[${language}] | ${url}`)
         return await retryHandler(async () => {
-            let result = await fetch(url, { timeout: this.config.fetchTimeout })
-            if (result.ok) {
-                let data = await result.json();
-                let validator = vGroupsGetByIdResult.decode(data)
-                if (isRight(validator)) {
-                    return validator.right
-                } else {
-                    throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
-                }
+            let result = await got(url, { timeout: this.config.httpTimeout }).json()
+            let validator = vGroupsGetByIdResult.decode(result)
+            if (isRight(validator)) {
+                return validator.right
             } else {
-                throw new Error(`${opId}| api access error: ${result.statusText}`)
+                throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
-        }, this.config.fetchRetry, (e) => { this.logger.warn(e) })
+        }, this.config.httpRetry, (e) => { this.logger.warn(e) })
     }
 }
