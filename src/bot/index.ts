@@ -145,11 +145,15 @@ export class cQQBot {
         this.bot.on('message', async (event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> => {
             let messageInfo = genMessageInfo(event, context, tags);
             let messageSource = await this.extService.models.modelQQBotMessageSource.getQQBotMessageSource(messageInfo)
-            let pHandlerMessage = this.handlerMessage(event, context)
-            let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageInfo, event, context, tags);
-            let result = await pHandlerMessage;
-            await pMessageLog;
-            return result
+            if(messageSource){
+                let pHandlerMessage = this.handlerMessage(event, context)
+                let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageSource, messageInfo, event, context, tags);
+                let result = await pHandlerMessage;
+                await pMessageLog;
+                return result
+            }else{
+                this.logger.error(`Can't read or create source for ${messageInfo}`)
+            }
         })
     }
     async startup() {

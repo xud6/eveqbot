@@ -5,6 +5,7 @@ import { CQEvent, CQTag } from "@xud6/cq-websocket";
 import { QQBotMessageLog } from "../db/entity/QQBotMessageLog";
 import { tMessageInfo } from "../bot";
 import { cModels } from ".";
+import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
 
 export class modelQQBotMessageLog implements tModelBase {
     readonly name = "QQBotMessageLog"
@@ -18,9 +19,8 @@ export class modelQQBotMessageLog implements tModelBase {
     }
     async startup() { }
     async shutdown() { }
-    async appendQQBotMessageLog(messageInfo: tMessageInfo, event: CQEvent, context: Record<string, any>, tags: CQTag[]) {
+    async appendQQBotMessageLog(source: QQBotMessageSource, messageInfo: tMessageInfo, event: CQEvent, context: Record<string, any>, tags: CQTag[]) {
         let repo = await this.extService.db.getRepository(QQBotMessageLog);
-        let source = await this.models.modelQQBotMessageSource.getQQBotMessageSource(messageInfo)
         let messageLogEntry = repo.create({
             message: messageInfo.message,
             message_id: messageInfo.message_id,
