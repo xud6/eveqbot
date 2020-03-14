@@ -13,6 +13,7 @@ import { commandHelp } from "./command/commandHelp";
 import { genMessageInfo, tMessageInfo } from "./qqMessage";
 import { tQQBotMessagePacket } from "./types";
 import { commandCfg } from "./command/commandCfg";
+import { opId } from "../opId";
 
 
 export interface tCQQBotCfg {
@@ -27,6 +28,7 @@ export interface cQQBotExtService {
         modelQQBotMessageSource: modelQQBotMessageSource,
         modelEveESIUniverseTypes: modelEveESIUniverseTypes
     }
+    opId: opId
 }
 
 export class cQQBot {

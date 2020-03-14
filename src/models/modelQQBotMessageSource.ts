@@ -6,6 +6,7 @@ import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
 import { cModels } from ".";
 import { tMessageInfo } from "../bot/qqMessage";
 import { indexOf } from "lodash";
+import { eveServer } from "../types";
 
 interface tMessageSourceInfo {
     source_type: string,
@@ -73,6 +74,21 @@ export class modelQQBotMessageSource implements tModelBase {
         })
         if (source) {
             source.info = info;
+            await repo.save(source)
+            return repo.findOne({
+                id: id
+            })
+        } else {
+            throw new Error("未找到")
+        }
+    }
+    async setServer(id: number, server: eveServer) {
+        let repo = await this.extService.db.getRepository(QQBotMessageSource);
+        let source = await repo.findOne({
+            id: id
+        })
+        if (source) {
+            source.eve_server = server;
             await repo.save(source)
             return repo.findOne({
                 id: id

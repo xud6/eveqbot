@@ -31,7 +31,7 @@ export class eveqbot {
         this.eveTranquility = new eveTranquility(this.logger, { models: this.models, eveESI: this.eveESI })
         this.CEVEMarketApi = new cCEVEMarketApi(this.logger, { httpClientCache: new Map() }, this.config.CEVEMarketApi);
         if (this.config.service.QQBot) {
-            this.bot = new cQQBot(this.logger, { CEVEMarketApi: this.CEVEMarketApi, models: this.models }, this.config.QQBot);
+            this.bot = new cQQBot(this.logger, { CEVEMarketApi: this.CEVEMarketApi, models: this.models, opId: this.opId }, this.config.QQBot);
         } else {
             this.bot = null
         }
