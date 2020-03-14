@@ -208,7 +208,7 @@ export class cQQBot {
             }), "/"))
             let marketdata: string[] = await Promise.all(items.map(async item => {
                 let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString())
-                return `${item.cn_name}/${item.en_name} --- ${market}`;
+                return `${item.cn_name} / ${item.en_name} |${item.group.cn_name}|${item.group.category.cn_name} --- ${market}`;
             }))
             return join(marketdata, "\n");
         } else {
