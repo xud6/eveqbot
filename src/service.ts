@@ -52,14 +52,14 @@ async function startNode() {
                 sLogger.logDisable([logTagCfg.name])
             }
         }
-        globalLogger.info('--------collector is starting--------');
+        globalLogger.info('--------service is starting--------');
         bot = new eveqbot(sLogger, {}, config)
         await bot.startup()
-        globalLogger.info('--------collector start success--------');
+        globalLogger.info('--------service start success--------');
     } catch (e) {
         globalLogger.error(e);
-        dumpToFileSync((new Date).toISOString() + "\n----------\n" + util.format(e), 'Collector-Crash')
-        globalLogger.fault('collector startup failed!!!!!!');
+        dumpToFileSync((new Date).toISOString() + "\n----------\n" + util.format(e), 'Service-Crash')
+        globalLogger.fault('service startup failed!!!!!!');
     }
 }
 
