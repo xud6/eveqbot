@@ -229,7 +229,7 @@ export class cQQBot {
             return '找不到该物品'
         } else if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
             if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `共有${items.length}种物品符合该条件 当前服务器${eveServerInfo[messageSource.eve_server].dispName} 当前市场API${eveMarketApiInfo[messageSource.eve_marketApi].dispName}\n`
+                let head = `当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] 共有${items.length}种物品符合该条件 当前市场API${eveMarketApiInfo[messageSource.eve_marketApi].dispName}\n`
                 let marketdata: string[] = await Promise.all(items.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
                     return `${itemNameDisp(item)} --- ${market}`;
