@@ -106,11 +106,19 @@ export class modelEveESIUniverseTypes implements tModelBase {
         await queue.onIdle();
         this.logger.info(`update data for UniverseTypes complete`)
     }
-    async MarketSearchByExactName(name: string, limit: number = 51) {
+    async searchByExactName(name: string, limit: number = 51, onlyMarketable: boolean = true) {
         let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let query = repo.createQueryBuilder("type")
-            .where(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
-            .andWhere(`type.published = :is_published`, { is_published: true })
+            .where(`type.published = :is_published`, { is_published: true })
+        if (onlyMarketable) {
+            query = query.andWhere(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
+        }
+        query = query
+            .andWhere(new Brackets(qb => {
+                qb.where(`type.cn_name = :name`)
+                    .orWhere(`type.en_name = :name`)
+            })).setParameter(`name`, `${name}`)
+            .limit(limit)
             .leftJoinAndSelect("type.group", "group")
             .leftJoinAndSelect("group.category", "category")
             .select([
@@ -124,24 +132,24 @@ export class modelEveESIUniverseTypes implements tModelBase {
                 "category.en_name",
                 "category.cn_name"
             ])
-            .andWhere(new Brackets(qb => {
-                qb.where(`type.cn_name = :name`)
-                    .orWhere(`type.en_name = :name`)
-            })).setParameter(`name`, `${name}`)
-            .limit(limit)
         return await query.getMany()
     }
-    async MarketSearchByWord(
+    async SearchByWord(
         word: string,
         limit: number = 51,
         skins: boolean = false,
         blueprint: boolean = false,
-        apparel: boolean = false
+        apparel: boolean = false,
+        onlyMarketable: boolean = true
     ) {
         let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let query = repo.createQueryBuilder("type")
-            .where(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
-            .andWhere(`type.published = :is_published`, { is_published: true })
+            .where(`type.published = :is_published`, { is_published: true })
+
+        if (onlyMarketable) {
+            query = query.andWhere(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
+        }
+        query = query
             .leftJoinAndSelect("type.group", "group")
             .leftJoinAndSelect("group.category", "category")
             .select([
@@ -171,17 +179,22 @@ export class modelEveESIUniverseTypes implements tModelBase {
         query = query.limit(limit)
         return await query.getMany()
     }
-    async MarketSearchByWords(
+    async SearchByWords(
         words: string[],
         limit: number = 51,
         skins: boolean = false,
         blueprint: boolean = false,
-        apparel: boolean = false
+        apparel: boolean = false,
+        onlyMarketable: boolean = true
     ) {
         let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let query = repo.createQueryBuilder("type")
-            .where(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
-            .andWhere(`type.published = :is_published`, { is_published: true })
+            .where(`type.published = :is_published`, { is_published: true })
+
+        if (onlyMarketable) {
+            query = query.andWhere(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
+        }
+        query = query
             .leftJoinAndSelect("type.group", "group")
             .leftJoinAndSelect("group.category", "category")
             .select([
@@ -215,26 +228,27 @@ export class modelEveESIUniverseTypes implements tModelBase {
         query = query.limit(limit)
         return await query.getMany()
     }
-    private async funcMarketSearch(
+    async SearchCombined(
         input: string,
-        limit: number = 51
+        limit: number = 51,
+        onlyMarketable: boolean = true
     ) {
-        let result = await this.MarketSearchByExactName(input, limit)
+        let result = await this.searchByExactName(input, limit, onlyMarketable)
         if (result.length > 0) {
             return result;
         }
         let isSkin = eveIsSkins(input);
         let isBlueprint = eveIsBlueprint(input);
-        result = await this.MarketSearchByWord(input, limit, isSkin, isBlueprint, false)
+        result = await this.SearchByWord(input, limit, isSkin, isBlueprint, false, onlyMarketable)
         if (result.length > 0) {
             return result;
         }
         let inputT = eveCommonNameTransfer(input);
         if (inputT === input) {
-            result = await this.MarketSearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false)
+            result = await this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, onlyMarketable)
         } else {
-            let pResultO = this.MarketSearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false)
-            let pResultT = this.MarketSearchByWords(spliteWords(inputT), limit, isSkin, isBlueprint, false)
+            let pResultO = this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, onlyMarketable)
+            let pResultT = this.SearchByWords(spliteWords(inputT), limit, isSkin, isBlueprint, false, onlyMarketable)
             result = uniq((await pResultO).concat(await pResultT))
         }
         return result;
@@ -245,7 +259,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
     ) {
         let opid = this.extService.opId.getId();
         this.logger.info(`${opid}| market search for ${input} in UniverseType`)
-        let records = await this.funcMarketSearch(input, limit)
+        let records = await this.SearchCombined(input, limit, true)
         this.logger.info(`${opid}| find ${records.length} record for ${input}`)
         for (let r of records) {
             this.logger.log(`${opid}| ID:${r.id}|${r.cn_name}|${r.en_name}|${r.group.cn_name}|${r.group.category.cn_name}`)
