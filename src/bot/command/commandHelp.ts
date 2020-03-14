@@ -11,7 +11,7 @@ let version = packageInfo.version
 export class commandHelp implements tCommandBase {
     readonly logger: tLogger
     readonly name: string = "help"
-    readonly helpStr: ""
+    readonly helpStr: string = ""
     readonly commandPrefix: string[] = ['.help', '。help', '.帮助', '。帮助']
     readonly param = {
     }
@@ -28,10 +28,12 @@ export class commandHelp implements tCommandBase {
         if (message == "version") {
             return `版本号:${version}`
         } else if (message === "cfg") {
-            return `Production Channel:${messageSource.production}\n当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`
+            return `Production Channel:${messageSource.production}\n当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}:${eveMarketApiInfo[messageSource.eve_marketApi].url}`
         } else {
-            let commandStr = join(this.QQBot.commands.map((c) => { return c.helpStr }))
-            let systemInfo = `当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`
+            let commandStr = join(this.QQBot.commands.map((c) => {
+                return c.helpStr
+            }), "")
+            let systemInfo = `当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}:${eveMarketApiInfo[messageSource.eve_marketApi].url}`
             return `${commandStr}\n${systemInfo}`
         }
     }

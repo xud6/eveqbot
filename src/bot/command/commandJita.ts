@@ -10,7 +10,7 @@ import { tMessageInfo } from "../qqMessage";
 export class commandJita implements tCommandBase {
     readonly logger: tLogger
     readonly name: string = "jita"
-    readonly helpStr: ".jita (.吉他) 查询市场信息\n"
+    readonly helpStr: string = ".jita (.吉他) 查询市场信息\n"
     readonly commandPrefix: string[] = ['.jita', '。jita', '.吉他', '。吉他']
     readonly param = {
         searchContentLimit: 30,

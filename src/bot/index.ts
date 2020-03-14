@@ -80,7 +80,7 @@ export class cQQBot {
     async checkMessage(messageInfo: tMessageInfo): Promise<{ command: tCommandBase, msg: string } | null> {
         for (let command of this.commands) {
             let msg = this.checkStartWith(messageInfo.message, command.commandPrefix)
-            if (msg) {
+            if (msg !== null) {
                 return {
                     command: command,
                     msg: msg

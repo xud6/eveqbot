@@ -57,10 +57,12 @@ export enum eveMarketApi {
 export const eveMarketApiInfo = [
     {
         name: "ceveMarket",
-        dispName: "EVE国服市场中心 https://www.ceve-market.org/api/"
+        dispName: "EVE国服市场中心 ",
+        url: "https://www.ceve-market.org/api/"
     },
     {
         name: "ESITQ",
-        dispName: "ESI Tranquility https://esi.evetech.net/"
+        dispName: "ESI TQ",
+        url: "https://esi.evetech.net/"
     }
 ]

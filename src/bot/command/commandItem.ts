@@ -8,7 +8,7 @@ import { tMessageInfo } from "../qqMessage";
 export class commandItem implements tCommandBase {
     readonly logger: tLogger
     readonly name: string = "item"
-    readonly helpStr: ".item (.物品) 查询物品名称\n"
+    readonly helpStr: string = ".item (.物品) 查询物品名称\n"
     readonly commandPrefix: string[] = ['.item', '。item', '.物品', '。物品']
     readonly param: {
         searchContentLimit: 30,
