@@ -201,13 +201,13 @@ export class modelEveESIUniverseTypes implements tModelBase {
         if (apparel === false) {
             query = query.andWhere(`category.id <> :apparel_category_id`, { apparel_category_id: 30 })
         }
-        let namecnt = 1
-        for (let name of words) {
-            let cnt = namecnt++;
+        let wordcnt = 1
+        for (let word of words) {
+            let cnt = wordcnt++;
             query = query.andWhere(new Brackets(qb => {
-                qb.where(`type.cn_name LIKE :name${cnt}`)
-                    .orWhere(`type.en_name LIKE :name${cnt}`)
-            })).setParameter(`name${cnt}`, `%${name}%`)
+                qb.where(`type.cn_name LIKE :word${cnt}`)
+                    .orWhere(`type.en_name LIKE :word${cnt}`)
+            })).setParameter(`word${cnt}`, `%${word}%`)
         }
         query = query.limit(limit)
         return await query.getMany()
