@@ -10,7 +10,8 @@ import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
 enum opType {
     JITA = '.jita',
     ADDR = '.addr',
-    HELP = '.help'
+    HELP = '.help',
+    ITEM = '.item'
 }
 
 interface tCommand {
@@ -119,6 +120,10 @@ export class cQQBot {
         resultPriceListLimit: 5,
         resultNameListLimit: 50
     }
+    readonly item = {
+        searchContentLimit: 30,
+        resultNameListLimit: 100
+    }
     readonly addr = {
         searchContentLimit: 10
     }
@@ -173,6 +178,13 @@ export class cQQBot {
                 msg: help
             }
         }
+        let item = checkStartWith(context.message, ['.item', '。item', '.物品', '。物品']);
+        if (item || item === '') {
+            return {
+                op: opType.ITEM,
+                msg: item
+            }
+        }
         return null
     }
     async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | void> {
@@ -189,6 +201,9 @@ export class cQQBot {
                     break;
                 case opType.HELP:
                     res = await this.handlerMessageHelp(command.msg, context);
+                    break;
+                case opType.ITEM:
+                    res = await this.handlerMessageItem(command.msg, context);
                     break;
             }
             if (res) {
@@ -230,6 +245,24 @@ export class cQQBot {
                 res = res + '\n......'
             }
             return res
+        }
+    }
+    async handlerMessageItem(message: string, context: Record<string, any>): Promise<string | null> {
+        if (message.length > this.item.searchContentLimit) {
+            this.logger.info(`search content too long from [${context.user_id}]`)
+            return `查询内容过长，当前共${message.length}个字符，最大${this.item.searchContentLimit}`
+        }
+
+        let items = await this.extService.models.modelEveESIUniverseTypes.SearchCombined(message, this.item.resultNameListLimit + 1, false)
+        if (items.length == 0) {
+            this.logger.info(`找不到 ${message}`)
+            return '找不到该物品'
+        } else {
+            if (items.length > this.item.resultNameListLimit) {
+                return `共有超过${this.item.resultNameListLimit}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
+            } else {
+                return `共有${items.length}种物品符合该条件\n${formatItemNames(items)}`
+            }
         }
     }
     async handlerMessageAddr(message: string, context: Record<string, any>): Promise<string | null> {
