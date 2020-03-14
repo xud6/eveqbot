@@ -30,3 +30,8 @@ export interface tConfig {
     service: tServiceCfg,
     dataLoadConcurrency: number
 }
+
+export enum eveServer {
+    tranquility = 0,
+    serenity = 1,
+}

@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { QQBotMessageLog } from "./QQBotMessageLog";
+import { eveServer } from "../../types";
 
 @Entity()
 export class QQBotMessageSource {
@@ -22,6 +23,12 @@ export class QQBotMessageSource {
         default: false
     })
     enable: boolean
+
+    @Column({
+        type: "int",
+        default: eveServer.serenity
+    })
+    eve_server: eveServer
 
     @OneToMany(type => QQBotMessageLog, messageLog => messageLog.source)
     messageLog: QQBotMessageLog[];
