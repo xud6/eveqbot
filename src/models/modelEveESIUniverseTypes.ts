@@ -2,7 +2,7 @@ import { tModelBase } from "./modelBase";
 import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
-import { DeepPartial } from "typeorm";
+import { DeepPartial, Brackets } from "typeorm";
 import { tTypesGetByIdResult } from "../eveESI/universe/types";
 import { modelKvs } from "./modelKvs";
 import { cModels } from ".";
@@ -102,5 +102,49 @@ export class modelEveESIUniverseTypes implements tModelBase {
         }
         await queue.onIdle();
         this.logger.info(`update data for UniverseTypes complete`)
+    }
+    async SearchByWords(
+        words: string[],
+        limit: number = 11,
+        skins: boolean = false,
+        blueprint: boolean = false,
+        apparel: boolean = false
+    ) {
+        let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
+        let query = repo.createQueryBuilder("type")
+            .where(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
+            .andWhere(`type.published = :is_published`, { is_published: true })
+            .leftJoinAndSelect("type.group", "group")
+            .leftJoinAndSelect("group.category", "category")
+            .select([
+                "type.id",
+                "type.en_name",
+                "type.cn_name",
+                "group.id",
+                "group.en_name",
+                "group.cn_name",
+                "category.id",
+                "category.en_name",
+                "category.cn_name"
+            ])
+        if (skins === false) {
+            query = query.andWhere(`category.id <> :skid_category_id`, { skid_category_id: 91 })
+        }
+        if (blueprint === false) {
+            query = query.andWhere(`category.id <> :blueprint_category_id`, { blueprint_category_id: 9 })
+        }
+        if (apparel === false) {
+            query = query.andWhere(`category.id <> :apparel_category_id`, { apparel_category_id: 30 })
+        }
+        let namecnt = 1
+        for (let name of words) {
+            let cnt = namecnt++;
+            query = query.andWhere(new Brackets(qb => {
+                qb.where(`type.cn_name LIKE :name${cnt}`)
+                    .orWhere(`type.en_name LIKE :name${cnt}`)
+            })).setParameter(`name${cnt}`, `%${name}%`)
+        }
+        query = query.limit(limit)
+        return await query.getMany()
     }
 }
