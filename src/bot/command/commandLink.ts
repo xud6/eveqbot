@@ -23,6 +23,10 @@ export class commandLink implements tCommandBase {
     async shutdown() { }
     async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
         let resultstr = ""
+        if (messageSource.links) {
+            resultstr = resultstr + messageSource.links
+        }
+
         if (messageSource.eve_server === eveServer.serenity) {
             resultstr = resultstr
                 + `KB: https://kb.ceve-market.org/` + '\n'
