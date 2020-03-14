@@ -6,10 +6,10 @@ import { tMessageInfo } from "../qqMessage";
 
 export class commandAddr implements tCommandBase {
     readonly logger: tLogger
-    readonly name: string = "addr"
-    readonly helpStr: string = ".addr (.地址) 查询常用网址\n"
-    readonly commandPrefix: string[] = ['.addr', '。addr', '.地址', '。地址']
-    readonly param: {
+    readonly name: string = "url"
+    readonly helpStr: string = ".url (.地址) 查询常用网址\n"
+    readonly commandPrefix: string[] = ['.url', '。url', '.地址', '。地址']
+    readonly param = {
         searchContentLimit: 10
     }
     constructor(
