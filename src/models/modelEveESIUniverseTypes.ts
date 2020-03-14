@@ -106,6 +106,30 @@ export class modelEveESIUniverseTypes implements tModelBase {
         await queue.onIdle();
         this.logger.info(`update data for UniverseTypes complete`)
     }
+    async searchById(id: number, onlyMarketable: boolean = true) {
+        let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
+        let query = repo.createQueryBuilder("type")
+            .where(`type.published = :is_published`, { is_published: true })
+        if (onlyMarketable) {
+            query = query.andWhere(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
+        }
+        query = query
+            .andWhere(`type.id = :typeid`, { typeid: id })
+            .leftJoinAndSelect("type.group", "group")
+            .leftJoinAndSelect("group.category", "category")
+            .select([
+                "type.id",
+                "type.en_name",
+                "type.cn_name",
+                "group.id",
+                "group.en_name",
+                "group.cn_name",
+                "category.id",
+                "category.en_name",
+                "category.cn_name"
+            ])
+        return await query.getMany()
+    }
     async searchByExactName(name: string, limit: number = 51, onlyMarketable: boolean = true) {
         let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let query = repo.createQueryBuilder("type")
@@ -228,42 +252,70 @@ export class modelEveESIUniverseTypes implements tModelBase {
         query = query.limit(limit)
         return await query.getMany()
     }
-    async SearchCombined(
+    private async doSearchCombined(
+        opId: number,
         input: string,
         limit: number = 51,
         onlyMarketable: boolean = true
     ) {
-        let result = await this.searchByExactName(input, limit, onlyMarketable)
+        let result
+        try {
+            let id = parseInt(input);
+            this.logger.log(`${opId}| parsed id [${id}] from input [${input}]`)
+            result = await this.searchById(id, onlyMarketable);
+            if (result.length > 0) {
+                this.logger.log(`${opId}| result by Id`)
+                return result;
+            }
+        } catch (e) { }
+        result = await this.searchByExactName(input, limit, onlyMarketable)
         if (result.length > 0) {
+            this.logger.log(`${opId}| result by ExactName`)
             return result;
         }
         let isSkin = eveIsSkins(input);
         let isBlueprint = eveIsBlueprint(input);
         result = await this.SearchByWord(input, limit, isSkin, isBlueprint, false, onlyMarketable)
         if (result.length > 0) {
+            this.logger.log(`${opId}| result by Word`)
             return result;
         }
         let inputT = eveCommonNameTransfer(input);
         if (inputT === input) {
             result = await this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, onlyMarketable)
+            if (result.length > 0) {
+                this.logger.log(`${opId}| result by SpliteWords without CommonName`)
+                return result;
+            }
         } else {
             let pResultO = this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, onlyMarketable)
             let pResultT = this.SearchByWords(spliteWords(inputT), limit, isSkin, isBlueprint, false, onlyMarketable)
             result = uniq((await pResultO).concat(await pResultT))
+            if (result.length > 0) {
+                this.logger.log(`${opId}| result by SpliteWords with CommonName`)
+                return result;
+            }
         }
-        return result;
+        return [];
     }
-    async MarketSearch(
+    async SearchCombined(
         input: string,
-        limit: number = 51
+        limit: number = 51,
+        onlyMarketable: boolean = true
     ) {
         let opid = this.extService.opId.getId();
         this.logger.info(`${opid}| market search for ${input} in UniverseType`)
-        let records = await this.SearchCombined(input, limit, true)
+        let records = await this.doSearchCombined(opid, input, limit, onlyMarketable)
         this.logger.info(`${opid}| find ${records.length} record for ${input}`)
         for (let r of records) {
             this.logger.log(`${opid}| ID:${r.id}|${r.cn_name}|${r.en_name}|${r.group.cn_name}|${r.group.category.cn_name}`)
         }
         return records
+    }
+    async MarketSearch(
+        input: string,
+        limit: number = 51
+    ) {
+        return this.SearchCombined(input, limit, true)
     }
 }
