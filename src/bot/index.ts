@@ -103,6 +103,7 @@ function genMessageInfo(event: CQEvent, context: Record<string, any>, tags: CQTa
 
 export interface tCQQBotCfg {
     cqwebConfig: Partial<CQWebSocketOption>
+    nonProductionSourceOnly: boolean,
 }
 
 export interface cQQBotExtService {
@@ -197,6 +198,12 @@ export class cQQBot {
         let command = await this.checkMessage(messageInfo);
         if (command) {
             if (messageSource.enable) {
+                if (this.config.nonProductionSourceOnly) {
+                    if (messageSource.production) {
+                        this.logger.info(`Ignore Command [${command.op}] with [${command.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}] because current server is non-production only`);
+                        return
+                    }
+                }
                 let res: string | null = null
                 this.logger.info(`Command [${command.op}] with [${command.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
                 switch (command.op) {

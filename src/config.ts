@@ -11,7 +11,8 @@ let config: tConfig = {
             host: "127.0.0.1",
             port: 6700,
             accessToken: ""
-        }
+        },
+        nonProductionSourceOnly: false
     },
     db: {
         database: 'dev_eveqbot',

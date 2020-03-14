@@ -20,7 +20,7 @@ export interface tDatabaseConfig {
 
 export interface tServiceCfg {
     QQBot: boolean,
-    reloadData: boolean
+    reloadData: boolean,
 }
 
 export interface tConfig {
@@ -38,11 +38,11 @@ export enum eveServer {
 
 export const eveServerInfo = [
     {
-        name:"tranquility",
+        name: "tranquility",
         dispName: "世界服"
     },
     {
-        name:"serenity",
+        name: "serenity",
         dispName: "国服"
     }
 ]
@@ -54,11 +54,11 @@ export enum eveMarketApi {
 
 export const eveMarketApiInfo = [
     {
-        name:"ceveMarket",
-        dispName:"EVE国服市场中心 https://www.ceve-market.org/api/"
+        name: "ceveMarket",
+        dispName: "EVE国服市场中心 https://www.ceve-market.org/api/"
     },
     {
-        name:"ESITQ",
-        dispName:"ESI Tranquility https://esi.evetech.net/"
+        name: "ESITQ",
+        dispName: "ESI Tranquility https://esi.evetech.net/"
     }
 ]
