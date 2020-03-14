@@ -1,4 +1,5 @@
-import { forEach, replace } from "lodash";
+import { forEach, replace, join, map } from "lodash";
+import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
 
 interface eveCommonNameTableObj {
     o: string,
@@ -42,4 +43,15 @@ export function eveIsBlueprint(name: string): boolean {
     } else {
         return false
     }
+}
+
+export function itemNameDisp(item: eveESIUniverseTypes) {
+    return `ID:${item.id} | ${item.cn_name} / ${item.en_name} |${item.group.cn_name}|${item.group.category.cn_name}|`
+}
+
+export function formatItemNames(items: eveESIUniverseTypes[]) {
+    let d = 0;
+    return join(map(items, item => {
+        return itemNameDisp(item)
+    }), "\n")
 }

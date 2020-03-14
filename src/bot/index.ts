@@ -1,25 +1,16 @@
 import { CQWebSocket, CQWebSocketOption, CQEvent, WebSocketType, CQTag } from "@xud6/cq-websocket";
 import { cCEVEMarketApi } from "../api/ceve_market_api/index";
-import { startsWith, trim, replace, map, join, forEach, take, toString, toInteger, find } from "lodash";
+import { startsWith, trim, replace, toString, toInteger, find } from "lodash";
 import { tLogger } from "tag-tree-logger";
 import { modelQQBotMessageLog } from "../models/modelQQBotMessageLog";
 import { modelQQBotMessageSource } from "../models/modelQQBotMessageSource";
 import { modelEveESIUniverseTypes } from "../models/modelEveESIUniverseTypes";
-import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
 import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
-import { eveMarketApi, eveServerInfo, eveMarketApiInfo } from "../types";
-
-enum opType {
-    JITA = '.jita',
-    ADDR = '.addr',
-    HELP = '.help',
-    ITEM = '.item'
-}
-
-interface tCommand {
-    op: opType,
-    msg: string
-}
+import { tCommandBase } from "./command/tCommandBase";
+import { commandAddr } from "./command/commandAddr";
+import { commandItem } from "./command/commandItem";
+import { commandJita } from "./command/commandJita";
+import { commandHelp } from "./command/commandHelp";
 
 function checkStartWith(msg: string, tags: string[]): string | null {
     for (let tag of tags) {
@@ -28,17 +19,6 @@ function checkStartWith(msg: string, tags: string[]): string | null {
         }
     }
     return null
-}
-
-function itemNameDisp(item: eveESIUniverseTypes) {
-    return `ID:${item.id} | ${item.cn_name} / ${item.en_name} |${item.group.cn_name}|${item.group.category.cn_name}|`
-}
-
-function formatItemNames(items: eveESIUniverseTypes[]) {
-    let d = 0;
-    return join(map(items, item => {
-        return itemNameDisp(item)
-    }), "\n")
 }
 
 export interface tMessageInfo {
@@ -118,18 +98,7 @@ export interface cQQBotExtService {
 export class cQQBot {
     readonly logger: tLogger
     readonly bot: CQWebSocket
-    readonly jita = {
-        searchContentLimit: 30,
-        resultPriceListLimit: 5,
-        resultNameListLimit: 50
-    }
-    readonly item = {
-        searchContentLimit: 30,
-        resultNameListLimit: 100
-    }
-    readonly addr = {
-        searchContentLimit: 10
-    }
+    readonly commands: tCommandBase[]
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: cQQBotExtService,
@@ -158,154 +127,48 @@ export class cQQBot {
                 this.logger.error(`Can't read or create source for ${messageInfo}`)
             }
         })
+
+        this.commands = [];
+        this.commands.push(new commandAddr(this.logger, this.extService))
+        this.commands.push(new commandItem(this.logger, this.extService))
+        this.commands.push(new commandJita(this.logger, this.extService))
+        this.commands.push(new commandHelp(this.logger, this.extService))
     }
     async startup() {
         this.bot.connect()
     }
 
-    async checkMessage(messageInfo: tMessageInfo): Promise<tCommand | null> {
-        let jita = checkStartWith(messageInfo.message, ['.jita', '。jita', '.吉他', '。吉他']);
-        if (jita) {
-            return {
-                op: opType.JITA,
-                msg: jita
-            }
-        }
-        let addr = checkStartWith(messageInfo.message, ['.addr', '。addr', '.地址', '。地址']);
-        if (addr) {
-            return {
-                op: opType.ADDR,
-                msg: addr
-            }
-        }
-        let help = checkStartWith(messageInfo.message, ['.help', '。help', '.帮助', '。帮助']);
-        if (help || help === '') {
-            return {
-                op: opType.HELP,
-                msg: help
-            }
-        }
-        let item = checkStartWith(messageInfo.message, ['.item', '。item', '.物品', '。物品']);
-        if (item || item === '') {
-            return {
-                op: opType.ITEM,
-                msg: item
+    async checkMessage(messageInfo: tMessageInfo): Promise<{ command: tCommandBase, msg: string } | null> {
+        for (let command of this.commands) {
+            let msg = checkStartWith(messageInfo.message, command.commandPrefix)
+            if (msg) {
+                return {
+                    command: command,
+                    msg: msg
+                };
             }
         }
         return null
     }
     async handlerMessage(messageSource: QQBotMessageSource, messageInfo: tMessageInfo): Promise<string | void> {
-        let command = await this.checkMessage(messageInfo);
-        if (command) {
+        let commandMsg = await this.checkMessage(messageInfo);
+        if (commandMsg) {
             if (messageSource.enable) {
                 if (this.config.nonProductionSourceOnly) {
                     if (messageSource.production) {
-                        this.logger.info(`Ignore Command [${command.op}] with [${command.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}] because current server is non-production only`);
+                        this.logger.info(`Ignore Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}] because current server is non-production only`);
                         return
                     }
                 }
                 let res: string | null = null
-                this.logger.info(`Command [${command.op}] with [${command.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
-                switch (command.op) {
-                    case opType.JITA:
-                        res = await this.handlerMessageJita(messageSource, messageInfo, command.msg);
-                        break;
-                    case opType.ADDR:
-                        res = await this.handlerMessageAddr(messageSource, messageInfo, command.msg);
-                        break;
-                    case opType.HELP:
-                        res = await this.handlerMessageHelp(messageSource, messageInfo, command.msg);
-                        break;
-                    case opType.ITEM:
-                        res = await this.handlerMessageItem(messageSource, messageInfo, command.msg);
-                        break;
-                }
+                this.logger.info(`Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
+                res = await commandMsg.command.handler(messageSource, messageInfo, commandMsg.msg)
                 if (res) {
                     return `[CQ:at,qq=${messageInfo.sender_user_id}]\n${res}`
                 }
             } else {
-                this.logger.info(`Ignore Command [${command.op}] with [${command.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}] because it's not enabled`);
+                this.logger.info(`Ignore Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}] because it's not enabled`);
             }
-        }
-    }
-    async handlerMessageJita(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
-        if (message.length > this.jita.searchContentLimit) {
-            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
-            return `查询内容过长，当前共${message.length}个字符，最大${this.jita.searchContentLimit}`
-        }
-
-        let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(message, this.jita.resultNameListLimit + 1)
-        if (items.length == 0) {
-            this.logger.info(`找不到 ${message}`)
-            return '找不到该物品'
-        } else if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
-            if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `共有${items.length}种物品符合该条件 | 当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}\n`
-                let marketdata: string[] = await Promise.all(items.map(async item => {
-                    let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
-                    return `${itemNameDisp(item)} --- ${market}`;
-                }))
-                return `${head}${join(marketdata, "\n")}`;
-            } else {
-                return "市场API配置错误"
-            }
-        } else {
-            this.logger.info(`搜索结果过多: ${items.length}`)
-            if (items.length > this.jita.resultNameListLimit) {
-                return `共有超过${this.jita.resultNameListLimit}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
-            } else {
-                return `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}`
-            }
-        }
-    }
-    async handlerMessageItem(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
-        if (message.length > this.item.searchContentLimit) {
-            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
-            return `查询内容过长，当前共${message.length}个字符，最大${this.item.searchContentLimit}`
-        }
-
-        let items = await this.extService.models.modelEveESIUniverseTypes.SearchCombined(message, this.item.resultNameListLimit + 1, false)
-        if (items.length == 0) {
-            this.logger.info(`找不到 ${message}`)
-            return '找不到该物品'
-        } else {
-            if (items.length > this.item.resultNameListLimit) {
-                return `共有超过${this.item.resultNameListLimit}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
-            } else {
-                return `共有${items.length}种物品符合该条件\n${formatItemNames(items)}`
-            }
-        }
-    }
-    async handlerMessageAddr(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
-        if (message.length > this.addr.searchContentLimit) {
-            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
-            return `查询内容过长，当前共${message.length}个字符，最大${this.addr.searchContentLimit}`
-        }
-        if (message.includes('出勤') || message.includes('积分')) {
-            return `https://eve.okzai.net/jfcx`
-        } else if (message.includes('kb') || message.includes('KB')) {
-            return `https://kb.ceve-market.org/`
-        } else if (message.includes('导航') || message.includes('旗舰')) {
-            return `http://eve.sgfans.org/navigator/jumpLayout`
-        } else if (message.includes('合同') || message.includes('货柜')) {
-            return `http://tools.ceve-market.org/contract/`
-        } else if (message.includes('扫描') || message.includes('5度')) {
-            return `http://tools.ceve-market.org/`
-        } else if (message.includes('市场')) {
-            return `https://www.ceve-market.org/home/`
-        } else {
-            return `我理解不了`
-        }
-    }
-    async handlerMessageHelp(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
-        if (message.length == 0) {
-            return ".jita (.吉他) 查询市场信息\n"
-                + ".addr (.地址) 查询常用网址 [出勤积分|KB|旗舰导航|市场|5度|合同分析]\n"
-        } else if (message == "version") {
-            let pkg: any = require('./../../package.json')
-            return `版本号:${pkg.version}`
-        } else {
-            return null
         }
     }
 }
