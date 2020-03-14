@@ -12,9 +12,9 @@ let version = packageInfo.version
 export class commandCfg implements tCommandBase {
     readonly logger: tLogger
     readonly name: string = "cfg"
-    readonly helpStr: string = ".cfg 参数设置\n--- setinfo 设置help信息"
+    readonly helpStr: string = ".cfg 参数设置\n"
     readonly commandPrefix: string[] = ['.cfg', '。cfg']
-    readonly adminOnly: boolean = true
+    readonly adminOnly: boolean = false
     readonly param = {
     }
     constructor(
@@ -36,6 +36,7 @@ export class commandCfg implements tCommandBase {
                     + `\n\n当前管理员\n${join(messageSource.admins.map((a) => { return ` - ${a}` }), '\n')}`
                     + `\n\n当前info信息\n${messageSource.info}`
                     + `\n\nsetinfo 设置info信息` + `\nsetserver 设置服务器`
+                    + `\n\nProduction Channel:${messageSource.production}` + `\n版本号:${version}`
             }
             if (startsWith(messagePacket.message, "setinfo")) {
                 this.logger.info(`${opId}| setinfo`)
@@ -70,6 +71,14 @@ export class commandCfg implements tCommandBase {
                     return `设置失败`
                 }
             }
+        }
+        if (messagePacket.message === "") {
+            let result = ""
+            result = result + `当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}:${eveMarketApiInfo[messageSource.eve_marketApi].url}`
+            if (messagePacket.isAdmin) {
+                result = result + `\n@我以使用管理员功能`
+            }
+            return result
         }
         return null
     }
