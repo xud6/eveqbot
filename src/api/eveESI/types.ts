@@ -1,4 +1,4 @@
-import { opId } from "../opId";
+import { opId } from "../../opId";
 
 export interface tEveESIExtService {
     opId: opId

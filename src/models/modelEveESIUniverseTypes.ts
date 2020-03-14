@@ -3,7 +3,7 @@ import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
 import { DeepPartial, Brackets } from "typeorm";
-import { tTypesGetByIdResult } from "../eveESI/universe/types";
+import { tTypesGetByIdResult } from "../api/eveESI/universe/types";
 import { modelKvs } from "./modelKvs";
 import { cModels } from ".";
 import PQueue from "p-queue";

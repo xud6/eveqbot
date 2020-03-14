@@ -1,4 +1,4 @@
-import { cCEVEMarketApi } from './eveSerenity/ceve_market_api/index';
+import { cCEVEMarketApi } from './api/ceve_market_api/index';
 import { cQQBot } from './bot/index';
 import { CQWebSocketOption } from '@xud6/cq-websocket';
 import { tLogger } from "tag-tree-logger";
@@ -7,8 +7,8 @@ import { tConfig } from './types';
 import { cModels } from './models';
 import { eveTranquility } from './eveTranquility';
 import { opId } from './opId';
-import { eveESI } from './eveESI';
-import { eveESICfgDefault } from './eveESI/types';
+import { eveESI } from './api/eveESI';
+import { eveESICfgDefault } from './api/eveESI/types';
 
 export interface eveqbotExtService {
 

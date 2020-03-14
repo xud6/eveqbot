@@ -1,5 +1,5 @@
 import { tLogger } from "tag-tree-logger"
-import { tEveESIExtService, tEveESICfg, tEveESILanguange } from "./../types"
+import { tEveESIExtService, tEveESICfg, tEveESILanguange } from "../types"
 import * as t from 'io-ts'
 import fetch from "node-fetch"
 import { isRight } from "fp-ts/lib/Either"

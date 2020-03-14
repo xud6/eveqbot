@@ -1,5 +1,5 @@
 import { typeormdb } from "../db";
-import { eveESI } from "../eveESI";
+import { eveESI } from "../api/eveESI";
 import { opId } from "../opId";
 
 export interface tModelsConfig {

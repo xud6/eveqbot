@@ -1,5 +1,5 @@
 import { tLogger } from "tag-tree-logger"
-import { tEveESIExtService, tEveESICfg } from "./../types"
+import { tEveESIExtService, tEveESICfg } from "../types"
 import { types } from "./types"
 import { categories } from "./categories"
 import { groups } from "./groups"

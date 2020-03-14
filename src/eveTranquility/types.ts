@@ -1,5 +1,5 @@
 import { cModels } from "../models";
-import { eveESI } from "../eveESI";
+import { eveESI } from "../api/eveESI";
 
 export interface eveTranquilityExtService {
     models: cModels,
