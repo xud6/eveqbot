@@ -1,32 +1,37 @@
 import { tCommandBase } from "./tCommandBase";
 import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
-import { cQQBotExtService } from "..";
+import { cQQBotExtService, cQQBot } from "..";
 import { tLogger } from "tag-tree-logger";
 import { tMessageInfo } from "../qqMessage";
+import { join } from "lodash";
+import { eveServerInfo, eveMarketApiInfo } from "../../types";
+let version = require('./../../package.json').version
 
 export class commandHelp implements tCommandBase {
     readonly logger: tLogger
     readonly name: string = "help"
+    readonly helpStr: ""
     readonly commandPrefix: string[] = ['.help', '。help', '.帮助', '。帮助']
     readonly param = {
     }
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: cQQBotExtService,
+        readonly QQBot: cQQBot
     ) {
 
     }
     async startup() { }
     async shutdown() { }
     async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
-        if (message.length == 0) {
-            return ".jita (.吉他) 查询市场信息\n"
-                + ".addr (.地址) 查询常用网址 [出勤积分|KB|旗舰导航|市场|5度|合同分析]\n"
-        } else if (message == "version") {
-            let pkg: any = require('./../../package.json')
-            return `版本号:${pkg.version}`
+        if (message == "version") {
+            return `版本号:${version}`
+        } else if (message === "cfg") {
+            return `Production Channel:${messageSource.production}\n当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`
         } else {
-            return null
+            let commandStr = join(this.QQBot.commands.map((c) => { return c.helpStr }))
+            let systemInfo = `当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`
+            return `${commandStr}\n${systemInfo}`
         }
     }
 }

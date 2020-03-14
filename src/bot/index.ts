@@ -64,7 +64,7 @@ export class cQQBot {
         this.commands.push(new commandAddr(this.logger, this.extService))
         this.commands.push(new commandItem(this.logger, this.extService))
         this.commands.push(new commandJita(this.logger, this.extService))
-        this.commands.push(new commandHelp(this.logger, this.extService))
+        this.commands.push(new commandHelp(this.logger, this.extService, this))
     }
     async startup() {
         this.bot.connect()

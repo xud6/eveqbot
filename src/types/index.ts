@@ -41,11 +41,11 @@ export enum eveServer {
 export const eveServerInfo = [
     {
         name: "tranquility",
-        dispName: "世界服"
+        dispName: "世界服(Tranquility)"
     },
     {
         name: "serenity",
-        dispName: "国服"
+        dispName: "国服(Serenity)"
     }
 ]
 
