@@ -29,7 +29,7 @@ export class eveqbot {
         this.opId = new opId()
         this.db = new typeormdb(this.logger, this.config.db)
         this.eveESI = new eveESI(this.logger, { opId: this.opId }, eveESICfgDefault)
-        this.models = new cModels(this.logger, { db: this.db, eveESI: this.eveESI }, {})
+        this.models = new cModels(this.logger, { db: this.db, eveESI: this.eveESI, opId: this.opId }, {})
         this.eveTranquility = new eveTranquility(this.logger, { models: this.models, eveESI: this.eveESI })
         this.itemdb = new cItemdb('itemdb.xls');
         this.CEVEMarketApi = new cCEVEMarketApi();
