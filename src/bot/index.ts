@@ -222,29 +222,18 @@ export class cQQBot {
             this.logger.info(`找不到 ${message}`)
             return '找不到该物品'
         } else if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
-            this.logger.info("搜索结果为：" + join(map(items, item => {
-                return `${item.cn_name}(${item.en_name})`
-            }), "/"))
             let marketdata: string[] = await Promise.all(items.map(async item => {
                 let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString())
                 return `${itemNameDisp(item)} --- ${market}`;
             }))
             return join(marketdata, "\n");
         } else {
-            let front = take(items, this.jita.resultNameListLimit);
             this.logger.info(`搜索结果过多: ${items.length}`)
-            this.logger.info("搜索结果为：" + join(map(items, item => {
-                return `${item.cn_name}(${item.en_name})`
-            }), "/"))
-            let cntStr = `共有${items.length}种物品符合该条件`
             if (items.length > this.jita.resultNameListLimit) {
-                cntStr = `共有超过50种物品符合该条件`
+                return `共有超过${this.jita.resultNameListLimit}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
+            } else {
+                return `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}`
             }
-            let res = `${cntStr}，请给出更明确的物品名称\n` + formatItemNames(front);
-            if (items.length > this.jita.resultNameListLimit) {
-                res = res + '\n......'
-            }
-            return res
         }
     }
     async handlerMessageItem(message: string, context: Record<string, any>): Promise<string | null> {
