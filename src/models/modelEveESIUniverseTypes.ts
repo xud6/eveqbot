@@ -103,7 +103,32 @@ export class modelEveESIUniverseTypes implements tModelBase {
         await queue.onIdle();
         this.logger.info(`update data for UniverseTypes complete`)
     }
-    async SearchByWords(
+    async MarketSearchByExactName(name: string, limit: number = 11) {
+        let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
+        let query = repo.createQueryBuilder("type")
+            .where(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
+            .andWhere(`type.published = :is_published`, { is_published: true })
+            .leftJoinAndSelect("type.group", "group")
+            .leftJoinAndSelect("group.category", "category")
+            .select([
+                "type.id",
+                "type.en_name",
+                "type.cn_name",
+                "group.id",
+                "group.en_name",
+                "group.cn_name",
+                "category.id",
+                "category.en_name",
+                "category.cn_name"
+            ])
+            .andWhere(new Brackets(qb => {
+                qb.where(`type.cn_name = :name`)
+                    .orWhere(`type.en_name = :name`)
+            })).setParameter(`name`, `${name}`)
+            .limit(limit)
+        return await query.getMany()
+    }
+    async MarketSearchByWords(
         words: string[],
         limit: number = 11,
         skins: boolean = false,
