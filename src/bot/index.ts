@@ -148,7 +148,7 @@ export class cQQBot {
             let messageInfo = genMessageInfo(event, context, tags);
             let messageSource = await this.extService.models.modelQQBotMessageSource.getQQBotMessageSource(messageInfo)
             if (messageSource) {
-                let pHandlerMessage = this.handlerMessage(messageSource, event, context)
+                let pHandlerMessage = this.handlerMessage(messageSource, messageInfo)
                 let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageSource, messageInfo, event, context, tags);
                 let result = await pHandlerMessage;
                 await pMessageLog;
@@ -162,29 +162,29 @@ export class cQQBot {
         this.bot.connect()
     }
 
-    async checkMessage(event: CQEvent, context: Record<string, any>): Promise<tCommand | null> {
-        let jita = checkStartWith(context.message, ['.jita', '。jita', '.吉他', '。吉他']);
+    async checkMessage(messageInfo: tMessageInfo): Promise<tCommand | null> {
+        let jita = checkStartWith(messageInfo.message, ['.jita', '。jita', '.吉他', '。吉他']);
         if (jita) {
             return {
                 op: opType.JITA,
                 msg: jita
             }
         }
-        let addr = checkStartWith(context.message, ['.addr', '。addr', '.地址', '。地址']);
+        let addr = checkStartWith(messageInfo.message, ['.addr', '。addr', '.地址', '。地址']);
         if (addr) {
             return {
                 op: opType.ADDR,
                 msg: addr
             }
         }
-        let help = checkStartWith(context.message, ['.help', '。help', '.帮助', '。帮助']);
+        let help = checkStartWith(messageInfo.message, ['.help', '。help', '.帮助', '。帮助']);
         if (help || help === '') {
             return {
                 op: opType.HELP,
                 msg: help
             }
         }
-        let item = checkStartWith(context.message, ['.item', '。item', '.物品', '。物品']);
+        let item = checkStartWith(messageInfo.message, ['.item', '。item', '.物品', '。物品']);
         if (item || item === '') {
             return {
                 op: opType.ITEM,
@@ -193,35 +193,37 @@ export class cQQBot {
         }
         return null
     }
-    async handlerMessage(messageSource: QQBotMessageSource, event: CQEvent, context: Record<string, any>): Promise<string | void> {
-        let command = await this.checkMessage(event, context);
+    async handlerMessage(messageSource: QQBotMessageSource, messageInfo: tMessageInfo): Promise<string | void> {
+        let command = await this.checkMessage(messageInfo);
         if (command) {
-            if(messageSource.enable){
+            if (messageSource.enable) {
                 let res: string | null = null
-                this.logger.info(`Command [${command.op}] with [${command.msg}] from [${context.user_id}]`);
+                this.logger.info(`Command [${command.op}] with [${command.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
                 switch (command.op) {
                     case opType.JITA:
-                        res = await this.handlerMessageJita(messageSource, command.msg, context);
+                        res = await this.handlerMessageJita(messageSource, messageInfo, command.msg);
                         break;
                     case opType.ADDR:
-                        res = await this.handlerMessageAddr(messageSource, command.msg, context);
+                        res = await this.handlerMessageAddr(messageSource, messageInfo, command.msg);
                         break;
                     case opType.HELP:
-                        res = await this.handlerMessageHelp(messageSource, command.msg, context);
+                        res = await this.handlerMessageHelp(messageSource, messageInfo, command.msg);
                         break;
                     case opType.ITEM:
-                        res = await this.handlerMessageItem(messageSource, command.msg, context);
+                        res = await this.handlerMessageItem(messageSource, messageInfo, command.msg);
                         break;
                 }
                 if (res) {
-                    return `[CQ:at,qq=${context.user_id}]\n${res}`
+                    return `[CQ:at,qq=${messageInfo.sender_user_id}]\n${res}`
                 }
+            } else {
+                this.logger.info(`Ignore Command [${command.op}] with [${command.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}] because it's not enabled`);
             }
         }
     }
-    async handlerMessageJita(messageSource: QQBotMessageSource, message: string, context: Record<string, any>): Promise<string | null> {
+    async handlerMessageJita(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
         if (message.length > this.jita.searchContentLimit) {
-            this.logger.info(`search content too long from [${context.user_id}]`)
+            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.jita.searchContentLimit}`
         }
 
@@ -249,9 +251,9 @@ export class cQQBot {
             }
         }
     }
-    async handlerMessageItem(messageSource: QQBotMessageSource, message: string, context: Record<string, any>): Promise<string | null> {
+    async handlerMessageItem(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
         if (message.length > this.item.searchContentLimit) {
-            this.logger.info(`search content too long from [${context.user_id}]`)
+            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.item.searchContentLimit}`
         }
 
@@ -267,9 +269,9 @@ export class cQQBot {
             }
         }
     }
-    async handlerMessageAddr(messageSource: QQBotMessageSource, message: string, context: Record<string, any>): Promise<string | null> {
+    async handlerMessageAddr(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
         if (message.length > this.addr.searchContentLimit) {
-            this.logger.info(`search content too long from [${context.user_id}]`)
+            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.addr.searchContentLimit}`
         }
         if (message.includes('出勤') || message.includes('积分')) {
@@ -288,7 +290,7 @@ export class cQQBot {
             return `我理解不了`
         }
     }
-    async handlerMessageHelp(messageSource: QQBotMessageSource, message: string, context: Record<string, any>): Promise<string | null> {
+    async handlerMessageHelp(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
         if (message.length == 0) {
             return ".jita (.吉他) 查询市场信息\n"
                 + ".addr (.地址) 查询常用网址 [出勤积分|KB|旗舰导航|市场|5度|合同分析]\n"
