@@ -4,12 +4,14 @@ import { cQQBotExtService } from "..";
 import { tLogger } from "tag-tree-logger";
 import { formatItemNames } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
+import { tQQBotMessagePacket } from "../types";
 
 export class commandItem implements tCommandBase {
     readonly logger: tLogger
     readonly name: string = "item"
     readonly helpStr: string = ".item (.物品) 查询物品名称\n"
     readonly commandPrefix: string[] = ['.item', '。item', '.物品', '。物品']
+    readonly adminOnly: boolean = false
     readonly param: {
         searchContentLimit: 30,
         resultNameListLimit: 100
@@ -22,7 +24,8 @@ export class commandItem implements tCommandBase {
     }
     async startup() { }
     async shutdown() { }
-    async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
+    async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
+        let message = messagePacket.message
         if (message.length > this.param.searchContentLimit) {
             this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`

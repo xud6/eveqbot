@@ -7,11 +7,13 @@ import { modelQQBotMessageSource } from "../models/modelQQBotMessageSource";
 import { modelEveESIUniverseTypes } from "../models/modelEveESIUniverseTypes";
 import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
 import { tCommandBase } from "./command/tCommandBase";
-import { commandLink } from "./command/commandLink";
 import { commandItem } from "./command/commandItem";
 import { commandJita } from "./command/commandJita";
 import { commandHelp } from "./command/commandHelp";
 import { genMessageInfo, tMessageInfo } from "./qqMessage";
+import { tQQBotMessagePacket } from "./types";
+import { commandCfg } from "./command/commandCfg";
+
 
 export interface tCQQBotCfg {
     cqwebConfig: Partial<CQWebSocketOption>
@@ -63,7 +65,7 @@ export class cQQBot {
         this.commands = [];
         this.commands.push(new commandJita(this.logger, this.extService))
         this.commands.push(new commandItem(this.logger, this.extService))
-        this.commands.push(new commandLink(this.logger, this.extService))
+        this.commands.push(new commandCfg(this.logger, this.extService))
         this.commands.push(new commandHelp(this.logger, this.extService, this))
     }
     async startup() {
@@ -96,6 +98,12 @@ export class cQQBot {
         }
         let commandMsg = await this.checkMessage(message);
         if (commandMsg) {
+            let messagePacket: tQQBotMessagePacket = {
+                atMe: messageInfo.atMe,
+                isAdmin: this.extService.models.modelQQBotMessageSource.isAdmin(messageInfo, messageSource),
+                message: commandMsg.msg,
+                commandName: commandMsg.command.name
+            }
             if (messageSource.enable) {
                 if (this.config.nonProductionSourceOnly) {
                     if (messageSource.production) {
@@ -105,7 +113,7 @@ export class cQQBot {
                 }
                 let res: string | null = null
                 this.logger.info(`Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
-                res = await commandMsg.command.handler(messageSource, messageInfo, commandMsg.msg)
+                res = await commandMsg.command.handler(messageSource, messageInfo, messagePacket)
                 if (res) {
                     return `[CQ:at,qq=${messageInfo.sender_user_id}]\n${res}`
                 }

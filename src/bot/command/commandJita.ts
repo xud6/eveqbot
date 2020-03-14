@@ -6,12 +6,14 @@ import { eveMarketApi, eveServerInfo, eveMarketApiInfo } from "../../types";
 import { join } from "lodash";
 import { itemNameDisp, formatItemNames } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
+import { tQQBotMessagePacket } from "../types";
 
 export class commandJita implements tCommandBase {
     readonly logger: tLogger
     readonly name: string = "jita"
     readonly helpStr: string = ".jita (.吉他) 查询市场信息\n"
     readonly commandPrefix: string[] = ['.jita', '。jita', '.吉他', '。吉他']
+    readonly adminOnly: boolean = false
     readonly param = {
         searchContentLimit: 30,
         resultPriceListLimit: 5,
@@ -25,7 +27,8 @@ export class commandJita implements tCommandBase {
     }
     async startup() { }
     async shutdown() { }
-    async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, message: string): Promise<string | null> {
+    async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
+        let message = messagePacket.message
         if (message.length > this.param.searchContentLimit) {
             this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
