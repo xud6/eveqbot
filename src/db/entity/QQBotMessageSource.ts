@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { QQBotMessageLog } from "./QQBotMessageLog";
-import { eveServer } from "../../types";
+import { eveServer, eveMarketApi } from "../../types";
 
 @Entity()
 export class QQBotMessageSource {
@@ -29,6 +29,12 @@ export class QQBotMessageSource {
         default: eveServer.serenity
     })
     eve_server: eveServer
+
+    @Column({
+        type: "int",
+        default: eveMarketApi.ceveMarket
+    })
+    eve_marketApi: eveMarketApi
 
     @Column({
         type: "varchar",

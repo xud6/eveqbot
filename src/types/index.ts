@@ -32,7 +32,33 @@ export interface tConfig {
 }
 
 export enum eveServer {
-    both = 0,
+    tranquility = 0,
     serenity = 1,
-    tranquility = 2,
 }
+
+export const eveServerInfo = [
+    {
+        name:"tranquility",
+        dispName: "世界服"
+    },
+    {
+        name:"serenity",
+        dispName: "国服"
+    }
+]
+
+export enum eveMarketApi {
+    ceveMarket = 0,
+    ESITQ = 1,
+}
+
+export const eveMarketApiInfo = [
+    {
+        name:"ceveMarket",
+        dispName:"EVE国服市场中心 https://www.ceve-market.org/api/"
+    },
+    {
+        name:"ESITQ",
+        dispName:"ESI Tranquility https://esi.evetech.net/"
+    }
+]

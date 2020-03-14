@@ -6,6 +6,8 @@ import { modelQQBotMessageLog } from "../models/modelQQBotMessageLog";
 import { modelQQBotMessageSource } from "../models/modelQQBotMessageSource";
 import { modelEveESIUniverseTypes } from "../models/modelEveESIUniverseTypes";
 import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
+import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
+import { eveMarketApi, eveServerInfo, eveMarketApiInfo } from "../types";
 
 enum opType {
     JITA = '.jita',
@@ -145,13 +147,13 @@ export class cQQBot {
         this.bot.on('message', async (event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> => {
             let messageInfo = genMessageInfo(event, context, tags);
             let messageSource = await this.extService.models.modelQQBotMessageSource.getQQBotMessageSource(messageInfo)
-            if(messageSource){
-                let pHandlerMessage = this.handlerMessage(event, context)
+            if (messageSource) {
+                let pHandlerMessage = this.handlerMessage(messageSource, event, context)
                 let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageSource, messageInfo, event, context, tags);
                 let result = await pHandlerMessage;
                 await pMessageLog;
                 return result
-            }else{
+            } else {
                 this.logger.error(`Can't read or create source for ${messageInfo}`)
             }
         })
@@ -191,23 +193,23 @@ export class cQQBot {
         }
         return null
     }
-    async handlerMessage(event: CQEvent, context: Record<string, any>): Promise<string | void> {
+    async handlerMessage(messageSource: QQBotMessageSource, event: CQEvent, context: Record<string, any>): Promise<string | void> {
         let command = await this.checkMessage(event, context);
         if (command) {
             let res: string | null = null
             this.logger.info(`Command [${command.op}] with [${command.msg}] from [${context.user_id}]`);
             switch (command.op) {
                 case opType.JITA:
-                    res = await this.handlerMessageJita(command.msg, context);
+                    res = await this.handlerMessageJita(messageSource, command.msg, context);
                     break;
                 case opType.ADDR:
-                    res = await this.handlerMessageAddr(command.msg, context);
+                    res = await this.handlerMessageAddr(messageSource, command.msg, context);
                     break;
                 case opType.HELP:
-                    res = await this.handlerMessageHelp(command.msg, context);
+                    res = await this.handlerMessageHelp(messageSource, command.msg, context);
                     break;
                 case opType.ITEM:
-                    res = await this.handlerMessageItem(command.msg, context);
+                    res = await this.handlerMessageItem(messageSource, command.msg, context);
                     break;
             }
             if (res) {
@@ -215,7 +217,7 @@ export class cQQBot {
             }
         }
     }
-    async handlerMessageJita(message: string, context: Record<string, any>): Promise<string | null> {
+    async handlerMessageJita(messageSource: QQBotMessageSource, message: string, context: Record<string, any>): Promise<string | null> {
         if (message.length > this.jita.searchContentLimit) {
             this.logger.info(`search content too long from [${context.user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.jita.searchContentLimit}`
@@ -226,11 +228,16 @@ export class cQQBot {
             this.logger.info(`找不到 ${message}`)
             return '找不到该物品'
         } else if (items.length > 0 && items.length <= this.jita.resultPriceListLimit) {
-            let marketdata: string[] = await Promise.all(items.map(async item => {
-                let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString())
-                return `${itemNameDisp(item)} --- ${market}`;
-            }))
-            return join(marketdata, "\n");
+            if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
+                let head = `共有${items.length}种物品符合该条件 当前服务器${eveServerInfo[messageSource.eve_server]} 当前市场API${eveMarketApiInfo[messageSource.eve_marketApi]}\n`
+                let marketdata: string[] = await Promise.all(items.map(async item => {
+                    let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
+                    return `${itemNameDisp(item)} --- ${market}`;
+                }))
+                return `${head}${join(marketdata, "\n")}`;
+            } else {
+                return "市场API配置错误"
+            }
         } else {
             this.logger.info(`搜索结果过多: ${items.length}`)
             if (items.length > this.jita.resultNameListLimit) {
@@ -240,7 +247,7 @@ export class cQQBot {
             }
         }
     }
-    async handlerMessageItem(message: string, context: Record<string, any>): Promise<string | null> {
+    async handlerMessageItem(messageSource: QQBotMessageSource, message: string, context: Record<string, any>): Promise<string | null> {
         if (message.length > this.item.searchContentLimit) {
             this.logger.info(`search content too long from [${context.user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.item.searchContentLimit}`
@@ -258,7 +265,7 @@ export class cQQBot {
             }
         }
     }
-    async handlerMessageAddr(message: string, context: Record<string, any>): Promise<string | null> {
+    async handlerMessageAddr(messageSource: QQBotMessageSource, message: string, context: Record<string, any>): Promise<string | null> {
         if (message.length > this.addr.searchContentLimit) {
             this.logger.info(`search content too long from [${context.user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.addr.searchContentLimit}`
@@ -279,7 +286,7 @@ export class cQQBot {
             return `我理解不了`
         }
     }
-    async handlerMessageHelp(message: string, context: Record<string, any>): Promise<string | null> {
+    async handlerMessageHelp(messageSource: QQBotMessageSource, message: string, context: Record<string, any>): Promise<string | null> {
         if (message.length == 0) {
             return ".jita (.吉他) 查询市场信息\n"
                 + ".addr (.地址) 查询常用网址 [出勤积分|KB|旗舰导航|市场|5度|合同分析]\n"
