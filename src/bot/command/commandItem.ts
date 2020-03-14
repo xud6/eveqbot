@@ -12,7 +12,7 @@ export class commandItem implements tCommandBase {
     readonly helpStr: string = ".item (.物品) 查询物品名称\n"
     readonly commandPrefix: string[] = ['.item', '。item', '.物品', '。物品']
     readonly adminOnly: boolean = false
-    readonly param: {
+    readonly param = {
         searchContentLimit: 30,
         resultNameListLimit: 100
     }
