@@ -41,13 +41,13 @@ export class commandHelp implements tCommandBase {
         }), "")
 
         if (messageSource.info) {
-            result = result + "---Links---\n"
+            result = result + "---置顶信息---\n"
             result = result + messageSource.info
             result = result + "\n"
         }
 
         if (messageSource.eve_server === eveServer.serenity) {
-            result = result + "-----------\n"
+            result = result + "------------\n"
             result = result
                 + `KB: https://kb.ceve-market.org/` + '\n'
                 + `市场: https://www.ceve-market.org/home/` + `\n`
