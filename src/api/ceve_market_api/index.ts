@@ -48,12 +48,14 @@ export class cCEVEMarketApi {
     readonly urlBase = 'https://www.ceve-market.org'
     readonly urlPathSerenity = '/api'
     readonly urlPathTranquility = '/tqapi'
+    readonly httpClientCacheMem: Map<any, any>
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: cCEVEMarketApiExtSrv,
         readonly config: tCEVEMarketApiCfg
     ) {
         this.logger = parentLogger.logger(["CEVEMarketApi"])
+        this.httpClientCacheMem = new Map()
     }
     async marketRegion(itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002'): Promise<apiMarketResponse> {
         let apiPath = this.urlPathSerenity;
@@ -65,7 +67,7 @@ export class cCEVEMarketApi {
         let result: any
         try {
             console.time(`get market api call for ${itemId} end in `)
-            result = await got(url).json();
+            result = await got(url, { cache: this.httpClientCacheMem }).json();
             console.timeEnd(`get market api call for ${itemId} end in `)
         } catch (e) {
             this.logger.error(`http error ${e.message || e}`)
