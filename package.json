@@ -18,7 +18,6 @@
   "devDependencies": {
     "@types/lodash": "^4.14.116",
     "@types/node": "^12.12.29",
-    "@types/request": "^2.47.1",
     "@types/uuid": "^7.0.0",
     "del": "^5.1.0",
     "gulp": "^4.0.2",
@@ -43,7 +42,6 @@
     "mysql": "^2.18.1",
     "p-queue": "^6.3.0",
     "reflect-metadata": "^0.1.13",
-    "request": "^2.88.0",
     "tag-tree-logger": "^1.2.0",
     "typeorm": "^0.2.24",
     "uuid": "^7.0.2",

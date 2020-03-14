@@ -29,7 +29,7 @@ export class eveqbot {
         this.eveESI = new eveESI(this.logger, { opId: this.opId }, eveESICfgDefault)
         this.models = new cModels(this.logger, { db: this.db, eveESI: this.eveESI, opId: this.opId }, {})
         this.eveTranquility = new eveTranquility(this.logger, { models: this.models, eveESI: this.eveESI })
-        this.CEVEMarketApi = new cCEVEMarketApi();
+        this.CEVEMarketApi = new cCEVEMarketApi(this.logger, {}, {});
         if (this.config.service.QQBot) {
             this.bot = new cQQBot(this.logger, { CEVEMarketApi: this.CEVEMarketApi, models: this.models }, this.config.QQBot);
         } else {
