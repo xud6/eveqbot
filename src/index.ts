@@ -26,10 +26,10 @@ export class eveqbot {
         this.logger = parentLogger.logger(["eveqbot"])
         this.opId = new opId()
         this.db = new typeormdb(this.logger, this.config.db)
-        this.eveESI = new eveESI(this.logger, { opId: this.opId }, eveESICfgDefault)
+        this.eveESI = new eveESI(this.logger, { opId: this.opId, httpClientCache: new Map() }, eveESICfgDefault)
         this.models = new cModels(this.logger, { db: this.db, eveESI: this.eveESI, opId: this.opId }, {})
         this.eveTranquility = new eveTranquility(this.logger, { models: this.models, eveESI: this.eveESI })
-        this.CEVEMarketApi = new cCEVEMarketApi(this.logger, {}, this.config.CEVEMarketApi);
+        this.CEVEMarketApi = new cCEVEMarketApi(this.logger, { httpClientCache: new Map() }, this.config.CEVEMarketApi);
         if (this.config.service.QQBot) {
             this.bot = new cQQBot(this.logger, { CEVEMarketApi: this.CEVEMarketApi, models: this.models }, this.config.QQBot);
         } else {

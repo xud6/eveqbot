@@ -1,7 +1,8 @@
 import { opId } from "../../opId";
 
 export interface tEveESIExtService {
-    opId: opId
+    opId: opId,
+    httpClientCache: string | Map<any, any>
 }
 
 export interface tEveESICfg {
