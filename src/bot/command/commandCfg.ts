@@ -35,8 +35,7 @@ export class commandCfg implements tCommandBase {
                 return `当前服务器:[${eveServerInfo[messageSource.eve_server].dispName}]\n当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}:${eveMarketApiInfo[messageSource.eve_marketApi].url}`
                     + `\n\n当前管理员\n${join(messageSource.admins.map((a) => { return ` - ${a}` }), '\n')}`
                     + `\n\n当前info信息\n${messageSource.info}`
-                    + `\n\nsetinfo 设置info信息`
-                    + `\n\nsetserver 设置服务器`
+                    + `\n\nsetinfo 设置info信息` + `\nsetserver 设置服务器`
             }
             if (startsWith(messagePacket.message, "setinfo")) {
                 this.logger.info(`${opId}| setinfo`)
@@ -63,7 +62,7 @@ export class commandCfg implements tCommandBase {
                         result = await this.extService.models.modelQQBotMessageSource.setServer(messageSource.id, eveServer.serenity)
                     }
                     if (result) {
-                        return `设置成功，当前server为:\n$${eveServerInfo[result.eve_server].dispName}`
+                        return `设置成功，当前server为:\n${eveServerInfo[result.eve_server].dispName}`
                     } else {
                         return `设置失败`
                     }
