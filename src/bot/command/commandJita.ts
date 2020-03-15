@@ -54,9 +54,9 @@ export class commandJita implements tCommandBase {
                     let head = `共有${items.length}种物品符合条件[${message}]\n`
                     let marketdata: string[] = await Promise.all(items.map(async item => {
                         let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
-                        return `${itemNameDisp(item)} --- ${market}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`;
+                        return `${itemNameDisp(item)}\n --- ${market}`;
                     }))
-                    return `${head}${join(marketdata, "\n")}`;
+                    return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`;
                 } else {
                     return "市场API配置错误"
                 }
