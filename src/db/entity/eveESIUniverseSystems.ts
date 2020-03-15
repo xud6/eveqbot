@@ -43,7 +43,7 @@ export class eveESIUniverseSystems {
         nullable: true,
         default: null
     })
-    planets_raw: tSystemPlanet | null
+    planets_raw: tSystemPlanet[] | null
 
     @Column({
         type: "simple-json"

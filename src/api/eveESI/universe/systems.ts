@@ -33,7 +33,7 @@ export const vSystemsGetByIdResultRequired = t.type({
     system_id: t.Int
 })
 export const vSystemsGetByIdResultOptional = t.partial({
-    planets: vSystemPlanet,
+    planets: t.array(vSystemPlanet),
     security_class: t.string,
     star_id: t.Int,
     stargates: t.array(t.Int),
@@ -67,7 +67,7 @@ export class systems {
     }
     async getById(id: number, language: tEveESILanguange) {
         let opId = this.extService.opId.getId()
-        let url = `${this.config.esiUrl}/v1/universe/systems/${id}/?datasource=${this.config.datasource}&language=${language}`
+        let url = `${this.config.esiUrl}/v4/universe/systems/${id}/?datasource=${this.config.datasource}&language=${language}`
         this.logger.log(`${opId}| read universe/systems id[${id}] lang[${language}] | ${url}`)
         return await retryHandler(async () => {
             let result = await got(url, { timeout: this.config.httpTimeout }).json()
@@ -75,8 +75,10 @@ export class systems {
             if (isRight(validator)) {
                 return validator.right
             } else {
-                throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
+                throw new Error(`${opId}| ${id} api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
         }, this.config.httpRetry, (e) => { this.logger.warn(e) })
     }
 }
+
+
