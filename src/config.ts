@@ -12,7 +12,8 @@ let config: tConfig = {
             port: 6700,
             accessToken: ""
         },
-        nonProductionSourceOnly: false
+        nonProductionSourceOnly: false,
+        sendRetryMax: 3
     },
     db: {
         database: 'dev_eveqbot',

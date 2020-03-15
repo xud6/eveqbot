@@ -14,11 +14,13 @@ import { genMessageInfo, tMessageInfo } from "./qqMessage";
 import { tQQBotMessagePacket } from "./types";
 import { commandCfg } from "./command/commandCfg";
 import { opId } from "../opId";
+import { retryHandler } from "../utils/retryHandler";
 
 
 export interface tCQQBotCfg {
     cqwebConfig: Partial<CQWebSocketOption>
     nonProductionSourceOnly: boolean,
+    sendRetryMax: number
 }
 
 export interface cQQBotExtService {
@@ -95,10 +97,15 @@ export class cQQBot {
         this.logger.info(`${opId}| reply message to ${JSON.stringify(messageParams)}`)
         messageParams.message = message
         try {
-            let result = await this.bot("send_msg", messageParams, { timeout: 1000 * 10 })
-            this.logger.info(`${opId}| 发送成功 ${JSON.stringify(result)}`)
+            await retryHandler(async (retryCnt) => {
+                if (retryCnt) {
+                    this.logger.info(`${opId}| retry ${retryCnt} send message to ${JSON.stringify(messageParams)}`)
+                }
+                let result = await this.bot("send_msg", messageParams, { timeout: 1000 * 10 })
+                this.logger.info(`${opId}| 发送成功 ${JSON.stringify(result)}`)
+            }, this.config.sendRetryMax, (e) => { this.logger.error(`${opId}| 发送错误 ${e.message || e}`) })
         } catch (e) {
-            this.logger.error(`${opId}| 发送错误`)
+            this.logger.error(`${opId}| 发送失败 ${e.message || e}`)
         }
     }
     async messageHandler(event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> {
