@@ -70,7 +70,7 @@ export class commandJita implements tCommandBase {
                 let head = `OP${opId} | 共有${items.length}种物品符合条件[${message}]\n`
                 let marketdata: string[] = await Promise.all(items.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
-                    return `${itemNameDisp(item)}\n --- ${market}`;
+                    return `🔴${itemNameDisp(item)}\n ${market}`;
                 }))
                 return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 使用 .jita 获取帮助 .help 查看其它功能`;
             } else {
@@ -121,13 +121,13 @@ export class commandJita implements tCommandBase {
                         let marketData = await this.extService.CEVEMarketApi.getMarketData(type.id.toString())
                         if (marketData) {
                             result.push(
-                                `${itemNameDisp(type)}\n`
-                                + ` --- ${this.extService.CEVEMarketApi.genMarketStringFromData(marketData)}`
+                                `🔴${itemNameDisp(type)}\n`
+                                + ` ${this.extService.CEVEMarketApi.genMarketStringFromData(marketData)}`
                             )
                             resultSumSellLow += marketData.sellLow * inputItem.amount;
                             resultSumBuyHigh += marketData.buyHigh * inputItem.amount;
                             resultLine.push(
-                                `${inputItem.amount} x ${itemNameDispShort(type)} 最高收价: ${numberFormat(marketData.buyHigh * inputItem.amount, 2)} / 最低卖价: ${numberFormat(marketData.sellLow * inputItem.amount, 2)}`
+                                `🔴${inputItem.amount} x ${itemNameDispShort(type)}\n 最高收价: ${numberFormat(marketData.buyHigh * inputItem.amount, 2)} / 最低卖价: ${numberFormat(marketData.sellLow * inputItem.amount, 2)}`
                             )
                         } else {
                             resultMarketError.push(`${itemNameDisp(type)}`)
@@ -202,13 +202,13 @@ export class commandJita implements tCommandBase {
                         let marketData = await this.extService.CEVEMarketApi.getMarketData(type.id.toString())
                         if (marketData) {
                             result.push(
-                                `${itemNameDisp(type)}\n`
-                                + ` --- ${this.extService.CEVEMarketApi.genMarketStringFromData(marketData)}`
+                                `🔴${itemNameDisp(type)}\n`
+                                + ` ${this.extService.CEVEMarketApi.genMarketStringFromData(marketData)}`
                             )
                             resultSumSellLow += marketData.sellLow * inputItem.amount;
                             resultSumBuyHigh += marketData.buyHigh * inputItem.amount;
                             resultLine.push(
-                                `${inputItem.amount} x ${itemNameDispShort(type)} 最高收价: ${numberFormat(marketData.buyHigh * inputItem.amount, 2)} / 最低卖价: ${numberFormat(marketData.sellLow * inputItem.amount, 2)}`
+                                `🔴${inputItem.amount} x ${itemNameDispShort(type)}\n 最高收价: ${numberFormat(marketData.buyHigh * inputItem.amount, 2)} / 最低卖价: ${numberFormat(marketData.sellLow * inputItem.amount, 2)}`
                             )
                         } else {
                             resultMarketError.push(`${itemNameDisp(type)}`)
