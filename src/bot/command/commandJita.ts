@@ -46,7 +46,7 @@ export class commandJita implements tCommandBase {
                 return '找不到该物品'
             } else if (items.length > 0 && items.length <= this.param.resultPriceListLimit) {
                 if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
-                    let head = `共有${items.length}种物品符合条件${message}\n`
+                    let head = `共有${items.length}种物品符合条件[${message}]\n`
                     let marketdata: string[] = await Promise.all(items.map(async item => {
                         let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
                         return `${itemNameDisp(item)} --- ${market}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`;
