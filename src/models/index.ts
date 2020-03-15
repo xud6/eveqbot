@@ -8,6 +8,7 @@ import { modelEveESIUniverseTypes } from "./modelEveESIUniverseTypes";
 import { modelEveESIUniverseCategories } from "./modelEveESIUniverseCategories";
 import { modelEveESIUniverseGroups } from "./modelEveESIUniverseGroups";
 import { modelEveESIUniverseRegions } from "./modelEveESIUniverseRegions";
+import { modelEveESIUniverseConstellations } from "./modelEveESIUniverseConstellations";
 
 export class cModels {
     readonly logger: tLogger
@@ -19,6 +20,7 @@ export class cModels {
     modelEveESIUniverseGroups: modelEveESIUniverseGroups
     modelEveESIUniverseTypes: modelEveESIUniverseTypes
     modelEveESIUniverseRegions: modelEveESIUniverseRegions
+    modelEveESIUniverseConstellations: modelEveESIUniverseConstellations
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
@@ -40,6 +42,8 @@ export class cModels {
         this.models.push(this.modelEveESIUniverseTypes)
         this.modelEveESIUniverseRegions = new modelEveESIUniverseRegions(this.logger, this.extService, this);
         this.models.push(this.modelEveESIUniverseRegions)
+        this.modelEveESIUniverseConstellations = new modelEveESIUniverseConstellations(this.logger, this.extService, this);
+        this.models.push(this.modelEveESIUniverseConstellations)
     }
     async startup() {
         for (let model of this.models) {

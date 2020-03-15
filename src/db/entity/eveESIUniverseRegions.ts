@@ -1,4 +1,5 @@
 import { Entity, PrimaryColumn, Column, UpdateDateColumn, OneToMany } from "typeorm";
+import { eveESIUniverseConstellations } from "./eveESIUniverseConstellations";
 
 @Entity()
 export class eveESIUniverseRegions {
@@ -35,4 +36,7 @@ export class eveESIUniverseRegions {
 
     @UpdateDateColumn()
     updateDate: Date;
+
+    @OneToMany(type => eveESIUniverseConstellations, constellations => constellations.region)
+    constellations: eveESIUniverseConstellations[];
 }
