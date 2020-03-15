@@ -64,10 +64,10 @@ export class commandJita implements tCommandBase {
             return '找不到该物品'
         } else if (items.length > 0 && items.length <= resultPriceListLimit) {
             if (isExtendedMode && items.length > this.param.resultPriceListLimit) {
-                this.QQBot.replyMessage(messageInfo, `${opId} | 共有 ${items.length}项条目，查询API中`)
+                this.QQBot.replyMessage(messageInfo, `OP${opId} | 共有 ${items.length}项条目，查询API中`)
             }
             if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `${opId} | 共有${items.length}种物品符合条件[${message}]\n`
+                let head = `OP${opId} | 共有${items.length}种物品符合条件[${message}]\n`
                 let marketdata: string[] = await Promise.all(items.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
                     return `${itemNameDisp(item)}\n --- ${market}`;
@@ -105,7 +105,7 @@ export class commandJita implements tCommandBase {
                     }
                 }
             })
-            this.QQBot.replyMessage(messageInfo, `${opId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
+            this.QQBot.replyMessage(messageInfo, `OP${opId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
             // this.logger.info(items)
             let result = [];
             let resultLine = [];
@@ -139,7 +139,7 @@ export class commandJita implements tCommandBase {
                     resultTypeError.push(inputItem.name)
                 }
             }
-            let resultStr = `${opId} | `
+            let resultStr = `OP${opId} | `
             resultStr += `EVE FIT总计${inputItems.length}种物品\n`
             if (resultTypeError.length) {
                 resultStr += `不可识别物品${resultTypeError.length}种\n`
@@ -194,7 +194,7 @@ export class commandJita implements tCommandBase {
                     UnknowLines.push(line)
                 }
             })
-            this.QQBot.replyMessage(messageInfo, `${opId} | 共有 ${inputItems.length}项条目，查询API中`)
+            this.QQBot.replyMessage(messageInfo, `OP${opId} | 共有 ${inputItems.length}项条目，查询API中`)
             for (let inputItem of inputItems) {
                 let type = (await this.extService.models.modelEveESIUniverseTypes.searchByExactName(inputItem.name))[0]
                 if (type) {
@@ -221,7 +221,7 @@ export class commandJita implements tCommandBase {
                 }
             }
 
-            let resultStr = `${opId} | `
+            let resultStr = `OP${opId} | `
             resultStr += `总计${inputItems.length}种物品\n`
             if (UnknowLines.length) {
                 resultStr += `不可识别行${UnknowLines.length}行\n`
