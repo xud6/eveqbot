@@ -3,7 +3,7 @@ import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
 import { cQQBotExtService } from "..";
 import { tLogger } from "tag-tree-logger";
 import { eveMarketApi, eveServerInfo, eveMarketApiInfo } from "../../types";
-import { join } from "lodash";
+import { join, startsWith } from "lodash";
 import { itemNameDisp, formatItemNames } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
 import { tQQBotMessagePacket } from "../types";
@@ -17,6 +17,7 @@ export class commandJita implements tCommandBase {
     readonly param = {
         searchContentLimit: 30,
         resultPriceListLimit: 5,
+        resultPriceListLimitExtended: 20,
         resultNameListLimit: 50
     }
     constructor(
@@ -39,12 +40,16 @@ export class commandJita implements tCommandBase {
                 this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
                 return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
             }
+            let resultPriceListLimit = this.param.resultPriceListLimit
+            if (startsWith(message, "skin")) {
+                resultPriceListLimit = this.param.resultPriceListLimitExtended
+            }
 
             let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(message, this.param.resultNameListLimit + 1)
             if (items.length == 0) {
                 this.logger.info(`找不到 ${message}`)
                 return '找不到该物品'
-            } else if (items.length > 0 && items.length <= this.param.resultPriceListLimit) {
+            } else if (items.length > 0 && items.length <= resultPriceListLimit) {
                 if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
                     let head = `共有${items.length}种物品符合条件[${message}]\n`
                     let marketdata: string[] = await Promise.all(items.map(async item => {
