@@ -3,10 +3,19 @@ import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
 import { cQQBotExtService } from "..";
 import { tLogger } from "tag-tree-logger";
 import { eveMarketApi, eveServerInfo, eveMarketApiInfo } from "../../types";
-import { join, startsWith } from "lodash";
-import { itemNameDisp, formatItemNames } from "../../utils/eveFuncs";
+import { join, startsWith, compact, trimEnd } from "lodash";
+import { itemNameDisp, formatItemNames, itemNameDispShort } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
 import { tQQBotMessagePacket } from "../types";
+
+const EVEFitHeadRegexp = /^&#91;(.+),( .+)&#93;$/
+const EVEFitItemWithAmountLineRegexp = /^(.+) x(\d+)$/
+
+export interface itemList {
+    id: number,
+    marketAble: boolean,
+    quantity: number
+}
 
 export class commandJita implements tCommandBase {
     readonly logger: tLogger
@@ -33,7 +42,7 @@ export class commandJita implements tCommandBase {
             return `1| .jita 物品名`
                 + `\n` + `2| .jita 物品ID`
         }
-        let messageLines = messagePacket.message.split("\r\n");
+        let messageLines = messagePacket.message.split("\n").map((line) => { return trimEnd(line, "\r") });
         if (messageLines.length <= 1) {
             let message = messageLines[0]
             if (message.length > this.param.searchContentLimit) {
@@ -68,7 +77,94 @@ export class commandJita implements tCommandBase {
                     return `共有${items.length}种物品符合符合条件${message}，请给出更明确的物品名称\n${formatItemNames(items)}`
                 }
             }
+        } else {
+            this.logger.log(`first line is ${messageLines[0]}`)
+
+            let EVEFitHead = messageLines[0].match(EVEFitHeadRegexp)
+            if (EVEFitHead) {
+                let ship = EVEFitHead[1];
+                this.logger.info(`EVE Fit Mode for ship ${ship}`)
+                messageLines[0] = ship
+                let inputItems = compact(messageLines).map((line) => {
+                    let reg = line.match(EVEFitItemWithAmountLineRegexp)
+                    if (reg) {
+                        return {
+                            name: reg[1],
+                            amount: parseInt(reg[2]) || 1
+                        }
+                    } else {
+                        return {
+                            name: line,
+                            amount: 1
+                        }
+                    }
+                })
+                // this.logger.info(items)
+                let result = [];
+                let resultLine = [];
+                let resultSumSellLow = 0;
+                let resultSumBuyHigh = 0;
+                let resultNotMarketAble = []
+                let resultTypeError = []
+                let resultMarketError = []
+                for (let inputItem of inputItems) {
+                    let type = (await this.extService.models.modelEveESIUniverseTypes.searchByExactName(inputItem.name))[0]
+                    if (type) {
+                        if (type.market_group_id !== null) {
+                            let marketData = await this.extService.CEVEMarketApi.getMarketData(type.id.toString())
+                            if (marketData) {
+                                result.push(
+                                    `${itemNameDisp(type)}\n`
+                                    + ` --- ${this.extService.CEVEMarketApi.genMarketStringFromData(marketData)}`
+                                )
+                                resultSumSellLow += marketData.sellLow * inputItem.amount;
+                                resultSumBuyHigh += marketData.buyHigh * inputItem.amount;
+                                resultLine.push(
+                                    `${inputItem.amount} x ${itemNameDispShort(type)} 最高收价: ${marketData.buyHigh * inputItem.amount} / 最低卖价: ${marketData.sellLow * inputItem.amount}`
+                                )
+                            } else {
+                                resultMarketError.push(`${itemNameDisp(type)}`)
+                            }
+                        } else {
+                            resultNotMarketAble.push(`${itemNameDisp(type)}`)
+                        }
+                    } else {
+                        resultTypeError.push(inputItem.name)
+                    }
+                }
+                let resultStr = ""
+                resultStr += `EVE FIT总计${inputItems.length}种物品\n`
+                if (resultTypeError.length) {
+                    resultStr += `不可识别物品${resultTypeError.length}种\n`
+                    resultStr += join(resultTypeError, '\n') + '\n'
+                }
+                if (resultMarketError.length) {
+                    resultStr += `市场访问错误${resultMarketError.length}种\n`
+                    resultStr += join(resultMarketError, '\n') + '\n'
+                }
+                if (resultNotMarketAble.length) {
+                    resultStr += `不可市场交易物品${resultNotMarketAble.length}种\n`
+                    resultStr += join(resultNotMarketAble, '\n') + '\n'
+                }
+                if (result.length) {
+                    resultStr += `可交易物品${result.length}种\n`
+                    resultStr += `最高收价总计 ${resultSumBuyHigh} ,最低卖价总计 ${resultSumSellLow}\n`
+                    resultStr += join(resultLine, '\n') + '\n'
+                    resultStr += `\n详细价格\n`
+                    resultStr += join(result, '\n') + '\n'
+                }
+                return resultStr
+            }
         }
         return null
     }
+}
+export interface eveFit {
+    shipName: string,
+    fitName: string,
+    lowSlots: string[],
+    midlots: string[],
+    highSlots: string[],
+    rigs: string[],
+
 }

@@ -49,6 +49,10 @@ export function itemNameDisp(item: eveESIUniverseTypes) {
     return `ID:${item.id} | ${item.cn_name} / ${item.en_name} |${item.group.cn_name}|${item.group.category.cn_name}|`
 }
 
+export function itemNameDispShort(item: eveESIUniverseTypes) {
+    return `${item.cn_name} / ${item.en_name}`
+}
+
 export function formatItemNames(items: eveESIUniverseTypes[]) {
     let d = 0;
     return join(map(items, item => {
