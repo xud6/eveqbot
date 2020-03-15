@@ -5,6 +5,7 @@ import { categories } from "./categories"
 import { groups } from "./groups"
 import { regions } from "./regions"
 import { constellations } from "./constellations"
+import { systems } from "./systems"
 
 export class universe {
     readonly logger: tLogger
@@ -13,6 +14,7 @@ export class universe {
     readonly groups: groups
     readonly regions: regions
     readonly constellations: constellations
+    readonly systems: systems
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tEveESIExtService,
@@ -24,5 +26,6 @@ export class universe {
         this.groups = new groups(this.logger, extService, config)
         this.regions = new regions(this.logger, extService, config)
         this.constellations = new constellations(this.logger, extService, config)
+        this.systems = new systems(this.logger, extService, config)
     }
 }

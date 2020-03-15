@@ -76,6 +76,10 @@ export class eveqbot {
                 this.logger.info("start refresh EveESIUniverseConstellations")
                 await this.models.modelEveESIUniverseConstellations.RefreshData(false, this.config.dataLoadConcurrency)
             })
+            await this.refreshDataJob("taskReloadDataSystems", async () => {
+                this.logger.info("start refresh EveESIUniverseSystems")
+                await this.models.modelEveESIUniverseSystems.RefreshData(false, this.config.dataLoadConcurrency)
+            })
         }
     }
 }
