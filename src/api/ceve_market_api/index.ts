@@ -67,9 +67,7 @@ export class cCEVEMarketApi {
         let result: any
 
         result = await retryHandler(async (retryCnt) => {
-            console.time(`get market api call for ${itemId} end in `)
             let r = await got(url, { cache: this.extService.httpClientCache }).json();
-            console.timeEnd(`get market api call for ${itemId} end in `)
             return r
         }, this.config.httpRetry, (e) => {
             this.logger.error(`http error ${e.message || e}`)
