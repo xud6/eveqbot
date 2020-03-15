@@ -27,11 +27,6 @@ export class eveESIUniverseGroups {
     category: eveESIUniverseCategories;
 
     @Column({
-        type: "bigint"
-    })
-    group_id: number
-
-    @Column({
         type: "varchar",
         length: 200
     })

@@ -27,7 +27,6 @@ export class modelEveESIUniverseCategories implements tModelBase {
                 result = repo.create()
                 result.id = id
             }
-            result.category_id = enData.category_id
             result.published = enData.published
             result.en_name = enData.name
             result.cn_name = cnData.name

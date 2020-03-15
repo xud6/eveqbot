@@ -74,11 +74,6 @@ export class eveESIUniverseTypes {
     icon_id: number | null
 
     @Column({
-        type: "bigint",
-    })
-    type_id: number
-
-    @Column({
         type: "float",
         nullable: true,
         default: null,

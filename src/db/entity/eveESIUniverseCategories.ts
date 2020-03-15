@@ -9,11 +9,6 @@ export class eveESIUniverseCategories {
     id: number;
 
     @Column({
-        type: "bigint"
-    })
-    category_id: number
-
-    @Column({
         type: "boolean",
     })
     published: boolean

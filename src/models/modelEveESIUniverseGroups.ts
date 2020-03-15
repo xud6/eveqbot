@@ -39,7 +39,6 @@ export class modelEveESIUniverseGroups implements tModelBase {
             } else {
                 throw new Error(`Category ${result.category_id} not found for group ${id}`)
             }
-            result.group_id = enData.group_id
             result.en_name = enData.name
             result.cn_name = cnData.name
             result.published = enData.published

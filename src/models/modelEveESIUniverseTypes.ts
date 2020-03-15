@@ -53,7 +53,6 @@ export class modelEveESIUniverseTypes implements tModelBase {
             result.cn_description = cnData.description;
             result.graphic_id = enData.graphic_id || null;
             result.icon_id = enData.icon_id || null;
-            result.type_id = enData.type_id;
             result.capacity = enData.capacity || null;
             result.mass = enData.mass || null;
             result.packaged_volume = enData.packaged_volume || null;
