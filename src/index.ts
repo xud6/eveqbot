@@ -56,27 +56,27 @@ export class eveqbot {
     }
     async refreshData() {
         if (this.config.service.reloadData) {
-            await this.refreshDataJob("taskReloadDataCategorie", async () => {
+            await this.refreshDataJob("taskReloadDataUniverseCategorie", async () => {
                 this.logger.info("start refresh EveESIUniverseCategories")
                 await this.models.modelEveESIUniverseCategories.RefreshData(false, this.config.dataLoadConcurrency)
             })
-            await this.refreshDataJob("taskReloadDataGroups", async () => {
+            await this.refreshDataJob("taskReloadDataUniversGroups", async () => {
                 this.logger.info("start refresh EveESIUniverseGroups")
                 await this.models.modelEveESIUniverseGroups.RefreshData(false, this.config.dataLoadConcurrency)
             })
-            await this.refreshDataJob("taskReloadDataTypes", async () => {
+            await this.refreshDataJob("taskReloadDataUniversTypes", async () => {
                 this.logger.info("start refresh EveESIUniverseTypes")
                 await this.models.modelEveESIUniverseTypes.RefreshData(false, this.config.dataLoadConcurrency)
             })
-            await this.refreshDataJob("taskReloadDataRegions", async () => {
+            await this.refreshDataJob("taskReloadDataUniversRegions", async () => {
                 this.logger.info("start refresh EveESIUniverseRegions")
                 await this.models.modelEveESIUniverseRegions.RefreshData(false, this.config.dataLoadConcurrency)
             })
-            await this.refreshDataJob("taskReloadDataConstellations", async () => {
+            await this.refreshDataJob("taskReloadDataUniversConstellations", async () => {
                 this.logger.info("start refresh EveESIUniverseConstellations")
                 await this.models.modelEveESIUniverseConstellations.RefreshData(false, this.config.dataLoadConcurrency)
             })
-            await this.refreshDataJob("taskReloadDataSystems", async () => {
+            await this.refreshDataJob("taskReloadDataUniversSystems", async () => {
                 this.logger.info("start refresh EveESIUniverseSystems")
                 await this.models.modelEveESIUniverseSystems.RefreshData(false, this.config.dataLoadConcurrency)
             })
