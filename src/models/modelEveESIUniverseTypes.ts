@@ -158,51 +158,6 @@ export class modelEveESIUniverseTypes implements tModelBase {
             ])
         return await query.getMany()
     }
-    async SearchByWord(
-        word: string,
-        limit: number = 51,
-        skins: boolean = false,
-        blueprint: boolean = false,
-        apparel: boolean = false,
-        onlyMarketable: boolean = true
-    ) {
-        let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
-        let query = repo.createQueryBuilder("type")
-            .where(`type.published = :is_published`, { is_published: true })
-
-        if (onlyMarketable) {
-            query = query.andWhere(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
-        }
-        query = query
-            .leftJoinAndSelect("type.group", "group")
-            .leftJoinAndSelect("group.category", "category")
-            .select([
-                "type.id",
-                "type.en_name",
-                "type.cn_name",
-                "group.id",
-                "group.en_name",
-                "group.cn_name",
-                "category.id",
-                "category.en_name",
-                "category.cn_name"
-            ])
-        if (skins === false) {
-            query = query.andWhere(`category.id <> :skid_category_id`, { skid_category_id: 91 })
-        }
-        if (blueprint === false) {
-            query = query.andWhere(`category.id <> :blueprint_category_id`, { blueprint_category_id: 9 })
-        }
-        if (apparel === false) {
-            query = query.andWhere(`category.id <> :apparel_category_id`, { apparel_category_id: 30 })
-        }
-        query = query.andWhere(new Brackets(qb => {
-            qb.where(`type.cn_name LIKE :word`)
-                .orWhere(`type.en_name LIKE :word`)
-        })).setParameter(`word`, `%${word}%`)
-        query = query.limit(limit)
-        return await query.getMany()
-    }
     async SearchByWords(
         words: string[],
         limit: number = 51,
@@ -277,7 +232,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         }
         let isSkin = eveIsSkins(input);
         let isBlueprint = eveIsBlueprint(input);
-        result = await this.SearchByWord(input, limit, isSkin, isBlueprint, false, onlyMarketable)
+        result = await this.SearchByWords([input], limit, isSkin, isBlueprint, false, onlyMarketable)
         if (result.length > 0) {
             this.logger.info(`${opId}| Find [${result.length}] result by Word for [${input}]`)
             return result;
