@@ -2,6 +2,11 @@ import { Entity, Column, PrimaryColumn, UpdateDateColumn, JoinColumn, ManyToOne,
 import { eveESIUniverseGroups } from "./eveESIUniverseGroups";
 
 @Entity()
+@Index(["published", "name_en"])
+@Index(["published", "name_cn"])
+@Index(["published", "market_group_id"])
+@Index(["published", "group_id"])
+@Index(["published", "market_group_id", "group_id"])
 export class eveESIUniverseTypes {
     @PrimaryColumn({
         type: "bigint"

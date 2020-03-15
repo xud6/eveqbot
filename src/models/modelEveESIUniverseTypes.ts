@@ -185,13 +185,13 @@ export class modelEveESIUniverseTypes implements tModelBase {
                 "category.name_cn"
             ])
         if (skins === false) {
-            query = query.andWhere(`category.id <> :skid_category_id`, { skid_category_id: 91 })
+            query = query.andWhere(`group.category_id <> :skid_category_id`, { skid_category_id: 91 })
         }
         if (blueprint === false) {
-            query = query.andWhere(`category.id <> :blueprint_category_id`, { blueprint_category_id: 9 })
+            query = query.andWhere(`group.category_id <> :blueprint_category_id`, { blueprint_category_id: 9 })
         }
         if (apparel === false) {
-            query = query.andWhere(`category.id <> :apparel_category_id`, { apparel_category_id: 30 })
+            query = query.andWhere(`group.category_id <> :apparel_category_id`, { apparel_category_id: 30 })
         }
         let wordcnt = 1
         for (let word of words) {
