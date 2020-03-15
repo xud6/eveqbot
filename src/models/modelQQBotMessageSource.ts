@@ -50,7 +50,8 @@ export class modelQQBotMessageSource implements tModelBase {
             if (result === undefined) {
                 let record = repo.create({
                     source_type: messageLogInfo.source_type,
-                    source_id: messageLogInfo.source_id
+                    source_id: messageLogInfo.source_id,
+                    info: ""
                 })
                 await repo.save(record)
                 return await repo.findOne({
