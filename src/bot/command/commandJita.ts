@@ -260,6 +260,9 @@ export class commandJita implements tCommandBase {
                 + `\n` + `4| .jita`
                 + `\n` + `   {EVE舰船装配}`
                 + `\n` + `  --- 查询EVE舰船装配价格`
+                + `\n` + `5| .jita`
+                + `\n` + `   {合同内容复制}`
+                + `\n` + `  --- 查询合同内容价格`
         }
         let messageLines = messagePacket.message.split("\n").map((line) => { return trimEnd(line, "\r") });
         if (messageLines.length <= 1) {
