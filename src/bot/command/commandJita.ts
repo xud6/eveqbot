@@ -190,12 +190,3 @@ export class commandJita implements tCommandBase {
         return null
     }
 }
-export interface eveFit {
-    shipName: string,
-    fitName: string,
-    lowSlots: string[],
-    midlots: string[],
-    highSlots: string[],
-    rigs: string[],
-
-}
