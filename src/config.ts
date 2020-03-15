@@ -88,6 +88,7 @@ if (process.env.DATA_LOAD_CONCURRENT && (process.env.DATA_LOAD_CONCURRENT.length
 if (config.debugMode) {
     config.QQBot.nonProductionSourceOnly = true
     config.models.noLog = true
+    console.log(`*** Enable DEBUG mode`)
 }
 
 export default config;
