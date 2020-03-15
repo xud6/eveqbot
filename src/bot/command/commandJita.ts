@@ -3,7 +3,7 @@ import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
 import { cQQBotExtService, cQQBot } from "..";
 import { tLogger } from "tag-tree-logger";
 import { eveMarketApi, eveServerInfo, eveMarketApiInfo } from "../../types";
-import { join, startsWith, compact, trimEnd, replace, trim } from "lodash";
+import { join, startsWith, compact, trimEnd, replace, trim, orderBy } from "lodash";
 import { itemNameDisp, formatItemNames, itemNameDispShort } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
 import { tQQBotMessagePacket } from "../types";
@@ -108,7 +108,7 @@ export class commandJita implements tCommandBase {
             this.QQBot.replyMessage(messageInfo, `OP${opId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
             // this.logger.info(items)
             let result = [];
-            let resultLine = [];
+            let resultLineData = [];
             let resultSumSellLow = 0;
             let resultSumBuyHigh = 0;
             let resultNotMarketAble = []
@@ -126,9 +126,12 @@ export class commandJita implements tCommandBase {
                             )
                             resultSumSellLow += marketData.sellLow * inputItem.amount;
                             resultSumBuyHigh += marketData.buyHigh * inputItem.amount;
-                            resultLine.push(
-                                `🔵${inputItem.amount} x ${itemNameDispShort(type)}\n 最高收价: ${numberFormat(marketData.buyHigh * inputItem.amount, 2)} / 最低卖价: ${numberFormat(marketData.sellLow * inputItem.amount, 2)}`
-                            )
+                            resultLineData.push({
+                                amount: inputItem.amount,
+                                itemType: type,
+                                buyHighTotal: marketData.buyHigh * inputItem.amount,
+                                sellLowTotal: marketData.sellLow * inputItem.amount
+                            })
                         } else {
                             resultMarketError.push(`${itemNameDisp(type)}`)
                         }
@@ -155,8 +158,11 @@ export class commandJita implements tCommandBase {
             }
             if (result.length) {
                 resultStr += `可交易物品${result.length}种\n`
-                resultStr += `最高收价总计 ${numberFormat(resultSumBuyHigh, 2)} ,最低卖价总计 ${numberFormat(resultSumSellLow, 2)}\n`
-                resultStr += join(resultLine, '\n') + '\n'
+                resultStr += `最低卖价总计 ${numberFormat(resultSumSellLow, 2)} ,最高收价总计 ${numberFormat(resultSumBuyHigh, 2)}\n`
+                resultLineData = orderBy(resultLineData, "sellLowTotal", "desc")
+                resultStr += join(resultLineData.map((lineData) => {
+                    return `🔵${lineData.amount} x ${itemNameDispShort(lineData.itemType)}\n 最低卖价: ${numberFormat(lineData.sellLowTotal, 2)} / 最高收价: ${numberFormat(lineData.buyHighTotal, 2)}`
+                }), '\n') + '\n'
                 resultStr += `\n详细价格\n`
                 resultStr += join(result, '\n') + '\n'
             }
@@ -171,7 +177,7 @@ export class commandJita implements tCommandBase {
             let inputItems: { name: string, amount: number }[] = []
             let UnknowLines: string[] = []
             let result = [];
-            let resultLine = [];
+            let resultLineData = [];
             let resultSumSellLow = 0;
             let resultSumBuyHigh = 0;
             let resultNotMarketAble = []
@@ -207,9 +213,12 @@ export class commandJita implements tCommandBase {
                             )
                             resultSumSellLow += marketData.sellLow * inputItem.amount;
                             resultSumBuyHigh += marketData.buyHigh * inputItem.amount;
-                            resultLine.push(
-                                `🔵${inputItem.amount} x ${itemNameDispShort(type)}\n 最高收价: ${numberFormat(marketData.buyHigh * inputItem.amount, 2)} / 最低卖价: ${numberFormat(marketData.sellLow * inputItem.amount, 2)}`
-                            )
+                            resultLineData.push({
+                                amount: inputItem.amount,
+                                itemType: type,
+                                buyHighTotal: marketData.buyHigh * inputItem.amount,
+                                sellLowTotal: marketData.sellLow * inputItem.amount
+                            })
                         } else {
                             resultMarketError.push(`${itemNameDisp(type)}`)
                         }
@@ -242,7 +251,10 @@ export class commandJita implements tCommandBase {
             if (result.length) {
                 resultStr += `可交易物品${result.length}种\n`
                 resultStr += `最高收价总计 ${numberFormat(resultSumBuyHigh, 2)} ,最低卖价总计 ${numberFormat(resultSumSellLow, 2)}\n`
-                resultStr += join(resultLine, '\n') + '\n'
+                resultLineData = orderBy(resultLineData, "sellLowTotal", "desc")
+                resultStr += join(resultLineData.map((lineData) => {
+                    return `🔵${lineData.amount} x ${itemNameDispShort(lineData.itemType)}\n 最低卖价: ${numberFormat(lineData.sellLowTotal, 2)} / 最高收价: ${numberFormat(lineData.buyHighTotal, 2)}`
+                }), '\n') + '\n'
                 resultStr += `\n详细价格\n`
                 resultStr += join(result, '\n') + '\n'
             }
