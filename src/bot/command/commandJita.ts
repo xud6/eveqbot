@@ -8,6 +8,7 @@ import { itemNameDisp, formatItemNames, itemNameDispShort } from "../../utils/ev
 import { tMessageInfo } from "../qqMessage";
 import { tQQBotMessagePacket } from "../types";
 import { numberFormat } from "../../utils/format";
+import { performance } from "../../utils/performance";
 
 const EVEFitHeadRegexp = /^&#91;(.+),( .+)&#93;$/
 const EVEFitItemWithAmountLineRegexp = /^(.+) x(\d+)$/
@@ -42,6 +43,7 @@ export class commandJita implements tCommandBase {
     async startup() { }
     async shutdown() { }
     async handlerSingleItem(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+        let perfUtil = new performance()
         let message = messageLines[0]
         if (message.length > this.param.searchContentLimit) {
             this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
@@ -57,8 +59,9 @@ export class commandJita implements tCommandBase {
             resultNameListLimit = this.param.resultNameListLimitExtended
             isExtendedMode = true
         }
-
+        perfUtil.reset()
         let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(message, resultNameListLimit + 1)
+        this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish market search ${message}`)
         if (items.length == 0) {
             this.logger.info(`找不到 ${message}`)
             return '找不到该物品'
@@ -68,10 +71,12 @@ export class commandJita implements tCommandBase {
             }
             if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
                 let head = `OP${opId} | 共有${items.length}种物品符合条件[${message}]\n`
+                perfUtil.reset()
                 let marketdata: string[] = await Promise.all(items.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
                     return `🔵${itemNameDisp(item)}\n ${market}`;
                 }))
+                this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api data`)
                 return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 使用 .jita 获取帮助 .help 查看其它功能`;
             } else {
                 return "市场API配置错误"
@@ -86,6 +91,8 @@ export class commandJita implements tCommandBase {
         }
     }
     async handlerEveFit(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+        let perf = new performance()
+        let perfUtil = new performance()
         let EVEFitHead = messageLines[0].match(EVEFitHeadRegexp)
         if (EVEFitHead) {
             let ship = EVEFitHead[1];
@@ -115,10 +122,14 @@ export class commandJita implements tCommandBase {
             let resultTypeError = []
             let resultMarketError = []
             for (let inputItem of inputItems) {
+                perfUtil.reset()
                 let type = (await this.extService.models.modelEveESIUniverseTypes.searchByExactName(inputItem.name))[0]
+                this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish search item of [${inputItem.name}]`)
                 if (type) {
                     if (type.market_group_id !== null) {
+                        perfUtil.reset()
                         let marketData = await this.extService.CEVEMarketApi.getMarketData(type.id.toString())
+                        this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api of [${inputItem.name}]`)
                         if (marketData) {
                             result.push(
                                 `🔵${itemNameDisp(type)}\n`
@@ -166,12 +177,15 @@ export class commandJita implements tCommandBase {
                 resultStr += `\n详细价格\n`
                 resultStr += join(result, '\n') + '\n'
             }
+            this.logger.info(`${opId}| finish handler evefit in ${perf.timePastStr()}`)
             return resultStr
         } else {
             return false
         }
     }
     async handlerContract(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+        let perf = new performance()
+        let perfUtil = new performance()
         let EVEContractLine = messageLines[0].match(EVEContractLineRegexp)
         if (EVEContractLine) {
             let inputItems: { name: string, amount: number }[] = []
@@ -202,10 +216,14 @@ export class commandJita implements tCommandBase {
             })
             this.QQBot.replyMessage(messageInfo, `OP${opId} | 共有 ${inputItems.length}项条目，查询API中`)
             for (let inputItem of inputItems) {
+                perfUtil.reset()
                 let type = (await this.extService.models.modelEveESIUniverseTypes.searchByExactName(inputItem.name))[0]
+                this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish search item [${inputItem.name}]`)
                 if (type) {
                     if (type.market_group_id !== null) {
+                        perfUtil.reset()
                         let marketData = await this.extService.CEVEMarketApi.getMarketData(type.id.toString())
+                        this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api [${inputItem.name}]`)
                         if (marketData) {
                             result.push(
                                 `🔵${itemNameDisp(type)}\n`
@@ -258,6 +276,7 @@ export class commandJita implements tCommandBase {
                 resultStr += `\n详细价格\n`
                 resultStr += join(result, '\n') + '\n'
             }
+            this.logger.info(`${opId}| finish handler contract ${perf.timePastStr()}`)
             return resultStr
         } else {
             return false
