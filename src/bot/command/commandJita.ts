@@ -11,6 +11,7 @@ import { numberFormat } from "../../utils/format";
 
 const EVEFitHeadRegexp = /^&#91;(.+),( .+)&#93;$/
 const EVEFitItemWithAmountLineRegexp = /^(.+) x(\d+)$/
+const EVEContractLineRegexp = /^(.+)\t(\d+)\t(.+)\t(.+)$/
 
 export interface itemList {
     id: number,
@@ -164,6 +165,92 @@ export class commandJita implements tCommandBase {
             return false
         }
     }
+    async handlerContract(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+        let EVEContractLine = messageLines[0].match(EVEContractLineRegexp)
+        if (EVEContractLine) {
+            let inputItems: { name: string, amount: number }[] = []
+            let UnknowLines: string[] = []
+            let result = [];
+            let resultLine = [];
+            let resultSumSellLow = 0;
+            let resultSumBuyHigh = 0;
+            let resultNotMarketAble = []
+            let resultTypeError = []
+            let resultMarketError = []
+            messageLines.forEach((line) => {
+                let regexp = line.match(EVEContractLineRegexp)
+                if (regexp) {
+                    let name = regexp[1].trim()
+                    let amount = parseInt(regexp[2])
+                    if (name.length > 0 && amount > 0) {
+                        inputItems.push({
+                            name: name,
+                            amount: amount
+                        })
+                    } else {
+                        UnknowLines.push(line)
+                    }
+                } else {
+                    UnknowLines.push(line)
+                }
+            })
+            this.QQBot.replyMessage(messageInfo, `${opId} | 共有 ${inputItems.length}项条目，查询API中`)
+            for (let inputItem of inputItems) {
+                let type = (await this.extService.models.modelEveESIUniverseTypes.searchByExactName(inputItem.name))[0]
+                if (type) {
+                    if (type.market_group_id !== null) {
+                        let marketData = await this.extService.CEVEMarketApi.getMarketData(type.id.toString())
+                        if (marketData) {
+                            result.push(
+                                `${itemNameDisp(type)}\n`
+                                + ` --- ${this.extService.CEVEMarketApi.genMarketStringFromData(marketData)}`
+                            )
+                            resultSumSellLow += marketData.sellLow * inputItem.amount;
+                            resultSumBuyHigh += marketData.buyHigh * inputItem.amount;
+                            resultLine.push(
+                                `${inputItem.amount} x ${itemNameDispShort(type)} 最高收价: ${numberFormat(marketData.buyHigh * inputItem.amount, 2)} / 最低卖价: ${numberFormat(marketData.sellLow * inputItem.amount, 2)}`
+                            )
+                        } else {
+                            resultMarketError.push(`${itemNameDisp(type)}`)
+                        }
+                    } else {
+                        resultNotMarketAble.push(`${itemNameDisp(type)}`)
+                    }
+                } else {
+                    resultTypeError.push(inputItem.name)
+                }
+            }
+
+            let resultStr = `${opId} | `
+            resultStr += `总计${inputItems.length}种物品\n`
+            if (UnknowLines.length) {
+                resultStr += `不可识别行${UnknowLines.length}行\n`
+                resultStr += join(UnknowLines, '\n') + '\n'
+            }
+            if (resultTypeError.length) {
+                resultStr += `不可识别物品${resultTypeError.length}种\n`
+                resultStr += join(resultTypeError, '\n') + '\n'
+            }
+            if (resultMarketError.length) {
+                resultStr += `市场访问错误${resultMarketError.length}种\n`
+                resultStr += join(resultMarketError, '\n') + '\n'
+            }
+            if (resultNotMarketAble.length) {
+                resultStr += `不可市场交易物品${resultNotMarketAble.length}种\n`
+                resultStr += join(resultNotMarketAble, '\n') + '\n'
+            }
+            if (result.length) {
+                resultStr += `可交易物品${result.length}种\n`
+                resultStr += `最高收价总计 ${numberFormat(resultSumBuyHigh, 2)} ,最低卖价总计 ${numberFormat(resultSumSellLow, 2)}\n`
+                resultStr += join(resultLine, '\n') + '\n'
+                resultStr += `\n详细价格\n`
+                resultStr += join(result, '\n') + '\n'
+            }
+            return resultStr
+        } else {
+            return false
+        }
+    }
     async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         let opId = this.extService.opId.getId()
         if (messagePacket.message === "") {
@@ -186,6 +273,14 @@ export class commandJita implements tCommandBase {
             if (result !== false) {
                 return result
             }
+            this.logger.info(messageLines)
+
+            result = await this.handlerContract(opId, messageLines, messageSource, messageInfo, messagePacket)
+            if (result !== false) {
+                return result
+            }
+            this.logger.info(messageLines)
+
         }
         return null
     }
