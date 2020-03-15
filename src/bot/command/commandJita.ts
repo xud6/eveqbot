@@ -29,8 +29,8 @@ export class commandJita implements tCommandBase {
     async shutdown() { }
     async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         if (messagePacket.message === "") {
-            return `.jita 物品名`
-                + `\n` + `.jita 物品ID`
+            return `1| .jita 物品名`
+                + `\n` + `2| .jita 物品ID`
         }
         let messageLines = messagePacket.message.split("\r\n");
         if (messageLines.length <= 1) {
