@@ -1,5 +1,8 @@
 export function formatHrtime(hr: [number, number]) {
-    return hr[0] + 's ' + hr[1] / 1000000 + 'ms ' + hr[1] % 1000000 + 'ns'
+    return hr[0] + 's ' + hr[1] / 1000000 + 'ms'
+}
+export function formatHrtimeMS(hr: [number, number]) {
+    return hr[0] + 's ' + Math.round(hr[1] / 1000000) + 'ms'
 }
 
 /**
@@ -21,7 +24,7 @@ export class performance {
      * 计算经过的时间
      */
     timePast(): [number, number] {
-        
+
         return process.hrtime(this.hrTime);
     }
     /**
@@ -29,5 +32,8 @@ export class performance {
      */
     timePastStr(): string {
         return formatHrtime(this.timePast());
+    }
+    timePastStrMS(): string {
+        return formatHrtimeMS(this.timePast());
     }
 }
