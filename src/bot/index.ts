@@ -84,14 +84,20 @@ export class cQQBot {
         return null
     }
     async replyMessage(messageInfo: tMessageInfo, message: string) {
+        let opId = this.extService.opId.getId()
         let messageParams: Record<string, any> = {}
         messageParams.message_type = messageInfo.message_type;
         messageParams.group_id = messageInfo.group_id || undefined
         messageParams.discuss_id = messageInfo.discuss_id || undefined
         messageParams.user_id = messageInfo.sender_user_id || undefined
-        this.logger.info(`reply message to ${JSON.stringify(messageParams)}`)
+        this.logger.info(`${opId}| reply message to ${JSON.stringify(messageParams)}`)
         messageParams.message = message
-        this.bot("send_msg", messageParams)
+        try {
+            let result = await this.bot("send_msg", messageParams, { timeout: 1000 * 10 })
+            this.logger.info(`${opId}| 发送成功 ${JSON.stringify(result)}`)
+        } catch (e) {
+            this.logger.error(`${opId}| 发送错误`)
+        }
     }
     async messageHandler(event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> {
         try {
