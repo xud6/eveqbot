@@ -34,6 +34,11 @@ export class commandJita implements tCommandBase {
             return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
         }
 
+        if (message === "") {
+            return `.jita 物品名`
+                + `\n` + `.jita 物品ID`
+        }
+
         let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(message, this.param.resultNameListLimit + 1)
         if (items.length == 0) {
             this.logger.info(`找不到 ${message}`)
