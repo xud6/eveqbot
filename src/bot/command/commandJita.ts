@@ -43,6 +43,7 @@ export class commandJita implements tCommandBase {
     async startup() { }
     async shutdown() { }
     async handlerSingleItem(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+        let perf = new performance()
         let perfUtil = new performance()
         let message = messageLines[0]
         if (message.length > this.param.searchContentLimit) {
@@ -77,7 +78,7 @@ export class commandJita implements tCommandBase {
                     return `🔵${itemNameDisp(item)}\n ${market}`;
                 }))
                 this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api data`)
-                return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 使用 .jita 获取帮助 .help 查看其它功能`;
+                return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 耗时${perf.timePastStrMS()}\n 使用 .jita 获取帮助 .help 查看其它功能`;
             } else {
                 return "市场API配置错误"
             }
@@ -176,6 +177,7 @@ export class commandJita implements tCommandBase {
                 }), '\n') + '\n'
                 resultStr += `\n详细价格\n`
                 resultStr += join(result, '\n') + '\n'
+                resultStr += `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 耗时${perf.timePastStrMS()}\n 使用 .jita 获取帮助 .help 查看其它功能`;
             }
             this.logger.info(`${opId}| finish handler evefit in ${perf.timePastStr()}`)
             return resultStr
@@ -275,6 +277,7 @@ export class commandJita implements tCommandBase {
                 }), '\n') + '\n'
                 resultStr += `\n详细价格\n`
                 resultStr += join(result, '\n') + '\n'
+                resultStr += `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 耗时${perf.timePastStrMS()}\n 使用 .jita 获取帮助 .help 查看其它功能`;
             }
             this.logger.info(`${opId}| finish handler contract ${perf.timePastStr()}`)
             return resultStr
