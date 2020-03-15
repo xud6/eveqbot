@@ -3,6 +3,7 @@ import { tEveESIExtService, tEveESICfg } from "../types"
 import { types } from "./types"
 import { categories } from "./categories"
 import { groups } from "./groups"
+import { regions } from "./regions"
 
 
 export class universe {
@@ -10,6 +11,7 @@ export class universe {
     readonly types: types
     readonly categories: categories
     readonly groups: groups
+    readonly regions: regions
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tEveESIExtService,
@@ -19,5 +21,6 @@ export class universe {
         this.types = new types(this.logger, extService, config)
         this.categories = new categories(this.logger, extService, config)
         this.groups = new groups(this.logger, extService, config)
+        this.regions = new regions(this.logger, extService, config)
     }
 }

@@ -7,6 +7,7 @@ import { modelKvs } from "./modelKvs";
 import { modelEveESIUniverseTypes } from "./modelEveESIUniverseTypes";
 import { modelEveESIUniverseCategories } from "./modelEveESIUniverseCategories";
 import { modelEveESIUniverseGroups } from "./modelEveESIUniverseGroups";
+import { modelEveESIUniverseRegions } from "./modelEveESIUniverseRegions";
 
 export class cModels {
     readonly logger: tLogger
@@ -15,8 +16,9 @@ export class cModels {
     modelQQBotMessageSource: modelQQBotMessageSource
     modelKvs: modelKvs
     modelEveESIUniverseCategories: modelEveESIUniverseCategories
-    modelEveESIUniverseGroups:modelEveESIUniverseGroups
+    modelEveESIUniverseGroups: modelEveESIUniverseGroups
     modelEveESIUniverseTypes: modelEveESIUniverseTypes
+    modelEveESIUniverseRegions: modelEveESIUniverseRegions
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
@@ -36,6 +38,8 @@ export class cModels {
         this.models.push(this.modelEveESIUniverseGroups)
         this.modelEveESIUniverseTypes = new modelEveESIUniverseTypes(this.logger, this.extService, this);
         this.models.push(this.modelEveESIUniverseTypes)
+        this.modelEveESIUniverseRegions = new modelEveESIUniverseRegions(this.logger, this.extService, this);
+        this.models.push(this.modelEveESIUniverseRegions)
     }
     async startup() {
         for (let model of this.models) {

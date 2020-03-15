@@ -47,18 +47,31 @@ export class eveqbot {
     async shutdown() {
 
     }
+    private async refreshDataJob(key: string, task: () => Promise<void>) {
+        let k = await this.models.modelKvs.get(key)
+        if (k !== "COMPLETE") {
+            await task();
+            await this.models.modelKvs.set(key, "COMPLETE")
+        }
+    }
     async refreshData() {
         if (this.config.service.reloadData) {
-            let taskReloadData = await this.models.modelKvs.get("taskReloadData")
-            if (taskReloadData !== "COMPLETE") {
+            await this.refreshDataJob("taskReloadDataCategorie", async () => {
                 this.logger.info("start refresh EveESIUniverseCategories")
                 await this.models.modelEveESIUniverseCategories.RefreshData(false, this.config.dataLoadConcurrency)
+            })
+            await this.refreshDataJob("taskReloadDataGroups", async () => {
                 this.logger.info("start refresh EveESIUniverseGroups")
                 await this.models.modelEveESIUniverseGroups.RefreshData(false, this.config.dataLoadConcurrency)
+            })
+            await this.refreshDataJob("taskReloadDataTypes", async () => {
                 this.logger.info("start refresh EveESIUniverseTypes")
                 await this.models.modelEveESIUniverseTypes.RefreshData(false, this.config.dataLoadConcurrency)
-                await this.models.modelKvs.set("taskReloadData", "COMPLETE")
-            }
+            })
+            await this.refreshDataJob("taskReloadDataRegions", async () => {
+                this.logger.info("start refresh EveESIUniverseRegions")
+                await this.models.modelEveESIUniverseRegions.RefreshData(false, this.config.dataLoadConcurrency)
+            })
         }
     }
 }
