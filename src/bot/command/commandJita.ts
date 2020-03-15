@@ -56,7 +56,7 @@ export class commandJita implements tCommandBase {
                         let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
                         return `${itemNameDisp(item)}\n --- ${market}`;
                     }))
-                    return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`;
+                    return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 使用 .jita 获取帮助 .help 查看其它功能`;
                 } else {
                     return "市场API配置错误"
                 }
