@@ -65,7 +65,7 @@ export class cQQBot {
                 }
             } catch (e) {
                 this.logger.error(`internal error ${e.message || e}`)
-                return `内部错误`
+                return
             }
         })
 
@@ -112,17 +112,22 @@ export class cQQBot {
                 commandName: commandMsg.command.name
             }
             if (messageSource.enable) {
-                if (this.config.nonProductionSourceOnly) {
-                    if (messageSource.production) {
-                        this.logger.info(`Ignore Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}] because current server is non-production only`);
-                        return
+                try {
+                    if (this.config.nonProductionSourceOnly) {
+                        if (messageSource.production) {
+                            this.logger.info(`Ignore Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}] because current server is non-production only`);
+                            return
+                        }
                     }
-                }
-                let res: string | null = null
-                this.logger.info(`Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
-                res = await commandMsg.command.handler(messageSource, messageInfo, messagePacket)
-                if (res) {
-                    return `[CQ:at,qq=${messageInfo.sender_user_id}]\n${res}`
+                    let res: string | null = null
+                    this.logger.info(`Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
+                    res = await commandMsg.command.handler(messageSource, messageInfo, messagePacket)
+                    if (res) {
+                        return `[CQ:at,qq=${messageInfo.sender_user_id}]\n${res}`
+                    }
+                } catch (e) {
+                    this.logger.error(`command process error ${e}`)
+                    return "内部错误"
                 }
             } else {
                 this.logger.info(`Ignore Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}] because it's not enabled`);
