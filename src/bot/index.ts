@@ -50,23 +50,8 @@ export class cQQBot {
             this.logger.info(`attemp to connect ${wsType} No.${attempts} failed`)
         })
 
-        this.bot.on('message', async (event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> => {
-            try {
-                let messageInfo = genMessageInfo(event, context, tags);
-                let messageSource = await this.extService.models.modelQQBotMessageSource.getQQBotMessageSource(messageInfo)
-                if (messageSource) {
-                    let pHandlerMessage = this.handlerMessage(messageSource, messageInfo)
-                    let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageSource, messageInfo, event, context, tags);
-                    let result = await pHandlerMessage;
-                    await pMessageLog;
-                    return result
-                } else {
-                    this.logger.error(`Can't read or create source for ${messageInfo}`)
-                }
-            } catch (e) {
-                this.logger.error(`internal error ${e.message || e}`)
-                return
-            }
+        this.bot.on('message', (event: CQEvent, context: Record<string, any>, tags: CQTag[]) => {
+            this.messageHandler(event, context, tags)
         })
 
         this.commands = [];
@@ -98,7 +83,37 @@ export class cQQBot {
         }
         return null
     }
-    async handlerMessage(messageSource: QQBotMessageSource, messageInfo: tMessageInfo): Promise<string | void> {
+    async replyMessage(messageInfo: tMessageInfo, message: string) {
+        let messageParams: Record<string, any> = {}
+        messageParams.message_type = messageInfo.message_type;
+        messageParams.group_id = messageInfo.group_id || undefined
+        messageParams.discuss_id = messageInfo.discuss_id || undefined
+        messageParams.user_id = messageInfo.sender_user_id || undefined
+        this.logger.info(`reply message to ${JSON.stringify(messageParams)}`)
+        messageParams.message = message
+        this.bot("send_msg", messageParams)
+    }
+    async messageHandler(event: CQEvent, context: Record<string, any>, tags: CQTag[]): Promise<string | void> {
+        try {
+            let messageInfo = genMessageInfo(event, context, tags);
+            let messageSource = await this.extService.models.modelQQBotMessageSource.getQQBotMessageSource(messageInfo)
+            if (messageSource) {
+                let pHandlerMessage = this.messageProcess(messageSource, messageInfo)
+                let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageSource, messageInfo, event, context, tags);
+                let replyMessage = await pHandlerMessage;
+                if (replyMessage) {
+                    await this.replyMessage(messageInfo, replyMessage)
+                }
+                await pMessageLog;
+            } else {
+                this.logger.error(`Can't read or create source for ${messageInfo}`)
+            }
+        } catch (e) {
+            this.logger.error(`internal error ${e.message || e}`)
+            return
+        }
+    }
+    async messageProcess(messageSource: QQBotMessageSource, messageInfo: tMessageInfo): Promise<string | void> {
         let message = messageInfo.message
         if (messageInfo.atMe) {
             message = trim(replace(message, `[CQ:at,qq=${messageInfo.self_id}]`, ''))
