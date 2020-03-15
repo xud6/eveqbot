@@ -28,7 +28,8 @@ let config: tConfig = {
         reloadData: true
     },
     CEVEMarketApi: {
-        httpTimeout: 1000 * 20
+        httpTimeout: 1000 * 20,
+        httpRetry: 3
     },
     dataLoadConcurrency: 5,
     models: {

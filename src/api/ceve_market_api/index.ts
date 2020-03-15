@@ -3,6 +3,7 @@ import { includes } from 'lodash';
 import { isString } from 'util';
 import { eveServer } from '../../types';
 import { tLogger } from "tag-tree-logger";
+import { retryHandler } from "../../utils/retryHandler";
 
 export interface apiMarketResponse {
     sell: {
@@ -36,7 +37,8 @@ function numberFormat(num: number, minimumFractionDigits: number = 0) {
 }
 
 export interface tCEVEMarketApiCfg {
-    httpTimeout: number
+    httpTimeout: number,
+    httpRetry: number
 }
 
 export interface cCEVEMarketApiExtSrv {
@@ -63,14 +65,15 @@ export class cCEVEMarketApi {
         const url = `${this.urlBase}${apiPath}/market/region/${regionId}/type/${itemId}.json`
         this.logger.log(`make get market api call for ${itemId} | ${url}`);
         let result: any
-        try {
+
+        result = await retryHandler(async (retryCnt) => {
             console.time(`get market api call for ${itemId} end in `)
-            result = await got(url, { cache: this.extService.httpClientCache }).json();
+            let r = await got(url, { cache: this.extService.httpClientCache }).json();
             console.timeEnd(`get market api call for ${itemId} end in `)
-        } catch (e) {
+            return r
+        }, this.config.httpRetry, (e) => {
             this.logger.error(`http error ${e.message || e}`)
-            throw new Error("市场中心暂时失联，原因HTTP错误")
-        }
+        })
         if (result.buy && result.sell && result.all) {
             return result;
         } else {
