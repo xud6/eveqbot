@@ -7,6 +7,7 @@ import { join, startsWith, compact, trimEnd } from "lodash";
 import { itemNameDisp, formatItemNames, itemNameDispShort } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
 import { tQQBotMessagePacket } from "../types";
+import { numberFormat } from "../../utils/format";
 
 const EVEFitHeadRegexp = /^&#91;(.+),( .+)&#93;$/
 const EVEFitItemWithAmountLineRegexp = /^(.+) x(\d+)$/
@@ -120,7 +121,7 @@ export class commandJita implements tCommandBase {
                                 resultSumSellLow += marketData.sellLow * inputItem.amount;
                                 resultSumBuyHigh += marketData.buyHigh * inputItem.amount;
                                 resultLine.push(
-                                    `${inputItem.amount} x ${itemNameDispShort(type)} 最高收价: ${marketData.buyHigh * inputItem.amount} / 最低卖价: ${marketData.sellLow * inputItem.amount}`
+                                    `${inputItem.amount} x ${itemNameDispShort(type)} 最高收价: ${numberFormat(marketData.buyHigh * inputItem.amount, 2)} / 最低卖价: ${numberFormat(marketData.sellLow * inputItem.amount, 2)}`
                                 )
                             } else {
                                 resultMarketError.push(`${itemNameDisp(type)}`)
@@ -148,7 +149,7 @@ export class commandJita implements tCommandBase {
                 }
                 if (result.length) {
                     resultStr += `可交易物品${result.length}种\n`
-                    resultStr += `最高收价总计 ${resultSumBuyHigh} ,最低卖价总计 ${resultSumSellLow}\n`
+                    resultStr += `最高收价总计 ${numberFormat(resultSumBuyHigh, 2)} ,最低卖价总计 ${numberFormat(resultSumSellLow, 2)}\n`
                     resultStr += join(resultLine, '\n') + '\n'
                     resultStr += `\n详细价格\n`
                     resultStr += join(result, '\n') + '\n'
