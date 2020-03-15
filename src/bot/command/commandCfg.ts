@@ -19,7 +19,8 @@ export class commandCfg implements tCommandBase {
     }
     constructor(
         readonly parentLogger: tLogger,
-        readonly extService: cQQBotExtService
+        readonly extService: cQQBotExtService,
+        readonly QQBot: cQQBot
     ) {
         this.logger = parentLogger.logger(["commandCfg"])
     }

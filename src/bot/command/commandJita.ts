@@ -1,6 +1,6 @@
 import { tCommandBase } from "./tCommandBase";
 import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
-import { cQQBotExtService } from "..";
+import { cQQBotExtService, cQQBot } from "..";
 import { tLogger } from "tag-tree-logger";
 import { eveMarketApi, eveServerInfo, eveMarketApiInfo } from "../../types";
 import { join, startsWith, compact, trimEnd } from "lodash";
@@ -33,12 +33,14 @@ export class commandJita implements tCommandBase {
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: cQQBotExtService,
+        readonly QQBot: cQQBot
     ) {
         this.logger = parentLogger.logger(["commandJita"])
     }
     async startup() { }
     async shutdown() { }
     async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
+        let opId = this.extService.opId.getId()
         if (messagePacket.message === "") {
             return `1| .jita 物品名`
                 + `\n` + `2| .jita 物品ID`
@@ -100,6 +102,7 @@ export class commandJita implements tCommandBase {
                         }
                     }
                 })
+                this.QQBot.replyMessage(messageInfo, `${opId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
                 // this.logger.info(items)
                 let result = [];
                 let resultLine = [];
@@ -133,7 +136,7 @@ export class commandJita implements tCommandBase {
                         resultTypeError.push(inputItem.name)
                     }
                 }
-                let resultStr = ""
+                let resultStr = `${opId} | `
                 resultStr += `EVE FIT总计${inputItems.length}种物品\n`
                 if (resultTypeError.length) {
                     resultStr += `不可识别物品${resultTypeError.length}种\n`

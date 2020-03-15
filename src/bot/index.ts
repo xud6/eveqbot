@@ -31,6 +31,8 @@ export interface cQQBotExtService {
     opId: opId
 }
 
+export type replyHandler = (messageInfo: tMessageInfo, message: string) => Promise<void>
+
 export class cQQBot {
     readonly logger: tLogger
     readonly bot: CQWebSocket
@@ -55,9 +57,9 @@ export class cQQBot {
         })
 
         this.commands = [];
-        this.commands.push(new commandJita(this.logger, this.extService))
-        this.commands.push(new commandItem(this.logger, this.extService))
-        this.commands.push(new commandCfg(this.logger, this.extService))
+        this.commands.push(new commandJita(this.logger, this.extService, this))
+        this.commands.push(new commandItem(this.logger, this.extService, this))
+        this.commands.push(new commandCfg(this.logger, this.extService, this))
         this.commands.push(new commandHelp(this.logger, this.extService, this))
     }
     async startup() {

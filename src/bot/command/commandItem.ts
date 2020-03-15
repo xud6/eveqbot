@@ -1,6 +1,6 @@
 import { tCommandBase } from "./tCommandBase";
 import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
-import { cQQBotExtService } from "..";
+import { cQQBotExtService, cQQBot } from "..";
 import { tLogger } from "tag-tree-logger";
 import { formatItemNames } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
@@ -19,6 +19,7 @@ export class commandItem implements tCommandBase {
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: cQQBotExtService,
+        readonly QQBot: cQQBot
     ) {
         this.logger = parentLogger.logger(["commandItem"])
     }
