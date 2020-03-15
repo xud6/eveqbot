@@ -30,13 +30,13 @@ export class eveESIUniverseGroups {
         type: "varchar",
         length: 200
     })
-    en_name: string
+    name_en: string
 
     @Column({
         type: "varchar",
         length: 200
     })
-    cn_name: string
+    name_cn: string
 
     @Column({
         type: "boolean",

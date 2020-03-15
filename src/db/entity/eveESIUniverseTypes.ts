@@ -41,23 +41,23 @@ export class eveESIUniverseTypes {
         type: "varchar",
         length: 200
     })
-    en_name: string
+    name_en: string
 
     @Column({
         type: "varchar",
         length: 200
     })
-    cn_name: string
+    name_cn: string
 
     @Column({
         type: "text"
     })
-    en_description: string
+    description_en: string
 
     @Column({
         type: "text"
     })
-    cn_description: string
+    description_cn: string
 
     @Column({
         type: "bigint",

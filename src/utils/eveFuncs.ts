@@ -46,11 +46,11 @@ export function eveIsBlueprint(name: string): boolean {
 }
 
 export function itemNameDisp(item: eveESIUniverseTypes) {
-    return `ID:${item.id} | ${item.cn_name} / ${item.en_name} |${item.group.cn_name}|${item.group.category.cn_name}|`
+    return `ID:${item.id} | ${item.name_cn} / ${item.name_en} |${item.group.name_cn}|${item.group.category.name_cn}|`
 }
 
 export function itemNameDispShort(item: eveESIUniverseTypes) {
-    return `${item.cn_name} / ${item.en_name}`
+    return `${item.name_cn} / ${item.name_en}`
 }
 
 export function formatItemNames(items: eveESIUniverseTypes[]) {

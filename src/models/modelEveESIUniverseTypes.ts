@@ -2,9 +2,7 @@ import { tModelBase } from "./modelBase";
 import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
 import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
-import { DeepPartial, Brackets } from "typeorm";
-import { tTypesGetByIdResult } from "../api/eveESI/universe/types";
-import { modelKvs } from "./modelKvs";
+import { Brackets } from "typeorm";
 import { cModels } from ".";
 import PQueue from "p-queue";
 import { eveIsSkins, eveIsBlueprint, eveCommonNameTransfer } from "../utils/eveFuncs";
@@ -47,10 +45,10 @@ export class modelEveESIUniverseTypes implements tModelBase {
             }
             result.market_group_id = enData.market_group_id || null;
             result.published = enData.published;
-            result.en_name = enData.name;
-            result.cn_name = cnData.name;
-            result.en_description = enData.description;
-            result.cn_description = cnData.description;
+            result.name_en = enData.name;
+            result.name_cn = cnData.name;
+            result.description_en = enData.description;
+            result.description_cn = cnData.description;
             result.graphic_id = enData.graphic_id || null;
             result.icon_id = enData.icon_id || null;
             result.capacity = enData.capacity || null;
@@ -118,14 +116,14 @@ export class modelEveESIUniverseTypes implements tModelBase {
             .leftJoinAndSelect("group.category", "category")
             .select([
                 "type.id",
-                "type.en_name",
-                "type.cn_name",
+                "type.name_en",
+                "type.name_cn",
                 "group.id",
-                "group.en_name",
-                "group.cn_name",
+                "group.name_en",
+                "group.name_cn",
                 "category.id",
-                "category.en_name",
-                "category.cn_name"
+                "category.name_en",
+                "category.name_cn"
             ])
         return await query.getMany()
     }
@@ -138,22 +136,22 @@ export class modelEveESIUniverseTypes implements tModelBase {
         }
         query = query
             .andWhere(new Brackets(qb => {
-                qb.where(`type.cn_name = :name`)
-                    .orWhere(`type.en_name = :name`)
+                qb.where(`type.name_en = :name`)
+                    .orWhere(`type.name_cn = :name`)
             })).setParameter(`name`, `${name}`)
             .limit(limit)
             .leftJoinAndSelect("type.group", "group")
             .leftJoinAndSelect("group.category", "category")
             .select([
                 "type.id",
-                "type.en_name",
-                "type.cn_name",
+                "type.name_en",
+                "type.name_cn",
                 "group.id",
-                "group.en_name",
-                "group.cn_name",
+                "group.name_en",
+                "group.name_cn",
                 "category.id",
-                "category.en_name",
-                "category.cn_name"
+                "category.name_en",
+                "category.name_cn"
             ])
         return await query.getMany()
     }
@@ -177,14 +175,14 @@ export class modelEveESIUniverseTypes implements tModelBase {
             .leftJoinAndSelect("group.category", "category")
             .select([
                 "type.id",
-                "type.en_name",
-                "type.cn_name",
+                "type.name_en",
+                "type.name_cn",
                 "group.id",
-                "group.en_name",
-                "group.cn_name",
+                "group.name_en",
+                "group.name_cn",
                 "category.id",
-                "category.en_name",
-                "category.cn_name"
+                "category.name_en",
+                "category.name_cn"
             ])
         if (skins === false) {
             query = query.andWhere(`category.id <> :skid_category_id`, { skid_category_id: 91 })
@@ -199,8 +197,8 @@ export class modelEveESIUniverseTypes implements tModelBase {
         for (let word of words) {
             let cnt = wordcnt++;
             query = query.andWhere(new Brackets(qb => {
-                qb.where(`type.cn_name LIKE :word${cnt}`)
-                    .orWhere(`type.en_name LIKE :word${cnt}`)
+                qb.where(`type.name_en LIKE :word${cnt}`)
+                    .orWhere(`type.name_cn LIKE :word${cnt}`)
             })).setParameter(`word${cnt}`, `%${word}%`)
         }
         query = query.limit(limit)
@@ -215,7 +213,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         let result
         try {
             let inputId = parseInt(input);
-            if(inputId){
+            if (inputId) {
                 this.logger.log(`${opId}| parsed id [${inputId}] from input [${input}]`)
                 result = await this.searchById(inputId, onlyMarketable);
                 if (result.length > 0) {
@@ -263,7 +261,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         this.logger.info(`${opid}| market search for ${input} in UniverseType`)
         let records = await this.doSearchCombined(opid, input, limit, onlyMarketable)
         for (let r of records) {
-            this.logger.log(`${opid}| ID:${r.id}|${r.cn_name}|${r.en_name}|${r.group.cn_name}|${r.group.category.cn_name}`)
+            this.logger.log(`${opid}| ID:${r.id}|${r.name_cn}|${r.name_en}|${r.group.name_cn}|${r.group.category.name_cn}`)
         }
         return records
     }
