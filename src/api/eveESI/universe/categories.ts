@@ -3,7 +3,7 @@ import { tEveESIExtService, tEveESICfg, tEveESILanguange } from "../types"
 import * as t from 'io-ts'
 import { isRight } from "fp-ts/lib/Either"
 import { PathReporter } from 'io-ts/lib/PathReporter'
-import { retryHandler } from "../retryHandler"
+import { retryHandler } from "../../../utils/retryHandler"
 import got from "got"
 
 export const vCategoriesGetIdsResult = t.array(t.Int)

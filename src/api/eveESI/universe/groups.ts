@@ -4,7 +4,7 @@ import * as t from 'io-ts'
 import got from "got"
 import { isRight } from "fp-ts/lib/Either"
 import { PathReporter } from 'io-ts/lib/PathReporter'
-import { retryHandler } from "../retryHandler"
+import { retryHandler } from "../../../utils/retryHandler"
 
 export const vGroupsGetIdsResult = t.array(t.Int)
 export const vGroupsGetByIdResult = t.type({
