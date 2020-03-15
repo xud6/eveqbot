@@ -20,7 +20,7 @@ let config: tConfig = {
         password: 'dev',
         host: 'localhost',
         port: 3306,
-        logging: ["error", "schema", "warn", "info", "log"]
+        logging: ["error", "schema", "warn", "info", "log"],
     },
     service: {
         QQBot: true,
@@ -29,7 +29,11 @@ let config: tConfig = {
     CEVEMarketApi: {
         httpTimeout: 1000 * 20
     },
-    dataLoadConcurrency: 5
+    dataLoadConcurrency: 5,
+    models: {
+        noLog: false
+    },
+    debugMode: false,
 }
 
 try {
@@ -79,6 +83,11 @@ if (process.env.DATA_LOAD_CONCURRENT && (process.env.DATA_LOAD_CONCURRENT.length
         }
     } catch (e) {
     }
+}
+
+if (config.debugMode) {
+    config.QQBot.nonProductionSourceOnly = true
+    config.models.noLog = true
 }
 
 export default config;

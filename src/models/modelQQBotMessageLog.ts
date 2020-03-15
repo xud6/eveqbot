@@ -20,6 +20,9 @@ export class modelQQBotMessageLog implements tModelBase {
     async startup() { }
     async shutdown() { }
     async appendQQBotMessageLog(source: QQBotMessageSource, messageInfo: tMessageInfo, event: CQEvent, context: Record<string, any>, tags: CQTag[]) {
+        if (this.models.config.noLog) {
+            return
+        }
         let repo = await this.extService.db.getRepository(QQBotMessageLog);
         let messageLogEntry = repo.create({
             message: messageInfo.message,
@@ -42,6 +45,7 @@ export class modelQQBotMessageLog implements tModelBase {
             source: source,
             raw_tags: tags
         })
-        return await repo.save(messageLogEntry)
+        await repo.save(messageLogEntry)
+        return
     }
 }

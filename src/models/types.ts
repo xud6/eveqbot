@@ -3,7 +3,7 @@ import { eveESI } from "../api/eveESI";
 import { opId } from "../opId";
 
 export interface tModelsConfig {
-
+    noLog: boolean
 }
 
 export interface tModelsExtService {
