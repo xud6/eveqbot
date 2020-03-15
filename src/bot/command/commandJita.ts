@@ -28,39 +28,42 @@ export class commandJita implements tCommandBase {
     async startup() { }
     async shutdown() { }
     async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
-        let message = messagePacket.message
-        if (message.length > this.param.searchContentLimit) {
-            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
-            return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
-        }
-
-        if (message === "") {
+        if (messagePacket.message === "") {
             return `.jita 物品名`
                 + `\n` + `.jita 物品ID`
         }
-
-        let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(message, this.param.resultNameListLimit + 1)
-        if (items.length == 0) {
-            this.logger.info(`找不到 ${message}`)
-            return '找不到该物品'
-        } else if (items.length > 0 && items.length <= this.param.resultPriceListLimit) {
-            if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `共有${items.length}种物品符合该条件`
-                let marketdata: string[] = await Promise.all(items.map(async item => {
-                    let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
-                    return `${itemNameDisp(item)} --- ${market}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`;
-                }))
-                return `${head}${join(marketdata, "\n")}`;
-            } else {
-                return "市场API配置错误"
+        let messageLines = messagePacket.message.split("\r\n");
+        if (messageLines.length <= 1) {
+            let message = messageLines[0]
+            if (message.length > this.param.searchContentLimit) {
+                this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
+                return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
             }
-        } else {
-            this.logger.info(`搜索结果过多: ${items.length}`)
-            if (items.length > this.param.resultNameListLimit) {
-                return `共有超过${this.param.resultNameListLimit}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
+
+            let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(message, this.param.resultNameListLimit + 1)
+            if (items.length == 0) {
+                this.logger.info(`找不到 ${message}`)
+                return '找不到该物品'
+            } else if (items.length > 0 && items.length <= this.param.resultPriceListLimit) {
+                if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
+                    let head = `共有${items.length}种物品符合条件${message}\n`
+                    let marketdata: string[] = await Promise.all(items.map(async item => {
+                        let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
+                        return `${itemNameDisp(item)} --- ${market}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName}`;
+                    }))
+                    return `${head}${join(marketdata, "\n")}`;
+                } else {
+                    return "市场API配置错误"
+                }
             } else {
-                return `共有${items.length}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}`
+                this.logger.info(`搜索结果过多: ${items.length}`)
+                if (items.length > this.param.resultNameListLimit) {
+                    return `共有超过${this.param.resultNameListLimit}种物品符合符合条件${message}，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
+                } else {
+                    return `共有${items.length}种物品符合符合条件${message}，请给出更明确的物品名称\n${formatItemNames(items)}`
+                }
             }
         }
+        return null
     }
 }
