@@ -170,7 +170,7 @@ export class commandJita implements tCommandBase {
                 resultStr += `最低卖价总计 ${numberFormat(resultSumSellLow, 2)} ,最高收价总计 ${numberFormat(resultSumBuyHigh, 2)}\n`
                 resultLineData = orderBy(resultLineData, "sellLowTotal", "desc")
                 resultStr += join(resultLineData.map((lineData) => {
-                    return `🔵${lineData.amount} x ${itemNameDispShort(lineData.itemType)}\n 最低卖价: ${numberFormat(lineData.sellLowTotal, 2)} / 最高收价: ${numberFormat(lineData.buyHighTotal, 2)} 挂单量${lineData.sellAmount}/${lineData.buyAmount}`
+                    return `🔵${lineData.amount} x ${itemNameDispShort(lineData.itemType)}\n 最低卖价: ${numberFormat(lineData.sellLowTotal, 2)} / 最高收价: ${numberFormat(lineData.buyHighTotal, 2)} | 挂单量 ${lineData.sellAmount} / ${lineData.buyAmount}`
                 }), '\n') + '\n'
                 resultStr += `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 耗时${perf.timePastStrMS()}\n 使用 .jita 获取帮助 .help 查看其它功能`;
             }
@@ -265,7 +265,7 @@ export class commandJita implements tCommandBase {
                 resultStr += `最高收价总计 ${numberFormat(resultSumBuyHigh, 2)} ,最低卖价总计 ${numberFormat(resultSumSellLow, 2)}\n`
                 resultLineData = orderBy(resultLineData, "sellLowTotal", "desc")
                 resultStr += join(resultLineData.map((lineData) => {
-                    return `🔵${lineData.amount} x ${itemNameDispShort(lineData.itemType)}\n 最低卖价: ${numberFormat(lineData.sellLowTotal, 2)} / 最高收价: ${numberFormat(lineData.buyHighTotal, 2)} 挂单量 ${lineData.sellAmount} / ${lineData.buyAmount}`
+                    return `🔵${lineData.amount} x ${itemNameDispShort(lineData.itemType)}\n 最低卖价: ${numberFormat(lineData.sellLowTotal, 2)} / 最高收价: ${numberFormat(lineData.buyHighTotal, 2)} | 挂单量 ${lineData.sellAmount} / ${lineData.buyAmount}`
                 }), '\n') + '\n'
                 resultStr += `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 耗时${perf.timePastStrMS()}\n 使用 .jita 获取帮助 .help 查看其它功能`;
             }
