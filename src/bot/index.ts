@@ -15,6 +15,7 @@ import { tQQBotMessagePacket } from "./types";
 import { commandCfg } from "./command/commandCfg";
 import { opId } from "../opId";
 import { retryHandler } from "../utils/retryHandler";
+import { commandJump } from "./command/commandJump";
 
 export interface tCQQBotCfg {
     cqwebConfig: Partial<CQWebSocketOption>
@@ -60,6 +61,7 @@ export class cQQBot {
         this.commands = [];
         this.commands.push(new commandJita(this.logger, this.extService, this))
         this.commands.push(new commandItem(this.logger, this.extService, this))
+        this.commands.push(new commandJump(this.logger, this.extService, this))
         this.commands.push(new commandCfg(this.logger, this.extService, this))
         this.commands.push(new commandHelp(this.logger, this.extService, this))
     }
