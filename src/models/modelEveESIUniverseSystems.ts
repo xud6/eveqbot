@@ -71,4 +71,18 @@ export class modelEveESIUniverseSystems implements tModelBase {
         await queue.onIdle();
         this.logger.info(`update data for UniverseSystems complete`)
     }
+    async SearchByWord(
+        word: string,
+        limit: number = 51
+    ) {
+        let repo = await this.extService.db.getRepository(eveESIUniverseSystems);
+        let query = repo.createQueryBuilder("system")
+            .where(`system.name_en LIKE :word`)
+            .orWhere(`system.name_cn LIKE :word`)
+            .setParameter(`word`, `%${word}%`)
+            .leftJoinAndSelect("system.constellation", "constellation")
+            .leftJoinAndSelect("constellation.region", "region")
+        query = query.limit(limit)
+        return await query.getMany()
+    }
 }
