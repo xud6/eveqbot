@@ -36,7 +36,7 @@ export class categories {
             } else {
                 throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
-        }, this.config.httpRetry, (e) => { this.logger.warn(e) })
+        }, this.config.httpRetry, (e) => { this.logger.warn(e.message || e) })
     }
     async getById(id: number, language: tEveESILanguange) {
         let opId = this.extService.opId.getId()
@@ -50,6 +50,6 @@ export class categories {
             } else {
                 throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
-        }, this.config.httpRetry, (e) => { this.logger.warn(e) })
+        }, this.config.httpRetry, (e) => { this.logger.warn(e.message || e) })
     }
 }

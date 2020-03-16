@@ -37,7 +37,7 @@ export class groups {
             } else {
                 throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
-        }, this.config.httpRetry, (e) => { this.logger.warn(e) })
+        }, this.config.httpRetry, (e) => { this.logger.warn(e.message || e) })
 
     }
     async getById(id: number, language: tEveESILanguange) {
@@ -52,6 +52,6 @@ export class groups {
             } else {
                 throw new Error(`${opId}| api access error result unexpected ${PathReporter.report(validator).toString()}`);
             }
-        }, this.config.httpRetry, (e) => { this.logger.warn(e) })
+        }, this.config.httpRetry, (e) => { this.logger.warn(e.message || e) })
     }
 }
