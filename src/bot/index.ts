@@ -67,6 +67,9 @@ export class cQQBot {
     async startup() {
         this.bot.connect()
     }
+    async shutdown(){
+        this.bot.disconnect()
+    }
     checkStartWith(msg: string, tags: string[]): string | null {
         for (let tag of tags) {
             if (startsWith(msg, tag)) {

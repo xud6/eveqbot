@@ -39,6 +39,7 @@ export class eveqbot {
     async startup() {
         await this.db.startup()
         await this.opId.setPersistentKvs(this.models.modelKvs, `${this.config.instanceName}.srvOpIdCurrent`)
+        await this.opId.startup()
         await this.eveTranquility.startup()
         if (this.bot) {
             await this.bot.startup()
@@ -46,7 +47,12 @@ export class eveqbot {
         this.refreshData()
     }
     async shutdown() {
-
+        await this.db.shutdown()
+        await this.opId.shutdown()
+        await this.eveTranquility.shutdown()
+        if (this.bot) {
+            await this.bot.shutdown()
+        }
     }
     private async refreshDataJob(key: string, task: () => Promise<void>) {
         let k = await this.models.modelKvs.get(key)

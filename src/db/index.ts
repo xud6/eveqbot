@@ -23,6 +23,8 @@ export class typeormdb {
         }
         this.resolveGetConnection(conn)
     }
+    async shutdown() {
+    }
     readonly getConnection = async (): Promise<Connection> => {
         return await this.pConnection
     }

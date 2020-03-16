@@ -44,15 +44,19 @@ export class opId {
             if (v) {
                 let i = parseInt(v);
                 if (i) {
+                    this.logger.info(`load id ${i} from key ${this.kvsKey}`)
                     dbid = i
+                } else {
+                    this.logger.warn(`data key ${this.kvsKey} not valied ${v}`)
                 }
+            } else {
+                this.logger.warn(`data of key ${this.kvsKey} not exist`)
             }
         } catch (e) {
-
+            this.logger.warn(`read key ${this.kvsKey} error ${e.message || e}`)
         }
         if (dbid) {
             this.currentId = this.currentId + dbid + this.kvsSaveInterval_s * 100
-            this.logger.info(`load id from data, current is ${this.currentId}`)
         }
         await this.kvs.set(this.kvsKey, this.currentId.toString())
     }
