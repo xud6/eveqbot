@@ -71,7 +71,7 @@ export class commandJita implements tCommandBase {
                 this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${items.length}项条目，查询API中`)
             }
             if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `OP${opId} | 共有${items.length}种物品符合条件[${message}]\n`
+                let head = `OP${opId} | 共有${items.length}种物品符合该条件\n`
                 perfUtil.reset()
                 let marketdata: string[] = await Promise.all(items.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), messageSource.eve_server)
@@ -85,9 +85,9 @@ export class commandJita implements tCommandBase {
         } else {
             this.logger.info(`${opId}| 搜索结果过多: ${items.length}, 需少于${resultPriceListLimit}个`)
             if (items.length > resultNameListLimit) {
-                return `共有超过${resultNameListLimit}种物品符合符合条件${message}，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
+                return `共有超过${resultNameListLimit}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
             } else {
-                return `共有${items.length}种物品符合符合条件${message}，请给出更明确的物品名称\n${formatItemNames(items)}`
+                return `共有${items.length}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}`
             }
         }
     }
