@@ -32,7 +32,7 @@ export class commandItem implements tCommandBase {
             return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
         }
 
-        let items = await this.extService.models.modelEveESIUniverseTypes.SearchCombined(message, this.param.resultNameListLimit + 1, false)
+        let items = await this.extService.models.modelEveESIUniverseTypes.SearchCombined(opId, message, this.param.resultNameListLimit + 1, false)
         if (items.length == 0) {
             this.logger.info(`${opId}| 找不到 ${message}`)
             return '找不到该物品'

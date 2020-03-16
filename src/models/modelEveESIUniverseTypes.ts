@@ -253,22 +253,23 @@ export class modelEveESIUniverseTypes implements tModelBase {
         return [];
     }
     async SearchCombined(
+        opId: number,
         input: string,
         limit: number = 51,
         onlyMarketable: boolean = true
     ) {
-        let opid = this.extService.opId.getId();
-        this.logger.info(`${opid}| market search for ${input} in UniverseType`)
-        let records = await this.doSearchCombined(opid, input, limit, onlyMarketable)
+        this.logger.info(`${opId}| market search for ${input} in UniverseType`)
+        let records = await this.doSearchCombined(opId, input, limit, onlyMarketable)
         for (let r of records) {
-            this.logger.log(`${opid}| ID:${r.id}|${r.name_cn}|${r.name_en}|${r.group.name_cn}|${r.group.category.name_cn}`)
+            this.logger.log(`${opId}| ID:${r.id}|${r.name_cn}|${r.name_en}|${r.group.name_cn}|${r.group.category.name_cn}`)
         }
         return records
     }
     async MarketSearch(
+        opId: number,
         input: string,
         limit: number = 51
     ) {
-        return this.SearchCombined(input, limit, true)
+        return this.SearchCombined(opId, input, limit, true)
     }
 }

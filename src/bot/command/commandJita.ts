@@ -61,7 +61,7 @@ export class commandJita implements tCommandBase {
             isExtendedMode = true
         }
         perfUtil.reset()
-        let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(message, resultNameListLimit + 1)
+        let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(opId, message, resultNameListLimit + 1)
         this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish market search ${message}`)
         if (items.length == 0) {
             this.logger.info(`${opId}| 找不到 ${message}`)
