@@ -34,7 +34,12 @@ export class commandJump implements tCommandBase {
         } else {
             let msgs = split(messagePacket.message, " ");
             if (msgs.length === 1) {
-                return `${msgs[0]}`
+                let systems = await this.extService.models.modelEveESIUniverseSystems.SearchByWord(msgs[0])
+                if (systems[0]) {
+                    return `${this.extService.models.modelEveESIUniverseSystems.formatStr(systems[0])}`
+                }else{
+                    return `找不到该星系`
+                }
             }
             this.logger.warn(`${opId}| unable to recognise comand ${msgs}`)
         }

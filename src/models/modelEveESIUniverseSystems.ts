@@ -85,4 +85,7 @@ export class modelEveESIUniverseSystems implements tModelBase {
         query = query.limit(limit)
         return await query.getMany()
     }
+    formatStr(system: eveESIUniverseSystems) {
+        return `ID:${system.id} | ${system.name_cn} / ${system.name_en} | ${system.constellation.name_cn} | ${system.constellation.region.name_cn}`
+    }
 }

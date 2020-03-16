@@ -2,9 +2,6 @@ import { CQWebSocket, CQWebSocketOption, CQEvent, WebSocketType, CQTag } from "@
 import { cCEVEMarketApi } from "../api/ceve_market_api/index";
 import { startsWith, trim, replace } from "lodash";
 import { tLogger } from "tag-tree-logger";
-import { modelQQBotMessageLog } from "../models/modelQQBotMessageLog";
-import { modelQQBotMessageSource } from "../models/modelQQBotMessageSource";
-import { modelEveESIUniverseTypes } from "../models/modelEveESIUniverseTypes";
 import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
 import { tCommandBase } from "./command/tCommandBase";
 import { commandItem } from "./command/commandItem";
@@ -16,6 +13,7 @@ import { commandCfg } from "./command/commandCfg";
 import { opId } from "../opId";
 import { retryHandler } from "../utils/retryHandler";
 import { commandJump } from "./command/commandJump";
+import { cModels } from "../models";
 
 export interface tCQQBotCfg {
     cqwebConfig: Partial<CQWebSocketOption>
@@ -25,11 +23,7 @@ export interface tCQQBotCfg {
 
 export interface cQQBotExtService {
     CEVEMarketApi: cCEVEMarketApi
-    models: {
-        modelQQBotMessageLog: modelQQBotMessageLog
-        modelQQBotMessageSource: modelQQBotMessageSource,
-        modelEveESIUniverseTypes: modelEveESIUniverseTypes
-    }
+    models: cModels
     opId: opId
 }
 
