@@ -3,11 +3,11 @@ import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
 import { cQQBotExtService, cQQBot } from "..";
 import { tLogger } from "tag-tree-logger";
 import { tMessageInfo } from "../qqMessage";
-import { join, startsWith, replace, split, orderBy } from "lodash";
+import { join, startsWith, replace, split, orderBy, round } from "lodash";
 import packageInfo from "../../../package.json"
 import { tQQBotMessagePacket } from "../types";
 import { eveESIUniverseSystems } from "../../db/entity/eveESIUniverseSystems";
-import { calcLy } from "../../utils/eveFuncs";
+import { calcLy, calcLyReal } from "../../utils/eveFuncs";
 
 export class commandLy implements tCommandBase {
     readonly logger: tLogger
@@ -60,9 +60,9 @@ export class commandLy implements tCommandBase {
                 distant: calcLy(route.a.position, route.b.position)
             }
         }), ["distant"], "asc")
-        return join(distances.map((d) => {
-            return `${d.distant}ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.a)} ➡️ ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.b)}`
-        }), "\n")
+        return `${join(distances.map((d) => {
+            return `${d.distant} ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.a)} ➡️ ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.b)}`
+        }), "\n")}\n参考 TT/大航:6(5.4) 小航无畏:7(6.3) 黑影:8(7.2) 跳货:10`
     }
     async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         this.logger.info(`${opId}| jump command ${messagePacket.message} from ${messageInfo.sender_user_id} in ${messageSource.source_type}/${messageSource.source_id}`)
