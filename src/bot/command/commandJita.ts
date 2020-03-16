@@ -47,7 +47,7 @@ export class commandJita implements tCommandBase {
         let perfUtil = new performance()
         let message = messageLines[0]
         if (message.length > this.param.searchContentLimit) {
-            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
+            this.logger.info(`${opId}| search content too long from [${messageInfo.sender_user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
         }
         let resultPriceListLimit = this.param.resultPriceListLimit
@@ -64,11 +64,11 @@ export class commandJita implements tCommandBase {
         let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(message, resultNameListLimit + 1)
         this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish market search ${message}`)
         if (items.length == 0) {
-            this.logger.info(`找不到 ${message}`)
+            this.logger.info(`${opId}| 找不到 ${message}`)
             return '找不到该物品'
         } else if (items.length > 0 && items.length <= resultPriceListLimit) {
             if (isExtendedMode && items.length > this.param.resultPriceListLimit) {
-                this.QQBot.replyMessage(messageInfo, `OP${opId} | 共有 ${items.length}项条目，查询API中`)
+                this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${items.length}项条目，查询API中`)
             }
             if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
                 let head = `OP${opId} | 共有${items.length}种物品符合条件[${message}]\n`
@@ -83,7 +83,7 @@ export class commandJita implements tCommandBase {
                 return "市场API配置错误"
             }
         } else {
-            this.logger.info(`搜索结果过多: ${items.length}, 需少于${resultPriceListLimit}个`)
+            this.logger.info(`${opId}| 搜索结果过多: ${items.length}, 需少于${resultPriceListLimit}个`)
             if (items.length > resultNameListLimit) {
                 return `共有超过${resultNameListLimit}种物品符合符合条件${message}，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
             } else {
@@ -97,7 +97,7 @@ export class commandJita implements tCommandBase {
         let EVEFitHead = messageLines[0].match(EVEFitHeadRegexp)
         if (EVEFitHead) {
             let ship = EVEFitHead[1];
-            this.logger.info(`EVE Fit Mode for ship ${ship}`)
+            this.logger.info(`${opId}| EVE Fit Mode for ship ${ship}`)
             messageLines[0] = ship
             let inputItems = compact(messageLines).map((line) => {
                 let reg = line.match(EVEFitItemWithAmountLineRegexp)
@@ -113,7 +113,7 @@ export class commandJita implements tCommandBase {
                     }
                 }
             })
-            this.QQBot.replyMessage(messageInfo, `OP${opId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
+            this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
             // this.logger.info(items)
             let resultLineData = [];
             let resultSumSellLow = 0;
@@ -210,7 +210,7 @@ export class commandJita implements tCommandBase {
                     UnknowLines.push(line)
                 }
             })
-            this.QQBot.replyMessage(messageInfo, `OP${opId} | 共有 ${inputItems.length}项条目，查询API中`)
+            this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${inputItems.length}项条目，查询API中`)
             for (let inputItem of inputItems) {
                 perfUtil.reset()
                 let type = (await this.extService.models.modelEveESIUniverseTypes.searchByExactName(inputItem.name))[0]
@@ -275,8 +275,7 @@ export class commandJita implements tCommandBase {
             return false
         }
     }
-    async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
-        let opId = this.extService.opId.getId()
+    async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         if (messagePacket.message === "") {
             return `1| .jita {物品名}`
                 + `\n` + `2| .jita {物品ID}`
@@ -295,20 +294,17 @@ export class commandJita implements tCommandBase {
                 return result
             }
         } else {
-            this.logger.log(`first line is ${messageLines[0]}`)
+            this.logger.log(`${opId}| first line is ${messageLines[0]}`)
             let result = await this.handlerEveFit(opId, messageLines, messageSource, messageInfo, messagePacket)
             if (result !== false) {
                 return result
             }
-            this.logger.info(messageLines)
 
             result = await this.handlerContract(opId, messageLines, messageSource, messageInfo, messagePacket)
             if (result !== false) {
                 return result
             }
-            this.logger.info(messageLines)
-
         }
-        return null
+        return "无法识别"
     }
 }

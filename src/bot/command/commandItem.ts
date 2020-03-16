@@ -25,16 +25,16 @@ export class commandItem implements tCommandBase {
     }
     async startup() { }
     async shutdown() { }
-    async handler(messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
+    async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         let message = messagePacket.message
         if (message.length > this.param.searchContentLimit) {
-            this.logger.info(`search content too long from [${messageInfo.sender_user_id}]`)
+            this.logger.info(`${opId}| search content too long from [${messageInfo.sender_user_id}]`)
             return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
         }
 
         let items = await this.extService.models.modelEveESIUniverseTypes.SearchCombined(message, this.param.resultNameListLimit + 1, false)
         if (items.length == 0) {
-            this.logger.info(`找不到 ${message}`)
+            this.logger.info(`${opId}| 找不到 ${message}`)
             return '找不到该物品'
         } else {
             if (items.length > this.param.resultNameListLimit) {
