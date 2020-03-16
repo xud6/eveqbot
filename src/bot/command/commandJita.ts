@@ -74,7 +74,7 @@ export class commandJita implements tCommandBase {
                 let head = `OP${opId} | 共有${items.length}种物品符合条件[${message}]\n`
                 perfUtil.reset()
                 let marketdata: string[] = await Promise.all(items.map(async item => {
-                    let market = await this.extService.CEVEMarketApi.getMarketString(item.id.toString(), messageSource.eve_server)
+                    let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), messageSource.eve_server)
                     return `🔵${itemNameDisp(item)}\n ${market}`;
                 }))
                 this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api data`)
@@ -129,7 +129,7 @@ export class commandJita implements tCommandBase {
                 if (type) {
                     if (type.market_group_id !== null) {
                         perfUtil.reset()
-                        let marketData = await this.extService.CEVEMarketApi.getMarketData(type.id.toString())
+                        let marketData = await this.extService.CEVEMarketApi.getMarketData(opId, type.id.toString())
                         this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api of [${inputItem.name}]`)
                         if (marketData) {
                             result.push(
@@ -224,7 +224,7 @@ export class commandJita implements tCommandBase {
                 if (type) {
                     if (type.market_group_id !== null) {
                         perfUtil.reset()
-                        let marketData = await this.extService.CEVEMarketApi.getMarketData(type.id.toString())
+                        let marketData = await this.extService.CEVEMarketApi.getMarketData(opId, type.id.toString())
                         this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api [${inputItem.name}]`)
                         if (marketData) {
                             result.push(

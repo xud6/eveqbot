@@ -57,34 +57,34 @@ export class cCEVEMarketApi {
     ) {
         this.logger = parentLogger.logger(["CEVEMarketApi"])
     }
-    async marketRegion(itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002'): Promise<apiMarketResponse> {
+    async marketRegion(opId: number, itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002'): Promise<apiMarketResponse> {
         let apiPath = this.urlPathSerenity;
         if (server === eveServer.tranquility) {
             apiPath = this.urlPathTranquility
         }
         const url = `${this.urlBase}${apiPath}/market/region/${regionId}/type/${itemId}.json`
-        this.logger.log(`make get market api call for ${itemId} | ${url}`);
+        this.logger.log(`${opId}| make get market api call for ${itemId} | ${url}`);
         let result: any
 
         result = await retryHandler(async (retryCnt) => {
             let r = await got(url, { cache: this.extService.httpClientCache }).json();
             return r
         }, this.config.httpRetry, (e) => {
-            this.logger.error(`http error ${e.message || e}`)
+            this.logger.error(`${opId}| http error ${e.message || e}`)
         })
         if (result.buy && result.sell && result.all) {
             return result;
         } else {
-            this.logger.warn(`unexpected api result ${result}`)
+            this.logger.warn(`${opId}| unexpected api result ${result}`)
             if (includes(result, '502')) {
                 throw new Error("市场中心暂时失联，原因(502)")
             }
             throw new Error("市场中心返回格式错误")
         }
     }
-    async getMarketData(itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002') {
+    async getMarketData(opId: number, itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002') {
         try {
-            let data = await this.marketRegion(itemId, server, regionId)
+            let data = await this.marketRegion(opId, itemId, server, regionId)
             return {
                 buyHigh: Number(data.buy.max),
                 sellLow: Number(data.sell.min),
@@ -92,7 +92,7 @@ export class cCEVEMarketApi {
                 sellAmount: Number(data.sell.volume)
             }
         } catch (e) {
-            this.logger.error(e)
+            this.logger.error(`${opId}| ${e.message || e}`)
             return null
         }
     }
@@ -108,9 +108,9 @@ export class cCEVEMarketApi {
         let sellAmount = numberFormat(data.sellAmount);
         return `最低卖价: ${sellLow} / 最高收价: ${buyHigh} | 挂单量: ${buyAmount} / ${sellAmount}`
     }
-    async getMarketString(itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002'): Promise<string> {
+    async getMarketString(opId: number, itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002'): Promise<string> {
         try {
-            let data = await this.marketRegion(itemId, server, regionId)
+            let data = await this.marketRegion(opId, itemId, server, regionId)
             let buyHigh = numberFormat(Number(data.buy.max), 2);
             let sellLow = numberFormat(Number(data.sell.min), 2);
             let buyAmount = numberFormat(Number(data.buy.volume));
@@ -120,7 +120,7 @@ export class cCEVEMarketApi {
             if (isString(e)) {
                 return e;
             } else {
-                console.log(e)
+                this.logger.error(`${opId}| ${e.message || e}`)
                 return '内部错误'
             }
         }
