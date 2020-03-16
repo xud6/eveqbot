@@ -106,7 +106,7 @@ export class cCEVEMarketApi {
         let sellLow = numberFormat(data.sellLow, 2);
         let buyAmount = numberFormat(data.buyAmount);
         let sellAmount = numberFormat(data.sellAmount);
-        return `最低卖价: ${sellLow} / 最高收价: ${buyHigh} | 挂单量: ${buyAmount} / ${sellAmount}`
+        return `最低卖价: ${sellLow} / 最高收价: ${buyHigh} | 挂单量: ${sellAmount} / ${buyAmount}`
     }
     async getMarketString(opId: number, itemId: string, server: eveServer = eveServer.serenity, regionId: string = '10000002'): Promise<string> {
         try {
@@ -115,7 +115,7 @@ export class cCEVEMarketApi {
             let sellLow = numberFormat(Number(data.sell.min), 2);
             let buyAmount = numberFormat(Number(data.buy.volume));
             let sellAmount = numberFormat(Number(data.sell.volume));
-            return `最低卖价: ${sellLow} / 最高收价: ${buyHigh} | 挂单量: ${buyAmount} / ${sellAmount}`
+            return `最低卖价: ${sellLow} / 最高收价: ${buyHigh} | 挂单量: ${sellAmount} / ${buyAmount}`
         } catch (e) {
             if (isString(e)) {
                 return e;

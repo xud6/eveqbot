@@ -50,7 +50,7 @@ export function itemNameDisp(item: eveESIUniverseTypes) {
 }
 
 export function itemNameDispShort(item: eveESIUniverseTypes) {
-    return `${item.name_cn} / ${item.name_en}`
+    return `ID:${item.id} | ${item.name_cn} / ${item.name_en}`
 }
 
 export function formatItemNames(items: eveESIUniverseTypes[]) {
