@@ -2,7 +2,6 @@ import { tLogger } from "tag-tree-logger"
 import { tEveESIExtService, tEveESICfg } from "./types"
 import { universe } from "./universe"
 
-
 export class eveESI {
     private readonly logger: tLogger
     readonly universe: universe

@@ -4,12 +4,6 @@ import { tModelsExtService } from "./types";
 import { kvs } from "../db/entity/kvs";
 import { cModels } from ".";
 
-interface tMessageSourceInfo {
-    source_type: string,
-    source_id: number
-}
-
-
 export class modelKvs implements tModelBase {
     readonly name = "modelKvs"
     readonly logger: tLogger

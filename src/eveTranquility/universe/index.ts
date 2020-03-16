@@ -1,7 +1,6 @@
 import { tLogger } from "tag-tree-logger"
 import { eveTranquilityExtService } from "../types";
 
-
 export class eveUniverse {
     readonly logger: tLogger
     constructor(

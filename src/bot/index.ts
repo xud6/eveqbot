@@ -16,7 +16,6 @@ import { commandCfg } from "./command/commandCfg";
 import { opId } from "../opId";
 import { retryHandler } from "../utils/retryHandler";
 
-
 export interface tCQQBotCfg {
     cqwebConfig: Partial<CQWebSocketOption>
     nonProductionSourceOnly: boolean,

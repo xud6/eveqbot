@@ -19,7 +19,6 @@ export interface tMessageInfo {
     time: number
     sub_type: string | null
     anonymous: any
-
 }
 
 export function genMessageInfoAtMe(event: CQEvent, context: Record<string, any>, tags: CQTag[]): boolean {

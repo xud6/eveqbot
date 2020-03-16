@@ -1,7 +1,6 @@
 import { tModelBase } from "./modelBase";
 import { tLogger } from "tag-tree-logger";
 import { tModelsExtService } from "./types";
-import { CQEvent, CQTag } from "@xud6/cq-websocket";
 import { QQBotMessageSource } from "../db/entity/QQBotMessageSource";
 import { cModels } from ".";
 import { tMessageInfo } from "../bot/qqMessage";
@@ -12,7 +11,6 @@ interface tMessageSourceInfo {
     source_type: string,
     source_id: number
 }
-
 
 export class modelQQBotMessageSource implements tModelBase {
     readonly name = "QQBotMessageLog"

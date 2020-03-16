@@ -1,5 +1,4 @@
 import { LoggerOptions } from "typeorm/logger/LoggerOptions";
-import { CQWebSocketOption } from "@xud6/cq-websocket";
 import { tCQQBotCfg } from "../bot";
 import { tCEVEMarketApiCfg } from "../api/ceve_market_api";
 import { tModelsConfig } from "../models/types";

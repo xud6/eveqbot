@@ -47,7 +47,6 @@ export class typeormdb {
         }
 
         let ConnectionOption: ConnectionOptions
-
         if (config.url) {
             const urldata = url.parse(config.url)
             ConnectionOption = {
@@ -90,5 +89,4 @@ export class typeormdb {
         this.logger.log(ConnectionOption)
         return await createConnection(ConnectionOption)
     }
-
 }

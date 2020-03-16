@@ -1,6 +1,5 @@
 import { cCEVEMarketApi } from './api/ceve_market_api/index';
 import { cQQBot } from './bot/index';
-import { CQWebSocketOption } from '@xud6/cq-websocket';
 import { tLogger } from "tag-tree-logger";
 import { typeormdb } from './db';
 import { tConfig } from './types';
@@ -11,8 +10,8 @@ import { eveESI } from './api/eveESI';
 import { eveESICfgDefault } from './api/eveESI/types';
 
 export interface eveqbotExtService {
-
 }
+
 export class eveqbot {
     readonly logger: tLogger
     opId: opId

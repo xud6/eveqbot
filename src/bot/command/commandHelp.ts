@@ -5,7 +5,6 @@ import { tLogger } from "tag-tree-logger";
 import { tMessageInfo } from "../qqMessage";
 import { join } from "lodash";
 import { eveServerInfo, eveMarketApiInfo, eveServer } from "../../types";
-import packageInfo from "./../../../package.json"
 import { tQQBotMessagePacket } from "../types";
 
 export class commandHelp implements tCommandBase {

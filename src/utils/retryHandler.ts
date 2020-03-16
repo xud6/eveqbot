@@ -1,4 +1,3 @@
-
 export async function retryHandler<T>(func: (retryCnt: number) => Promise<T>, cnt: number = 1, log?: (e: Error) => Promise<void> | void): Promise<T> {
     if (cnt < 1) {
         cnt = 1
