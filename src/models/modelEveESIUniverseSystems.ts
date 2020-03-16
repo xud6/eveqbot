@@ -37,7 +37,7 @@ export class modelEveESIUniverseSystems implements tModelBase {
                 result.security_class = enData.security_class || null
                 result.security_status = enData.security_status
                 result.star_id = enData.star_id || null
-                result.stargates = enData.stargates || null
+                result.stargates_raw = enData.stargates || null
                 result.stations = enData.stations || null
                 await repo.save(result)
                 result = (await repo.findByIds([id]))[0];

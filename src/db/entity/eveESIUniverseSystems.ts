@@ -76,7 +76,7 @@ export class eveESIUniverseSystems {
         nullable: true,
         default: null
     })
-    stargates: number[] | null
+    stargates_raw: number[] | null
 
     @Column({
         type: "simple-array",
