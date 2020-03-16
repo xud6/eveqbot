@@ -99,6 +99,10 @@ export class modelEveESIUniverseSystems implements tModelBase {
         return await query.getMany()
     }
     formatStr(system: eveESIUniverseSystems) {
-        return `${system.name_cn} / ${system.name_en} (${system.constellation.name_cn} / ${system.constellation.region.name_cn})`
+        if(system.name_cn === system.name_en){
+            return `${system.name_cn} (${system.constellation.name_cn} / ${system.constellation.region.name_cn})`
+        }else{
+            return `${system.name_cn} / ${system.name_en} (${system.constellation.name_cn} / ${system.constellation.region.name_cn})`
+        }
     }
 }
