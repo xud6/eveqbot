@@ -41,7 +41,8 @@ export class eveESIUniverseSystems {
     @Column({
         type: "simple-json",
         nullable: true,
-        default: null
+        default: null,
+        select: false
     })
     planets_raw: tSystemPlanet[] | null
 
@@ -74,14 +75,16 @@ export class eveESIUniverseSystems {
     @Column({
         type: "simple-array",
         nullable: true,
-        default: null
+        default: null,
+        select: false
     })
     stargates_raw: number[] | null
 
     @Column({
         type: "simple-array",
         nullable: true,
-        default: null
+        default: null,
+        select: false
     })
     stations_raw: number[] | null
 
