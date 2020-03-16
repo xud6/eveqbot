@@ -1,3 +1,4 @@
+import { tLogger } from "tag-tree-logger";
 
 export interface tOpIdKvs {
     get: (key: string) => Promise<string | null>
@@ -5,18 +6,24 @@ export interface tOpIdKvs {
 }
 
 export class opId {
+    logger: tLogger
     currentId: number;
     kvs: tOpIdKvs | null = null
     kvsKey: string = "opid"
     kvsSaveTimer: NodeJS.Timeout | null
     kvsSaveInterval_s: number = 10
-    constructor() {
+    constructor(
+        readonly parentLogger: tLogger
+    ) {
+        this.logger = parentLogger.logger(["opid"])
         this.currentId = 0;
     }
     async startup() {
-        this.kvsSaveTimer = setInterval(() => {
+        this.kvsSaveTimer = setInterval(async () => {
             if (this.kvs) {
-                this.kvs.set(this.kvsKey, this.currentId.toString())
+                let id = this.currentId.toString()
+                await this.kvs.set(this.kvsKey, id)
+                this.logger.log(`save current id ${id}`)
             }
         }, this.kvsSaveInterval_s * 1000)
     }
@@ -43,7 +50,10 @@ export class opId {
         } catch (e) {
 
         }
-        this.currentId = this.currentId + dbid + this.kvsSaveInterval_s * 100
+        if (dbid) {
+            this.currentId = this.currentId + dbid + this.kvsSaveInterval_s * 100
+            this.logger.info(`load id from data, current is ${this.currentId}`)
+        }
         await this.kvs.set(this.kvsKey, this.currentId.toString())
     }
 }

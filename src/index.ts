@@ -24,7 +24,7 @@ export class eveqbot {
     bot: cQQBot | null
     constructor(readonly parentLogger: tLogger, readonly extService: eveqbotExtService, readonly config: tConfig) {
         this.logger = parentLogger.logger(["eveqbot"])
-        this.opId = new opId()
+        this.opId = new opId(this.logger)
         this.db = new typeormdb(this.logger, this.config.db)
         this.eveESI = new eveESI(this.logger, { opId: this.opId, httpClientCache: new Map() }, eveESICfgDefault)
         this.models = new cModels(this.logger, { db: this.db, eveESI: this.eveESI, opId: this.opId }, this.config.models)
