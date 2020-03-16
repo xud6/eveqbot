@@ -7,7 +7,6 @@ import { join } from "lodash";
 import { eveServerInfo, eveMarketApiInfo, eveServer } from "../../types";
 import packageInfo from "./../../../package.json"
 import { tQQBotMessagePacket } from "../types";
-let version = packageInfo.version
 
 export class commandHelp implements tCommandBase {
     readonly logger: tLogger
