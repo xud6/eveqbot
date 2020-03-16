@@ -33,7 +33,8 @@ export interface tConfig {
     CEVEMarketApi: tCEVEMarketApiCfg
     dataLoadConcurrency: number,
     debugMode: boolean,
-    models: tModelsConfig
+    models: tModelsConfig,
+    instanceName: string
 }
 
 export enum eveServer {

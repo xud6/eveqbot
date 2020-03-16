@@ -38,6 +38,7 @@ export class eveqbot {
     }
     async startup() {
         await this.db.startup()
+        await this.opId.setPersistentKvs(this.models.modelKvs, `${this.config.instanceName}.srvOpIdCurrent`)
         await this.eveTranquility.startup()
         if (this.bot) {
             await this.bot.startup()

@@ -36,6 +36,7 @@ let config: tConfig = {
         noLog: false
     },
     debugMode: false,
+    instanceName: "prod0"
 }
 
 try {
@@ -90,6 +91,9 @@ if (process.env.DATA_LOAD_CONCURRENT && (process.env.DATA_LOAD_CONCURRENT.length
 if (config.debugMode) {
     config.QQBot.nonProductionSourceOnly = true
     config.models.noLog = true
+    if (config.instanceName === "prod0") {
+        config.instanceName = "dev"
+    }
     console.log(`*** Enable DEBUG mode`)
 }
 
