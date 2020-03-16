@@ -61,7 +61,7 @@ export class commandLy implements tCommandBase {
             }
         }), ["distant"], "asc")
         return join(distances.map((d) => {
-            return `${d.distant}ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.a)} - ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.b)}`
+            return `${d.distant}ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.a)} ➡️ ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.b)}`
         }), "\n")
     }
     async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
