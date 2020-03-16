@@ -83,7 +83,7 @@ export class eveESIUniverseSystems {
         nullable: true,
         default: null
     })
-    stations: number[] | null
+    stations_raw: number[] | null
 
     @UpdateDateColumn()
     updateDate: Date;
