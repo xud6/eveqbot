@@ -1,5 +1,6 @@
-import { forEach, replace, join, map } from "lodash";
+import { forEach, replace, join, map, round } from "lodash";
 import { eveESIUniverseTypes } from "../db/entity/eveESIUniverseTypes";
+import { tPosition } from "../types";
 
 interface eveCommonNameTableObj {
     o: string,
@@ -58,4 +59,12 @@ export function formatItemNames(items: eveESIUniverseTypes[]) {
     return join(map(items, item => {
         return itemNameDisp(item)
     }), "\n")
+}
+
+const ly = 9460730472580800
+export function calcLyReal(p1: tPosition, p2: tPosition) {
+    return (Math.hypot((p1.x - p2.x), (p1.y - p2.y), (p1.z - p2.z)) / ly)
+}
+export function calcLy(p1: tPosition, p2: tPosition) {
+    return round(calcLyReal(p1, p2), 2)
 }

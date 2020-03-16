@@ -69,3 +69,10 @@ export const eveMarketApiInfo = [
         url: "https://esi.evetech.net/"
     }
 ]
+
+
+export interface tPosition {
+    x: number,
+    y: number,
+    z: number
+}
