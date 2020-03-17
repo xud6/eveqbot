@@ -51,7 +51,7 @@ export class commandJita implements tCommandBase {
             return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
         }
         let resultPriceListLimit = this.param.resultPriceListLimit
-        let resultNameListLimit = this.param.resultPriceListLimit
+        let resultNameListLimit = this.param.resultNameListLimit
         let isExtendedMode = false
         if (startsWith(message, "EXT ")) {
             this.logger.info(`${opId}| extended mode`)
