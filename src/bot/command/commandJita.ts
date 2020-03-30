@@ -2,7 +2,7 @@ import { tCommandBase } from "./tCommandBase";
 import { QQBotMessageSource } from "../../db/entity/QQBotMessageSource";
 import { cQQBotExtService, cQQBot } from "..";
 import { tLogger } from "tag-tree-logger";
-import { eveMarketApi, eveServerInfo, eveMarketApiInfo } from "../../types";
+import { eveMarketApi, eveServerInfo, eveMarketApiInfo, eveServer } from "../../types";
 import { join, startsWith, compact, trimEnd, replace, trim, orderBy } from "lodash";
 import { itemNameDisp, formatItemNames, itemNameDispShort } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
@@ -52,13 +52,19 @@ export class commandJita implements tCommandBase {
         }
         let resultPriceListLimit = this.param.resultPriceListLimit
         let resultNameListLimit = this.param.resultNameListLimit
+        let eve_server:eveServer = messageSource.eve_server
+        let eve_marketApi:eveMarketApi = messageSource.eve_marketApi
         let isExtendedMode = false
         if (startsWith(message, "EXT ")) {
             this.logger.info(`${opId}| extended mode`)
-            message = trim(replace(message, "EXT ", ""))
+            message = trim(message.slice(3))
             resultPriceListLimit = this.param.resultPriceListLimitExtended
             resultNameListLimit = this.param.resultNameListLimitExtended
             isExtendedMode = true
+        }
+        if (startsWith(message,`tq `)||startsWith(message,`TQ `)){
+            message = trim(message.slice(2))
+            eve_server = eveServer.tranquility
         }
         perfUtil.reset()
         let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(opId, message, resultNameListLimit + 1)
@@ -70,15 +76,15 @@ export class commandJita implements tCommandBase {
             if (isExtendedMode && items.length > this.param.resultPriceListLimit) {
                 this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${items.length}项条目，查询API中`)
             }
-            if (messageSource.eve_marketApi === eveMarketApi.ceveMarket) {
+            if (eve_marketApi === eveMarketApi.ceveMarket) {
                 let head = `OP${opId} | 共有${items.length}种物品符合该条件\n`
                 perfUtil.reset()
                 let marketdata: string[] = await Promise.all(items.map(async item => {
-                    let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), messageSource.eve_server)
+                    let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), eve_server)
                     return `🔹${itemNameDisp(item)}\n ${market}`;
                 }))
                 this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api data`)
-                return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[messageSource.eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 耗时${perf.timePastStrMS()}\n 使用 .jita 获取帮助 .help 查看其它功能`;
+                return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 耗时${perf.timePastStrMS()}\n 使用 .jita 获取帮助 .help 查看其它功能`;
             } else {
                 return "市场API配置错误"
             }
@@ -280,6 +286,7 @@ export class commandJita implements tCommandBase {
             return `1| .jita {物品名}`
                 + `\n` + `2| .jita {物品ID}`
                 + `\n` + `3| .jita EXT {物品名}  ---  扩展查询模式，最大${this.param.resultPriceListLimitExtended}条市场项目`
+                + `\n` + `3| .jita TQ {物品名}  ---  使用世界服数据`
                 + `\n` + `4| .jita`
                 + `\n` + `   {EVE舰船装配}`
                 + `\n` + `  --- 查询EVE舰船装配价格`
