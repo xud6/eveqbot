@@ -41,7 +41,7 @@ export class cQQBot {
         this.logger = parentLogger.logger(["QQBot"])
         this.bot = new CQWebSocket(config.cqwebConfig);
         this.bot.on('socket.connecting', (wsType: WebSocketType, attempts: number) => {
-            this.logger.info(`attemp to connect ${wsType} No.${attempts} started`)
+            this.logger.info(`attemp to connect ${wsType} No.${++attempts} started`)
         }).on('socket.connect', (wsType: WebSocketType, sock: any, attempts: number) => {
             this.logger.info(`attemp to connect ${wsType} No.${attempts} success`)
         }).on('socket.failed', (wsType: WebSocketType, attempts: number) => {
