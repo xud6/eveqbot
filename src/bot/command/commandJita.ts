@@ -67,19 +67,19 @@ export class commandJita implements tCommandBase {
             eve_server = eveServer.tranquility
         }
         perfUtil.reset()
-        let items = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(opId, message, resultNameListLimit + 1)
+        let result = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(opId, message, resultNameListLimit + 1)
         this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish market search ${message}`)
-        if (items.length == 0) {
+        if (result.types.length == 0 || result.matchType === null) {
             this.logger.info(`${opId}| 找不到 ${message}`)
             return '找不到该物品'
-        } else if (items.length > 0 && items.length <= resultPriceListLimit) {
-            if (isExtendedMode && items.length > this.param.resultPriceListLimit) {
-                this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${items.length}项条目，查询API中`)
+        } else if (result.types.length > 0 && result.types.length <= resultPriceListLimit) {
+            if (isExtendedMode && result.types.length > this.param.resultPriceListLimit) {
+                this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${result.types.length}项条目，查询API中`)
             }
             if (eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `OP${opId} | 共有${items.length}种物品符合该条件\n`
+                let head = `OP${opId} | 共有${result.types.length}种物品符合该条件,匹配方式${result.matchType.cn}\n`
                 perfUtil.reset()
-                let marketdata: string[] = await Promise.all(items.map(async item => {
+                let marketdata: string[] = await Promise.all(result.types.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), eve_server)
                     return `🔹${itemNameDisp(item)}\n ${market}`;
                 }))
@@ -89,11 +89,11 @@ export class commandJita implements tCommandBase {
                 return "市场API配置错误"
             }
         } else {
-            this.logger.info(`${opId}| 搜索结果过多: ${items.length}, 需少于${resultPriceListLimit}个`)
-            if (items.length > resultNameListLimit) {
-                return `共有超过${resultNameListLimit}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
+            this.logger.info(`${opId}| 搜索结果过多: ${result.types.length}, 需少于${resultPriceListLimit}个`)
+            if (result.types.length > resultNameListLimit) {
+                return `共有超过${resultNameListLimit}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(result.types)}\n......`
             } else {
-                return `共有${items.length}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}`
+                return `共有${result.types.length}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(result.types)}`
             }
         }
     }

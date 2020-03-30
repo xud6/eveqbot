@@ -32,15 +32,15 @@ export class commandItem implements tCommandBase {
             return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
         }
 
-        let items = await this.extService.models.modelEveESIUniverseTypes.SearchCombined(opId, message, this.param.resultNameListLimit + 1, false)
-        if (items.length == 0) {
+        let result = await this.extService.models.modelEveESIUniverseTypes.SearchCombined(opId, message, this.param.resultNameListLimit + 1, false)
+        if (result.types.length == 0 || result.matchType === null) {
             this.logger.info(`${opId}| 找不到 ${message}`)
             return '找不到该物品'
         } else {
-            if (items.length > this.param.resultNameListLimit) {
-                return `共有超过${this.param.resultNameListLimit}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(items)}\n......`
+            if (result.types.length > this.param.resultNameListLimit) {
+                return `共有超过${this.param.resultNameListLimit}种物品符合该条件，请给出更明确的物品名称\n${formatItemNames(result.types)}\n......`
             } else {
-                return `共有${items.length}种物品符合该条件\n${formatItemNames(items)}`
+                return `共有${result.types.length}种物品符合该条件,匹配方式${result.matchType.cn}\n${formatItemNames(result.types)}`
             }
         }
     }

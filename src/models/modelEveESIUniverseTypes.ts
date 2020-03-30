@@ -9,6 +9,21 @@ import { eveIsSkins, eveIsBlueprint, eveCommonNameTransfer } from "../utils/eveF
 import { spliteWords } from "../utils/spliteWords";
 import { uniq } from "lodash";
 
+export interface tMarketSearchMatchType {
+    en:string,
+    cn:string
+}
+
+const marketSearchMatchTypeID = {en:"ID",cn:"ID"}
+const marketSearchMatchTypeExactName = {en:"ExactName",cn:"准确物品名"}
+const marketSearchMatchTypePhrase = {en:"Phrase",cn:"短语"}
+const marketSearchMatchTypeWords = {en:"Words",cn:"字符匹配"}
+
+export interface tMarketSearchResult {
+    types:eveESIUniverseTypes[],
+    matchType:tMarketSearchMatchType | null
+}
+
 export class modelEveESIUniverseTypes implements tModelBase {
     readonly name = "modelEveESIUniverseTypes"
     readonly logger: tLogger
@@ -209,7 +224,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         input: string,
         limit: number = 51,
         onlyMarketable: boolean = true
-    ) {
+    ):Promise<tMarketSearchResult> {
         let result
         try {
             let inputId = parseInt(input);
@@ -218,28 +233,40 @@ export class modelEveESIUniverseTypes implements tModelBase {
                 result = await this.searchById(inputId, onlyMarketable);
                 if (result.length > 0) {
                     this.logger.info(`${opId}| Find [${result.length}] result by Id for [${input}]`)
-                    return result;
+                    return {
+                        types:result,
+                        matchType:marketSearchMatchTypeID
+                    }
                 }
             }
         } catch (e) { }
         result = await this.searchByExactName(input, limit, onlyMarketable)
         if (result.length > 0) {
             this.logger.info(`${opId}| Find [${result.length}] result by ExactName for [${input}]`)
-            return result;
+            return {
+                types:result,
+                matchType:marketSearchMatchTypeExactName
+            }
         }
         let isSkin = eveIsSkins(input);
         let isBlueprint = eveIsBlueprint(input);
         result = await this.SearchByWords([input], limit, isSkin, isBlueprint, false, onlyMarketable)
         if (result.length > 0) {
             this.logger.info(`${opId}| Find [${result.length}] result by Word for [${input}]`)
-            return result;
+            return {
+                types:result,
+                matchType:marketSearchMatchTypePhrase
+            }
         }
         let inputT = eveCommonNameTransfer(input);
         if (inputT === input) {
             result = await this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, onlyMarketable)
             if (result.length > 0) {
                 this.logger.info(`${opId}| Find [${result.length}] result by SpliteWords without CommonName for [${input}]`)
-                return result;
+                return {
+                    types:result,
+                    matchType:marketSearchMatchTypeWords
+                }
             }
         } else {
             let pResultO = this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, onlyMarketable)
@@ -247,29 +274,35 @@ export class modelEveESIUniverseTypes implements tModelBase {
             result = uniq((await pResultO).concat(await pResultT))
             if (result.length > 0) {
                 this.logger.info(`${opId}| Find [${result.length}] result by SpliteWords with CommonName for [${input}]`)
-                return result;
+                return {
+                    types:result,
+                    matchType:marketSearchMatchTypeWords
+                }
             }
         }
-        return [];
+        return {
+            types:[],
+            matchType:null
+        };
     }
     async SearchCombined(
         opId: number,
         input: string,
         limit: number = 51,
         onlyMarketable: boolean = true
-    ) {
+    ):Promise<tMarketSearchResult> {
         this.logger.info(`${opId}| market search for ${input} in UniverseType`)
-        let records = await this.doSearchCombined(opId, input, limit, onlyMarketable)
-        for (let r of records) {
+        let result = await this.doSearchCombined(opId, input, limit, onlyMarketable)
+        for (let r of result.types) {
             this.logger.log(`${opId}| ID:${r.id}|${r.name_cn}|${r.name_en}|${r.group.name_cn}|${r.group.category.name_cn}`)
         }
-        return records
+        return result
     }
     async MarketSearch(
         opId: number,
         input: string,
         limit: number = 51
-    ) {
+    ):Promise<tMarketSearchResult> {
         return this.SearchCombined(opId, input, limit, true)
     }
 }
