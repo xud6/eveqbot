@@ -93,7 +93,7 @@ export class commandLy implements tCommandBase {
                 } else if (systems.length === 1) {
                     return `ID:${systems[0].id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(systems[0])}`
                 } else {
-                    return join(systems.map((system) => { return `ID:${systems[0].id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(systems[0])}` }), `\n`)
+                    return `共有${systems.length}个星系符合条件\n` + join(systems.map((system) => { return `ID:${systems[0].id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(systems[0])}` }), `\n`)
                 }
             }
             if (msgs.length === 2) {
