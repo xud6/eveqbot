@@ -4,6 +4,8 @@ import { tModelsExtService } from "./types";
 import { eveESIUniverseSystems } from "../db/entity/eveESIUniverseSystems";
 import { cModels } from ".";
 import PQueue from "p-queue";
+import { eveESIUniverseSystemsNearDistance } from "../db/entity/eveESIUniverseSystemsNearDistance";
+import { calcLy } from "../utils/eveFuncs";
 
 export class modelEveESIUniverseSystems implements tModelBase {
     readonly name = "modelEveESIUniverseSystems"
@@ -99,10 +101,30 @@ export class modelEveESIUniverseSystems implements tModelBase {
         return await query.getMany()
     }
     formatStr(system: eveESIUniverseSystems) {
-        if(system.name_cn === system.name_en){
+        if (system.name_cn === system.name_en) {
             return `${system.name_cn} (${system.constellation.name_cn} / ${system.constellation.region.name_cn})`
-        }else{
+        } else {
             return `${system.name_cn} / ${system.name_en} (${system.constellation.name_cn} / ${system.constellation.region.name_cn})`
+        }
+    }
+    async recalcNearSystemDistance(maxDistance: number = 15) {
+        let systemrepo = await this.extService.db.getRepository(eveESIUniverseSystems);
+        let distancerepo = await this.extService.db.getRepository(eveESIUniverseSystemsNearDistance);
+
+        let systems = await systemrepo.find();
+        await distancerepo.clear();
+        for (let fromSystem of systems) {
+            for (let toSystem of systems) {
+                let distance = calcLy(fromSystem.position, toSystem.position)
+                if (distance <= maxDistance) {
+                    let dis = distancerepo.create({
+                        from_system: fromSystem,
+                        target_system: toSystem,
+                        distance: distance
+                    })
+                    await distancerepo.save(dis)
+                }
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 import { Entity, PrimaryColumn, Column, UpdateDateColumn, OneToMany, ManyToOne, Index, JoinColumn } from "typeorm";
 import { eveESIUniverseConstellations } from "./eveESIUniverseConstellations";
 import { tSystemPosition, tSystemPlanet } from "../../api/eveESI/universe/systems";
+import { eveESIUniverseSystemsNearDistance } from "./eveESIUniverseSystemsNearDistance";
 
 @Entity()
 export class eveESIUniverseSystems {
@@ -90,4 +91,7 @@ export class eveESIUniverseSystems {
 
     @UpdateDateColumn()
     updateDate: Date;
+
+    @OneToMany(type => eveESIUniverseSystemsNearDistance, nearDistance => nearDistance.from_system)
+    nearDistances: eveESIUniverseSystemsNearDistance[];
 }
