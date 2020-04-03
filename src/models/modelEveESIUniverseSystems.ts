@@ -120,7 +120,7 @@ export class modelEveESIUniverseSystems implements tModelBase {
             let distanceObjects = []
             for (let toSystem of systems) {
                 let distance = calcLy(fromSystem.position, toSystem.position)
-                if (distance <= maxDistance) {
+                if ((toSystem !== fromSystem) && (distance <= maxDistance)) {
                     let dis = distancerepo.create({
                         from_system: fromSystem,
                         target_system: toSystem,
