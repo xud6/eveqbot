@@ -88,10 +88,12 @@ export class commandLy implements tCommandBase {
             let msgs = split(messagePacket.message, " ");
             if (msgs.length === 1) {
                 let systems = await this.extService.models.modelEveESIUniverseSystems.SearchByWord(msgs[0])
-                if (systems[0]) {
+                if (systems.length === 0) {
+                    return `找不到该星系`
+                } else if (systems.length === 1) {
                     return `ID:${systems[0].id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(systems[0])}`
                 } else {
-                    return `找不到该星系`
+                    return join(systems.map((system) => { return `ID:${systems[0].id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(systems[0])}` }), `\n`)
                 }
             }
             if (msgs.length === 2) {
