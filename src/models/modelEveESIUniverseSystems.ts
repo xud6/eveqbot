@@ -6,6 +6,7 @@ import { cModels } from ".";
 import PQueue from "p-queue";
 import { eveESIUniverseSystemsNearDistance } from "../db/entity/eveESIUniverseSystemsNearDistance";
 import { calcLy } from "../utils/eveFuncs";
+import { orderBy } from "lodash";
 
 export class modelEveESIUniverseSystems implements tModelBase {
     readonly name = "modelEveESIUniverseSystems"
@@ -130,6 +131,7 @@ export class modelEveESIUniverseSystems implements tModelBase {
                         distanceObjects.push(dis)
                     }
                 }
+                distanceObjects = orderBy(distanceObjects,['distance','asc'])
                 await distancerepo.save(distanceObjects)
                 this.logger.info(`${++systemComplete} / ${systems.length} complete, distance added ${distanceObjects.length}`)
             });
