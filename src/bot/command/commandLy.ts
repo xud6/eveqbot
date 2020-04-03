@@ -78,6 +78,15 @@ export class commandLy implements tCommandBase {
             }), "\n")}\n参考 TT/大航:6(5.4) 小航无畏:7(6.3) 黑影:8(7.2) 跳货:10`
         }
     }
+    async handlerSystemNear(system: eveESIUniverseSystems, opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket) {
+        let nears = await this.extService.models.modelEveESIUniverseSystems.readNearSystems(system)
+        nears = orderBy(nears, ['distance', 'asc'])
+        let res = `${this.extService.models.modelEveESIUniverseSystems.formatStr(system)}`
+            + `\n` + join(nears.map((near) => {
+                return `🗺${near.distance} ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(near.from_system)} -> ${this.extService.models.modelEveESIUniverseSystems.formatStr(near.target_system)}`
+            }), `\n`)
+        return res
+    }
     async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         this.logger.info(`${opId}| jump command ${messagePacket.message} from ${messageInfo.sender_user_id} in ${messageSource.source_type}/${messageSource.source_id}`)
         if (messagePacket.message === "") {
@@ -91,7 +100,7 @@ export class commandLy implements tCommandBase {
                 if (systems.length === 0) {
                     return `找不到该星系`
                 } else if (systems.length === 1) {
-                    return `ID:${systems[0].id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(systems[0])}`
+                    return this.handlerSystemNear(systems[0], opId, messageSource, messageInfo, messagePacket);
                 } else {
                     return `共有${systems.length}个星系符合条件\n` + join(systems.map((system) => { return `ID:${systems[0].id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(systems[0])}` }), `\n`)
                 }

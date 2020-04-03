@@ -131,10 +131,18 @@ export class modelEveESIUniverseSystems implements tModelBase {
                         distanceObjects.push(dis)
                     }
                 }
-                distanceObjects = orderBy(distanceObjects,['distance','asc'])
+                distanceObjects = orderBy(distanceObjects, ['distance', 'asc'])
                 await distancerepo.save(distanceObjects)
                 this.logger.info(`${++systemComplete} / ${systems.length} complete, distance added ${distanceObjects.length}`)
             });
         }
+    }
+    async readNearSystems(system: eveESIUniverseSystems) {
+        let distancerepo = await this.extService.db.getRepository(eveESIUniverseSystemsNearDistance);
+        return await distancerepo.find({
+            where: {
+                from_system: system
+            }
+        })
     }
 }
