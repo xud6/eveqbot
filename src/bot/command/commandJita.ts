@@ -52,19 +52,19 @@ export class commandJita implements tCommandBase {
         }
         let resultPriceListLimit = this.param.resultPriceListLimit
         let resultNameListLimit = this.param.resultNameListLimit
-        let eve_server:eveServer = messageSource.eve_server
-        let eve_marketApi:eveMarketApi = messageSource.eve_marketApi
+        let eve_server: eveServer = messageSource.eve_server
+        let eve_marketApi: eveMarketApi = messageSource.eve_marketApi
         let isExtendedMode = false
-        if (startsWith(message, "EXT ")) {
+        if (startsWith(message, `tq `) || startsWith(message, `TQ `)) {
+            message = trim(message.slice(2))
+            eve_server = eveServer.tranquility
+        }
+        if (startsWith(message, "ext ") || startsWith(message, "EXT ")) {
             this.logger.info(`${opId}| extended mode`)
             message = trim(message.slice(3))
             resultPriceListLimit = this.param.resultPriceListLimitExtended
             resultNameListLimit = this.param.resultNameListLimitExtended
             isExtendedMode = true
-        }
-        if (startsWith(message,`tq `)||startsWith(message,`TQ `)){
-            message = trim(message.slice(2))
-            eve_server = eveServer.tranquility
         }
         perfUtil.reset()
         let result = await this.extService.models.modelEveESIUniverseTypes.MarketSearch(opId, message, resultNameListLimit + 1)
@@ -77,7 +77,7 @@ export class commandJita implements tCommandBase {
                 this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${result.types.length}项条目，查询API中`)
             }
             if (eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `OP${opId} | 共有${result.types.length}种物品符合该条件,匹配方式${result.matchType.cn}\n`
+                let head = `OP${opId} | 共有${result.types.length}种物品符合该条件, 匹配方式${result.matchType.cn}, ${eveServerInfo[eve_server].dispName}市场价格:\n`
                 perfUtil.reset()
                 let marketdata: string[] = await Promise.all(result.types.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), eve_server)
@@ -134,7 +134,7 @@ export class commandJita implements tCommandBase {
                 if (type) {
                     if (type.market_group_id !== null) {
                         perfUtil.reset()
-                        let marketData = await this.extService.CEVEMarketApi.getMarketData(opId, type.id.toString())
+                        let marketData = await this.extService.CEVEMarketApi.getMarketData(opId, type.id.toString(), messageSource.eve_server)
                         this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api of [${inputItem.name}]`)
                         if (marketData) {
                             resultSumSellLow += marketData.sellLow * inputItem.amount;
@@ -172,7 +172,7 @@ export class commandJita implements tCommandBase {
                 resultStr += join(resultNotMarketAble, '\n') + '\n'
             }
             if (resultLineData.length) {
-                resultStr += `可交易物品${resultLineData.length}种\n`
+                resultStr += `可交易物品${resultLineData.length}种, ${eveServerInfo[messageSource.eve_server].dispName}市场价格:\n`
                 resultStr += `最低卖价总计 ${numberFormat(resultSumSellLow, 2)} ,最高收价总计 ${numberFormat(resultSumBuyHigh, 2)}\n`
                 resultLineData = orderBy(resultLineData, "sellLowTotal", "desc")
                 resultStr += join(resultLineData.map((lineData) => {
@@ -224,7 +224,7 @@ export class commandJita implements tCommandBase {
                 if (type) {
                     if (type.market_group_id !== null) {
                         perfUtil.reset()
-                        let marketData = await this.extService.CEVEMarketApi.getMarketData(opId, type.id.toString())
+                        let marketData = await this.extService.CEVEMarketApi.getMarketData(opId, type.id.toString(), messageSource.eve_server)
                         this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api [${inputItem.name}]`)
                         if (marketData) {
                             resultSumSellLow += marketData.sellLow * inputItem.amount;
@@ -267,7 +267,7 @@ export class commandJita implements tCommandBase {
                 resultStr += join(resultNotMarketAble, '\n') + '\n'
             }
             if (resultLineData.length) {
-                resultStr += `可交易物品${resultLineData.length}种\n`
+                resultStr += `可交易物品${resultLineData.length}种, ${eveServerInfo[messageSource.eve_server].dispName}市场价格:\n`
                 resultStr += `最高收价总计 ${numberFormat(resultSumBuyHigh, 2)} ,最低卖价总计 ${numberFormat(resultSumSellLow, 2)}\n`
                 resultLineData = orderBy(resultLineData, "sellLowTotal", "desc")
                 resultStr += join(resultLineData.map((lineData) => {
@@ -285,12 +285,12 @@ export class commandJita implements tCommandBase {
         if (messagePacket.message === "") {
             return `1| .jita {物品名}`
                 + `\n` + `2| .jita {物品ID}`
-                + `\n` + `3| .jita EXT {物品名}  ---  扩展查询模式，最大${this.param.resultPriceListLimitExtended}条市场项目`
                 + `\n` + `3| .jita TQ {物品名}  ---  使用世界服数据`
-                + `\n` + `4| .jita`
+                + `\n` + `4| .jita EXT {物品名}  ---  扩展查询模式，最大${this.param.resultPriceListLimitExtended}条市场项目`
+                + `\n` + `5| .jita`
                 + `\n` + `   {EVE舰船装配}`
                 + `\n` + `  --- 查询EVE舰船装配价格`
-                + `\n` + `5| .jita`
+                + `\n` + `6| .jita`
                 + `\n` + `   {合同内容复制}`
                 + `\n` + `  --- 查询合同内容价格`
         }
