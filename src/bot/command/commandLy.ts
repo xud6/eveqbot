@@ -60,9 +60,23 @@ export class commandLy implements tCommandBase {
                 distant: calcLy(route.a.position, route.b.position)
             }
         }), ["distant"], "asc")
-        return `${join(distances.map((d) => {
-            return `${d.distant} ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.a)} ➡️ ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.b)}`
-        }), "\n")}\n参考 TT/大航:6(5.4) 小航无畏:7(6.3) 黑影:8(7.2) 跳货:10`
+        if (distances.length === 1) {
+            let d = distances[0];
+            function formatIsInRange(target: number, distance: number) {
+                if (target <= distance) {
+                    return `${target}✔️`
+                } else {
+                    return `${target}❌`
+                }
+            }
+            return `🗺${d.distant} ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.a)} -> ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.b)}`
+                + `\n 四级TT/大航:${formatIsInRange(5.4, d.distant)} 五级TT/大航:${formatIsInRange(6, d.distant)} 四级小航无畏:${formatIsInRange(6.3, d.distant)} 五级小航无畏:${formatIsInRange(7, d.distant)}`
+                + ` 四级黑影:${formatIsInRange(7.2, d.distant)} 五级黑影:${formatIsInRange(8, d.distant)} 五级跳货:${formatIsInRange(10, d.distant)}`
+        } else {
+            return `${join(distances.map((d) => {
+                return `🗺${d.distant} ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.a)} -> ${this.extService.models.modelEveESIUniverseSystems.formatStr(d.b)}`
+            }), "\n")}\n参考 TT/大航:6(5.4) 小航无畏:7(6.3) 黑影:8(7.2) 跳货:10`
+        }
     }
     async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         this.logger.info(`${opId}| jump command ${messagePacket.message} from ${messageInfo.sender_user_id} in ${messageSource.source_type}/${messageSource.source_id}`)
