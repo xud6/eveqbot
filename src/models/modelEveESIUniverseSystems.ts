@@ -107,7 +107,8 @@ export class modelEveESIUniverseSystems implements tModelBase {
             return `${system.name_cn} / ${system.name_en} (${system.constellation.name_cn} / ${system.constellation.region.name_cn})`
         }
     }
-    async reCalcNearSystemDistance(maxDistance: number = 10) {
+    async reCalcNearSystemDistance(maxDistance: number = 10, concurrency: number = 3) {
+        const queue = new PQueue({ concurrency: concurrency });
         let systemrepo = await this.extService.db.getRepository(eveESIUniverseSystems);
         let distancerepo = await this.extService.db.getRepository(eveESIUniverseSystemsNearDistance);
 
@@ -115,23 +116,23 @@ export class modelEveESIUniverseSystems implements tModelBase {
         await distancerepo.clear();
 
         let systemComplete = 0;
-        let distanceObjectCnt = 0;
         for (let fromSystem of systems) {
-            let distanceObjects = []
-            for (let toSystem of systems) {
-                let distance = calcLy(fromSystem.position, toSystem.position)
-                if ((toSystem !== fromSystem) && (distance <= maxDistance)) {
-                    let dis = distancerepo.create({
-                        from_system: fromSystem,
-                        target_system: toSystem,
-                        distance: distance
-                    })
-                    distanceObjects.push(dis)
-                    distanceObjectCnt++;
+            await queue.add(async () => {
+                let distanceObjects = []
+                for (let toSystem of systems) {
+                    let distance = calcLy(fromSystem.position, toSystem.position)
+                    if ((toSystem !== fromSystem) && (distance <= maxDistance)) {
+                        let dis = distancerepo.create({
+                            from_system: fromSystem,
+                            target_system: toSystem,
+                            distance: distance
+                        })
+                        distanceObjects.push(dis)
+                    }
                 }
-            }
-            await distancerepo.save(distanceObjects)
-            this.logger.info(`${++systemComplete} / ${systems.length} complete, distance added ${distanceObjectCnt}`)
+                await distancerepo.save(distanceObjects)
+                this.logger.info(`${++systemComplete} / ${systems.length} complete, distance added ${distanceObjects.length}`)
+            });
         }
     }
 }
