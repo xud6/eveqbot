@@ -102,7 +102,7 @@ export class commandLy implements tCommandBase {
                 } else if (systems.length === 1) {
                     return this.handlerSystemNear(systems[0], opId, messageSource, messageInfo, messagePacket);
                 } else {
-                    return `共有${systems.length}个星系符合条件\n` + join(systems.map((system) => { return `ID:${systems[0].id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(systems[0])}` }), `\n`)
+                    return `共有${systems.length}个星系符合条件\n` + join(systems.map((system) => { return `ID:${system.id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(system)}` }), `\n`)
                 }
             }
             if (msgs.length === 2) {
