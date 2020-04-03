@@ -121,14 +121,16 @@ export class modelEveESIUniverseSystems implements tModelBase {
             await queue.add(async () => {
                 let distanceObjects = []
                 for (let toSystem of systems) {
-                    let distance = calcLy(fromSystem.position, toSystem.position)
-                    if ((toSystem !== fromSystem) && (distance <= maxDistance)) {
-                        let dis = distancerepo.create({
-                            from_system: fromSystem,
-                            target_system: toSystem,
-                            distance: distance
-                        })
-                        distanceObjects.push(dis)
+                    if ((toSystem !== fromSystem) && (toSystem.security_status < 0.5)) {
+                        let distance = calcLy(fromSystem.position, toSystem.position)
+                        if (distance <= maxDistance) {
+                            let dis = distancerepo.create({
+                                from_system: fromSystem,
+                                target_system: toSystem,
+                                distance: distance
+                            })
+                            distanceObjects.push(dis)
+                        }
                     }
                 }
                 distanceObjects = orderBy(distanceObjects, ['distance', 'asc'])
