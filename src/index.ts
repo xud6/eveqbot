@@ -86,6 +86,10 @@ export class eveqbot {
                 this.logger.info("start refresh EveESIUniverseSystems")
                 await this.models.modelEveESIUniverseSystems.RefreshData(false, this.config.dataLoadConcurrency)
             })
+            await this.refreshDataJob("taskReCalcUniversSystemNearDistances", async () => {
+                this.logger.info("start recalc EveESIUniverseSystemNearDistance")
+                await this.models.modelEveESIUniverseSystems.reCalcNearSystemDistance()
+            })
         }
     }
 }

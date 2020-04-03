@@ -107,13 +107,17 @@ export class modelEveESIUniverseSystems implements tModelBase {
             return `${system.name_cn} / ${system.name_en} (${system.constellation.name_cn} / ${system.constellation.region.name_cn})`
         }
     }
-    async recalcNearSystemDistance(maxDistance: number = 15) {
+    async reCalcNearSystemDistance(maxDistance: number = 10) {
         let systemrepo = await this.extService.db.getRepository(eveESIUniverseSystems);
         let distancerepo = await this.extService.db.getRepository(eveESIUniverseSystemsNearDistance);
 
         let systems = await systemrepo.find();
         await distancerepo.clear();
+
+        let systemComplete = 0;
+        let distanceObjectCnt = 0;
         for (let fromSystem of systems) {
+            let distanceObjects = []
             for (let toSystem of systems) {
                 let distance = calcLy(fromSystem.position, toSystem.position)
                 if (distance <= maxDistance) {
@@ -122,9 +126,12 @@ export class modelEveESIUniverseSystems implements tModelBase {
                         target_system: toSystem,
                         distance: distance
                     })
-                    await distancerepo.save(dis)
+                    distanceObjects.push(dis)
+                    distanceObjectCnt++;
                 }
             }
+            await distancerepo.save(distanceObjects)
+            this.logger.info(`${++systemComplete} / ${systems.length} complete, distance added ${distanceObjectCnt}`)
         }
     }
 }
