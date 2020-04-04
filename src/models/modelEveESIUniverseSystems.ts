@@ -7,6 +7,7 @@ import PQueue from "p-queue";
 import { eveESIUniverseSystemsNearDistance } from "../db/entity/eveESIUniverseSystemsNearDistance";
 import { calcLy } from "../utils/eveFuncs";
 import { orderBy } from "lodash";
+import { LessThanOrEqual } from "typeorm";
 
 export class modelEveESIUniverseSystems implements tModelBase {
     readonly name = "modelEveESIUniverseSystems"
@@ -139,13 +140,14 @@ export class modelEveESIUniverseSystems implements tModelBase {
             });
         }
     }
-    async readNearSystems(system: eveESIUniverseSystems) {
+    async readNearSystems(system: eveESIUniverseSystems, distance: number = 7) {
         let distancerepo = await this.extService.db.getRepository(eveESIUniverseSystemsNearDistance);
         return await distancerepo.find({
             where: {
-                from_system: system
+                from_system: system,
+                distance: LessThanOrEqual(distance)
             },
-            relations:["target_system"]
+            relations: ["target_system", "target_system.constellation", "target_system.constellation.region"]
         })
     }
 }
