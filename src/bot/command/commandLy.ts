@@ -64,7 +64,7 @@ export class commandLy implements tCommandBase {
         if (distances.length === 1) {
             let d = distances[0];
             function formatIsInRange(target: number, distance: number) {
-                if (target <= distance) {
+                if (distance <= target) {
                     return `${target}✔️`
                 } else {
                     return `${target}❌`
