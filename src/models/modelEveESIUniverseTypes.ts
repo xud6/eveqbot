@@ -10,23 +10,25 @@ import { spliteWords } from "../utils/spliteWords";
 import { uniq } from "lodash";
 
 export interface tMarketSearchMatchType {
-    en:string,
-    cn:string
+    en: string,
+    cn: string
 }
 
-const marketSearchMatchTypeID = {en:"ID",cn:"ID"}
-const marketSearchMatchTypeExactName = {en:"ExactName",cn:"准确物品名"}
-const marketSearchMatchTypePhrase = {en:"Phrase",cn:"短语"}
-const marketSearchMatchTypeWords = {en:"Words",cn:"字符匹配"}
+const marketSearchMatchTypeID = { en: "ID", cn: "ID" }
+const marketSearchMatchTypeExactName = { en: "ExactName", cn: "准确物品名" }
+const marketSearchMatchTypePhrase = { en: "Phrase", cn: "短语" }
+const marketSearchMatchTypeWords = { en: "Words", cn: "字符匹配" }
 
 export interface tMarketSearchResult {
-    types:eveESIUniverseTypes[],
-    matchType:tMarketSearchMatchType | null
+    types: eveESIUniverseTypes[],
+    matchType: tMarketSearchMatchType | null
 }
 
 export class modelEveESIUniverseTypes implements tModelBase {
     readonly name = "modelEveESIUniverseTypes"
     readonly logger: tLogger
+    typesUpdateInterval: number = 1000 * 60 * 60 * 24 * 5
+    typesUpdateTimer: NodeJS.Timeout | undefined
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: tModelsExtService,
@@ -34,8 +36,16 @@ export class modelEveESIUniverseTypes implements tModelBase {
     ) {
         this.logger = parentLogger.logger(["modelEveESIUniverseTypes"])
     }
-    async startup() { }
-    async shutdown() { }
+    async startup() {
+        this.typesUpdateTimer = setInterval(() => {
+            this.RefreshData(false)
+        }, this.typesUpdateInterval)
+    }
+    async shutdown() {
+        if (this.typesUpdateTimer) {
+            clearInterval(this.typesUpdateTimer)
+        }
+    }
     async get(id: number, forceRefresh: boolean = false): Promise<eveESIUniverseTypes | null> {
         let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let result = (await repo.findByIds([id]))[0];
@@ -224,7 +234,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         input: string,
         limit: number = 51,
         onlyMarketable: boolean = true
-    ):Promise<tMarketSearchResult> {
+    ): Promise<tMarketSearchResult> {
         let result
         try {
             let inputId = parseInt(input);
@@ -234,8 +244,8 @@ export class modelEveESIUniverseTypes implements tModelBase {
                 if (result.length > 0) {
                     this.logger.info(`${opId}| Find [${result.length}] result by Id for [${input}]`)
                     return {
-                        types:result,
-                        matchType:marketSearchMatchTypeID
+                        types: result,
+                        matchType: marketSearchMatchTypeID
                     }
                 }
             }
@@ -244,8 +254,8 @@ export class modelEveESIUniverseTypes implements tModelBase {
         if (result.length > 0) {
             this.logger.info(`${opId}| Find [${result.length}] result by ExactName for [${input}]`)
             return {
-                types:result,
-                matchType:marketSearchMatchTypeExactName
+                types: result,
+                matchType: marketSearchMatchTypeExactName
             }
         }
         let isSkin = eveIsSkins(input);
@@ -254,8 +264,8 @@ export class modelEveESIUniverseTypes implements tModelBase {
         if (result.length > 0) {
             this.logger.info(`${opId}| Find [${result.length}] result by Word for [${input}]`)
             return {
-                types:result,
-                matchType:marketSearchMatchTypePhrase
+                types: result,
+                matchType: marketSearchMatchTypePhrase
             }
         }
         let inputT = eveCommonNameTransfer(input);
@@ -264,8 +274,8 @@ export class modelEveESIUniverseTypes implements tModelBase {
             if (result.length > 0) {
                 this.logger.info(`${opId}| Find [${result.length}] result by SpliteWords without CommonName for [${input}]`)
                 return {
-                    types:result,
-                    matchType:marketSearchMatchTypeWords
+                    types: result,
+                    matchType: marketSearchMatchTypeWords
                 }
             }
         } else {
@@ -275,14 +285,14 @@ export class modelEveESIUniverseTypes implements tModelBase {
             if (result.length > 0) {
                 this.logger.info(`${opId}| Find [${result.length}] result by SpliteWords with CommonName for [${input}]`)
                 return {
-                    types:result,
-                    matchType:marketSearchMatchTypeWords
+                    types: result,
+                    matchType: marketSearchMatchTypeWords
                 }
             }
         }
         return {
-            types:[],
-            matchType:null
+            types: [],
+            matchType: null
         };
     }
     async SearchCombined(
@@ -290,7 +300,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         input: string,
         limit: number = 51,
         onlyMarketable: boolean = true
-    ):Promise<tMarketSearchResult> {
+    ): Promise<tMarketSearchResult> {
         this.logger.info(`${opId}| market search for ${input} in UniverseType`)
         let result = await this.doSearchCombined(opId, input, limit, onlyMarketable)
         for (let r of result.types) {
@@ -302,7 +312,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         opId: number,
         input: string,
         limit: number = 51
-    ):Promise<tMarketSearchResult> {
+    ): Promise<tMarketSearchResult> {
         return this.SearchCombined(opId, input, limit, true)
     }
 }
