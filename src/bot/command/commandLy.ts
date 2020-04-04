@@ -15,6 +15,7 @@ export class commandLy implements tCommandBase {
     readonly helpStr: string = ".ly 星系测距\n"
     readonly commandPrefix: string[] = ['.ly', '。ly']
     readonly adminOnly: boolean = false
+    readonly systemSearchLimit: number = 50
     readonly param = {
         distanceCalcMaxRoutes: 10
     }
@@ -96,12 +97,14 @@ export class commandLy implements tCommandBase {
         } else {
             let msgs = split(messagePacket.message, " ");
             if (msgs.length === 1) {
-                let systems = await this.extService.models.modelEveESIUniverseSystems.SearchByWord(msgs[0])
+                let systems = await this.extService.models.modelEveESIUniverseSystems.SearchByWord(msgs[0],this.systemSearchLimit + 1)
                 if (systems.length === 0) {
                     return `找不到该星系`
                 } else if (systems.length === 1) {
                     return this.handlerSystemNear(systems[0], opId, messageSource, messageInfo, messagePacket);
-                } else {
+                } else if (systems.length > this.systemSearchLimit) {
+                    return `共有超过${this.systemSearchLimit}个星系符合条件\n` + join(systems.map((system) => { return `ID:${system.id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(system)}` }), `\n`) + `\n ......`
+                }else{
                     return `共有${systems.length}个星系符合条件\n` + join(systems.map((system) => { return `ID:${system.id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(system)}` }), `\n`)
                 }
             }
