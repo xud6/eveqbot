@@ -144,7 +144,8 @@ export class modelEveESIUniverseSystems implements tModelBase {
         return await distancerepo.find({
             where: {
                 from_system: system
-            }
+            },
+            relations:["target_system"]
         })
     }
 }
