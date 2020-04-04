@@ -82,9 +82,12 @@ export class commandLy implements tCommandBase {
     async handlerSystemNear(system: eveESIUniverseSystems, opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket) {
         let nears = await this.extService.models.modelEveESIUniverseSystems.readNearSystems(system)
         nears = orderBy(nears, ['distance', 'asc'])
-        let res = `${this.extService.models.modelEveESIUniverseSystems.formatStr(system)}`
+        this.logger.info(nears.length)
+        let res = `${this.extService.models.modelEveESIUniverseSystems.formatStr(system)} (${system.security_status})`
             + `\n` + join(nears.map((near) => {
-                return `🗺${near.distance} ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(near.from_system)} -> ${this.extService.models.modelEveESIUniverseSystems.formatStr(near.target_system)}`
+                let target_system = near.target_system
+                this.logger.info(target_system)
+                return `🗺${near.distance} ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(system)} -> ${this.extService.models.modelEveESIUniverseSystems.formatStr(near.target_system)} (${near.target_system.security_status})`
             }), `\n`)
         return res
     }
@@ -97,15 +100,15 @@ export class commandLy implements tCommandBase {
         } else {
             let msgs = split(messagePacket.message, " ");
             if (msgs.length === 1) {
-                let systems = await this.extService.models.modelEveESIUniverseSystems.SearchByWord(msgs[0],this.systemSearchLimit + 1)
+                let systems = await this.extService.models.modelEveESIUniverseSystems.SearchByWord(msgs[0], (this.systemSearchLimit + 1))
                 if (systems.length === 0) {
                     return `找不到该星系`
                 } else if (systems.length === 1) {
                     return this.handlerSystemNear(systems[0], opId, messageSource, messageInfo, messagePacket);
                 } else if (systems.length > this.systemSearchLimit) {
-                    return `共有超过${this.systemSearchLimit}个星系符合条件\n` + join(systems.map((system) => { return `ID:${system.id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(system)}` }), `\n`) + `\n ......`
-                }else{
-                    return `共有${systems.length}个星系符合条件\n` + join(systems.map((system) => { return `ID:${system.id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(system)}` }), `\n`)
+                    return `共有超过${this.systemSearchLimit}个星系符合条件\n` + join(systems.map((system) => { return `ID:${system.id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(system)} (${system.security_status})` }), `\n`) + `\n ......`
+                } else {
+                    return `共有${systems.length}个星系符合条件\n` + join(systems.map((system) => { return `ID:${system.id} | ${this.extService.models.modelEveESIUniverseSystems.formatStr(system)} (${system.security_status})` }), `\n`)
                 }
             }
             if (msgs.length === 2) {
