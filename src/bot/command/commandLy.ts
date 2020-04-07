@@ -85,8 +85,6 @@ export class commandLy implements tCommandBase {
         this.logger.info(nears.length)
         let res = `${this.extService.models.modelEveESIUniverseSystems.formatStr(system)} (${system.security_status})`
             + `\n` + join(nears.map((near) => {
-                let target_system = near.target_system
-                this.logger.info(target_system)
                 return `🗺${near.distance} ly | ${this.extService.models.modelEveESIUniverseSystems.formatStr(system)} -> ${this.extService.models.modelEveESIUniverseSystems.formatStr(near.target_system)} (${near.target_system.security_status})`
             }), `\n`)
         return res
