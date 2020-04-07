@@ -33,6 +33,8 @@ export class cQQBot {
     readonly logger: tLogger
     readonly bot: CQWebSocket
     readonly commands: tCommandBase[]
+    socketConntectCnt: number = 0;
+    timerKeepAlive: NodeJS.Timeout | undefined
     constructor(
         readonly parentLogger: tLogger,
         readonly extService: cQQBotExtService,
@@ -41,11 +43,11 @@ export class cQQBot {
         this.logger = parentLogger.logger(["QQBot"])
         this.bot = new CQWebSocket(config.cqwebConfig);
         this.bot.on('socket.connecting', (wsType: WebSocketType, attempts: number) => {
-            this.logger.info(`attemp to connect ${wsType} No.${++attempts} started`)
+            this.logger.info(`attemp to connect ${wsType} No.${this.socketConntectCnt++}[${attempts}] started`)
         }).on('socket.connect', (wsType: WebSocketType, sock: any, attempts: number) => {
-            this.logger.info(`attemp to connect ${wsType} No.${attempts} success`)
+            this.logger.info(`attemp to connect ${wsType} No.${this.socketConntectCnt}[${attempts}] success`)
         }).on('socket.failed', (wsType: WebSocketType, attempts: number) => {
-            this.logger.info(`attemp to connect ${wsType} No.${attempts} failed`)
+            this.logger.info(`attemp to connect ${wsType} No.${this.socketConntectCnt}[${attempts}] failed`)
         })
 
         this.bot.on('message', (event: CQEvent, context: Record<string, any>, tags: CQTag[]) => {
@@ -61,8 +63,14 @@ export class cQQBot {
     }
     async startup() {
         this.bot.connect()
+        this.timerKeepAlive = setInterval(() => {
+            this.op_getLoginInfo()
+        }, 1000)
     }
     async shutdown() {
+        if(this.timerKeepAlive){
+            clearInterval(this.timerKeepAlive);
+        }
         this.bot.disconnect()
     }
     checkStartWith(msg: string, tags: string[]): string | null {
@@ -100,6 +108,19 @@ export class cQQBot {
                 }
                 let result = await this.bot("send_msg", messageParams, { timeout: 1000 * 10 })
                 this.logger.info(`${opId}| 发送成功 ${JSON.stringify(result)}`)
+            }, this.config.sendRetryMax, (e) => { this.logger.error(`${opId}| 发送错误 ${e.message || e}`) })
+        } catch (e) {
+            this.logger.error(`${opId}| 发送失败 ${e.message || e}`)
+        }
+    }
+    async op_getLoginInfo() {
+        try {
+            await retryHandler(async (retryCnt) => {
+                if (retryCnt) {
+                    this.logger.info(`${opId}| retry ${retryCnt} getLoginInfo`)
+                }
+                let result = await this.bot("get_login_info", {}, { timeout: 1000 })
+                this.logger.info(`${opId}| get_login_info ${result}`)
             }, this.config.sendRetryMax, (e) => { this.logger.error(`${opId}| 发送错误 ${e.message || e}`) })
         } catch (e) {
             this.logger.error(`${opId}| 发送失败 ${e.message || e}`)
