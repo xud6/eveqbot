@@ -121,7 +121,7 @@ export class cQQBot {
                     this.logger.info(`${opId}| retry ${retryCnt} getLoginInfo`)
                 }
                 let result = await this.bot("get_login_info", {}, { timeout: 1000 })
-                this.logger.info(`${opId}| get_login_info ${JSON.stringify(result)}`)
+                this.logger.debug(`${opId}| get_login_info ${JSON.stringify(result)}`)
             }, this.config.sendRetryMax, (e) => { this.logger.error(`${opId}| 发送错误 ${e.message || e}`) })
         } catch (e) {
             this.logger.error(`${opId}| 发送失败 ${e.message || e}`)
