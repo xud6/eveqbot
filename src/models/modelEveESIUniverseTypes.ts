@@ -315,4 +315,43 @@ export class modelEveESIUniverseTypes implements tModelBase {
     ): Promise<tMarketSearchResult> {
         return this.SearchCombined(opId, input, limit, true)
     }
+    async SearchByGroupNames(
+        words: string[],
+        limit: number = 51,
+        onlyMarketable: boolean = true
+    ) {
+        let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
+        let query = repo.createQueryBuilder("type")
+            .where(`type.published = :is_published`, { is_published: true })
+
+        if (onlyMarketable) {
+            query = query.andWhere(`type.market_group_id <> :not_market_group_id`, { not_market_group_id: "null" })
+        }
+        query = query
+            .leftJoinAndSelect("type.group", "group")
+            .leftJoinAndSelect("group.category", "category")
+            .select([
+                "type.id",
+                "type.name_en",
+                "type.name_cn",
+                "group.id",
+                "group.name_en",
+                "group.name_cn",
+                "category.id",
+                "category.name_en",
+                "category.name_cn"
+            ])
+        let wordcnt = 1
+        for (let word of words) {
+            let cnt = wordcnt++;
+            query = query.andWhere(new Brackets(qb => {
+                qb.where(`group.name_en LIKE :word${cnt}`)
+                    .orWhere(`group.name_cn LIKE :word${cnt}`)
+                    .orWhere(`category.name_en LIKE :word${cnt}`)
+                    .orWhere(`category.name_cn LIKE :word${cnt}`)
+            })).setParameter(`word${cnt}`, `%${word}%`)
+        }
+        query = query.limit(limit)
+        return await query.getMany()
+    }
 }
