@@ -114,13 +114,14 @@ export class cQQBot {
         }
     }
     async op_getLoginInfo() {
+        let opId = this.extService.opId.getId()
         try {
             await retryHandler(async (retryCnt) => {
                 if (retryCnt) {
                     this.logger.info(`${opId}| retry ${retryCnt} getLoginInfo`)
                 }
                 let result = await this.bot("get_login_info", {}, { timeout: 1000 })
-                this.logger.info(`${opId}| get_login_info ${result}`)
+                this.logger.info(`${opId}| get_login_info ${JSON.stringify(result)}`)
             }, this.config.sendRetryMax, (e) => { this.logger.error(`${opId}| 发送错误 ${e.message || e}`) })
         } catch (e) {
             this.logger.error(`${opId}| 发送失败 ${e.message || e}`)
