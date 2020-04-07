@@ -31,7 +31,7 @@ export class commandJita implements tCommandBase {
         resultPriceListLimit: 5,
         resultPriceListLimitExtended: 50,
         resultNameListLimit: 50,
-        resultNameListLimitExtended: 100
+        resultNameListLimitExtended: 100,
     }
     constructor(
         readonly parentLogger: tLogger,
@@ -281,21 +281,78 @@ export class commandJita implements tCommandBase {
             return false
         }
     }
+    async handlerGroup(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+        let perf = new performance()
+        let perfUtil = new performance()
+        let message = messageLines[0]
+        if (message.length > this.param.searchContentLimit) {
+            this.logger.info(`${opId}| search content too long from [${messageInfo.sender_user_id}]`)
+            return `查询内容过长，当前共${message.length}个字符，最大${this.param.searchContentLimit}`
+        }
+        let resultPriceListLimit = this.param.resultPriceListLimitExtended
+        let resultNameListLimit = this.param.resultNameListLimitExtended
+        let eve_server: eveServer = messageSource.eve_server
+        let eve_marketApi: eveMarketApi = messageSource.eve_marketApi
+        let isExtendedMode = false
+        if (startsWith(message, `tq `) || startsWith(message, `TQ `)) {
+            message = trim(message.slice(2))
+            eve_server = eveServer.tranquility
+        }
+        perfUtil.reset()
+        let result = await this.extService.models.modelEveESIUniverseTypes.SearchByGroupNames([message], resultNameListLimit + 1, true)
+        this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish market search ${message}`)
+        if (result.length == 0) {
+            this.logger.info(`${opId}| 找不到 ${message}`)
+            return '找不到该物品'
+        } else if (result.length > 0 && result.length <= resultPriceListLimit) {
+            if (isExtendedMode && result.length > this.param.resultPriceListLimit) {
+                this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${result.length}项条目，查询API中`)
+            }
+            if (eve_marketApi === eveMarketApi.ceveMarket) {
+                let head = `OP${opId} | 共有${result.length}种物品符合该条件, ${eveServerInfo[eve_server].dispName}市场价格:\n`
+                perfUtil.reset()
+                let marketdata: string[] = await Promise.all(result.map(async item => {
+                    let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), eve_server)
+                    return `🔹${itemNameDisp(item)}\n ${market}`;
+                }))
+                this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api data`)
+                return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 耗时${perf.timePastStrMS()}\n 使用 .jita 获取帮助 .help 查看其它功能`;
+            } else {
+                return "市场API配置错误"
+            }
+        } else {
+            this.logger.info(`${opId}| 搜索结果过多: ${result.length}, 需少于${resultPriceListLimit}个`)
+            if (result.length > resultNameListLimit) {
+                return `共有超过${resultNameListLimit}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(result)}\n......`
+            } else {
+                return `共有${result.length}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(result)}`
+            }
+        }
+    }
     async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         if (messagePacket.message === "") {
             return `1| .jita {物品名}`
                 + `\n` + `2| .jita {物品ID}`
-                + `\n` + `3| .jita TQ {物品名}  ---  使用世界服数据`
-                + `\n` + `4| .jita EXT {物品名}  ---  扩展查询模式，最大${this.param.resultPriceListLimitExtended}条市场项目`
-                + `\n` + `5| .jita`
+                + `\n` + `3| .jita group {类型名}`
+                + `\n` + `4| .jita TQ {物品名}  ---  使用世界服数据`
+                + `\n` + `5| .jita EXT {物品名}  ---  扩展查询模式，最大${this.param.resultPriceListLimitExtended}条市场项目`
+                + `\n` + `6| .jita`
                 + `\n` + `   {EVE舰船装配}`
                 + `\n` + `  --- 查询EVE舰船装配价格`
-                + `\n` + `6| .jita`
+                + `\n` + `7| .jita`
                 + `\n` + `   {合同内容复制}`
                 + `\n` + `  --- 查询合同内容价格`
         }
         let messageLines = messagePacket.message.split("\n").map((line) => { return trimEnd(line, "\r") });
         if (messageLines.length <= 1) {
+
+            if (startsWith(messageLines[0], `group `) || startsWith(messageLines[0], `GROUP `)) {
+                messageLines[0] = trim(messageLines[0].slice(5))
+                let result = await this.handlerGroup(opId, messageLines, messageSource, messageInfo, messagePacket)
+                if (result !== false) {
+                    return result
+                }
+            }
             let result = await this.handlerSingleItem(opId, messageLines, messageSource, messageInfo, messagePacket)
             if (result !== false) {
                 return result
