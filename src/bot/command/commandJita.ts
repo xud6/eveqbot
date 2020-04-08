@@ -30,7 +30,7 @@ export class commandJita implements tCommandBase {
         searchContentLimit: 30,
         resultPriceListLimit: 5,
         resultPriceListLimitExtended: 50,
-        resultNameListLimit: 50,
+        resultNameListLimit: 10,
         resultNameListLimitExtended: 100,
     }
     constructor(
