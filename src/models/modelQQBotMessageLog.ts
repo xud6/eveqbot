@@ -19,13 +19,14 @@ export class modelQQBotMessageLog implements tModelBase {
     }
     async startup() { }
     async shutdown() { }
-    async appendQQBotMessageLog(source: QQBotMessageSource, messageInfo: tMessageInfo, event: CQEvent, context: Record<string, any>, tags: CQTag[]) {
+    async appendQQBotMessageLog(source: QQBotMessageSource, messageInfo: tMessageInfo, replyMessage: string, event: CQEvent, context: Record<string, any>, tags: CQTag[]) {
         if (this.models.config.noLog) {
             return
         }
         let repo = await this.extService.db.getRepository(QQBotMessageLog);
         let messageLogEntry = repo.create({
             message: messageInfo.message,
+            replyMessage: replyMessage,
             message_id: messageInfo.message_id,
             message_type: messageInfo.message_type,
             group_id: messageInfo.group_id,

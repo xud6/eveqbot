@@ -15,6 +15,13 @@ export class QQBotMessageLog {
     message: string
 
     @Column({
+        type: "text",
+        nullable: true,
+        default: null,
+    })
+    replyMessage: string
+
+    @Column({
         type: "bigint"
     })
     message_id: number

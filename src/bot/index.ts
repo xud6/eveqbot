@@ -68,7 +68,7 @@ export class cQQBot {
         }, 1000)
     }
     async shutdown() {
-        if(this.timerKeepAlive){
+        if (this.timerKeepAlive) {
             clearInterval(this.timerKeepAlive);
         }
         this.bot.disconnect()
@@ -136,7 +136,7 @@ export class cQQBot {
                 let pHandlerMessage = this.messageProcess(opId, messageSource, messageInfo)
                 let replyMessage = await pHandlerMessage;
                 if (replyMessage) {
-                    let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageSource, messageInfo, event, context, tags);
+                    let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageSource, messageInfo, replyMessage, event, context, tags);
                     await this.replyMessage(opId, messageInfo, replyMessage)
                     await pMessageLog;
                 }
