@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Index, Column, JoinColumn, ManyToOne} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Index, Column, JoinColumn, ManyToOne } from "typeorm";
 import { eveESIUniverseSystems } from "./eveESIUniverseSystems";
 
 @Entity()
@@ -43,7 +43,8 @@ export class eveESIUniverseSystemsNearDistance {
     target_system: eveESIUniverseSystems;
 
     @Column({
-        type: "float"
+        type: "float",
+        precision: 12
     })
     distance: number
 }
