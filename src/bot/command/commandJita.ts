@@ -28,9 +28,9 @@ export class commandJita implements tCommandBase {
     readonly adminOnly: boolean = false
     readonly param = {
         searchContentLimit: 30,
-        resultPriceListLimit: 5,
+        resultPriceListLimit: 10,
         resultPriceListLimitExtended: 50,
-        resultNameListLimit: 10,
+        resultNameListLimit: 20,
         resultNameListLimitExtended: 100,
     }
     constructor(
