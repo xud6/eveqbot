@@ -134,12 +134,12 @@ export class cQQBot {
             let messageSource = await this.extService.models.modelQQBotMessageSource.getQQBotMessageSource(messageInfo)
             if (messageSource) {
                 let pHandlerMessage = this.messageProcess(opId, messageSource, messageInfo)
-                let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageSource, messageInfo, event, context, tags);
                 let replyMessage = await pHandlerMessage;
                 if (replyMessage) {
+                    let pMessageLog = this.extService.models.modelQQBotMessageLog.appendQQBotMessageLog(messageSource, messageInfo, event, context, tags);
                     await this.replyMessage(opId, messageInfo, replyMessage)
+                    await pMessageLog;
                 }
-                await pMessageLog;
             } else {
                 this.logger.error(`${opId}| Can't read or create source for ${messageInfo}`)
             }
