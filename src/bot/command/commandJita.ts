@@ -4,7 +4,7 @@ import { cQQBotExtService, cQQBot } from "..";
 import { tLogger } from "tag-tree-logger";
 import { eveMarketApi, eveServerInfo, eveMarketApiInfo, eveServer } from "../../types";
 import { join, startsWith, compact, trimEnd, replace, trim, orderBy } from "lodash";
-import { itemNameDisp, formatItemNames, itemNameDispShort } from "../../utils/eveFuncs";
+import { itemNameDisp, formatItemNames, itemNameDispShort, itemNameDispShortCn } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
 import { tQQBotMessagePacket } from "../types";
 import { numberFormat } from "../../utils/format";
@@ -81,7 +81,11 @@ export class commandJita implements tCommandBase {
                 perfUtil.reset()
                 let marketdata: string[] = await Promise.all(result.types.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), eve_server)
-                    return `🔹${itemNameDisp(item)}\n ${market}`;
+                    if(eve_server == eveServer.serenity){
+                        return `🔹${itemNameDispShortCn(item)} | ${market}`;
+                    }else{
+                        return `🔹${itemNameDisp(item)}\n ${market}`;
+                    }
                 }))
                 this.logger.info(`${opId}| ${perfUtil.timePastStr()} finish read market api data`)
                 return `${head}${join(marketdata, "\n")}` + `\n当前服务器[${eveServerInfo[eve_server].dispName}] | 当前市场API:${eveMarketApiInfo[messageSource.eve_marketApi].dispName} | 耗时${perf.timePastStrMS()}`;
