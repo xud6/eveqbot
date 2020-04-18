@@ -186,7 +186,8 @@ export class modelEveESIUniverseTypes implements tModelBase {
         skins: boolean = false,
         blueprint: boolean = false,
         apparel: boolean = false,
-        onlyMarketable: boolean = true
+        specialEditionAssets: boolean = false,
+        onlyMarketable: boolean = true,
     ) {
         let repo = await this.extService.db.getRepository(eveESIUniverseTypes);
         let query = repo.createQueryBuilder("type")
@@ -217,6 +218,9 @@ export class modelEveESIUniverseTypes implements tModelBase {
         }
         if (apparel === false) {
             query = query.andWhere(`group.category_id <> :apparel_category_id`, { apparel_category_id: 30 })
+        }
+        if (specialEditionAssets === false) {
+            query = query.andWhere(`group.category_id <> :apparel_category_id`, { apparel_category_id: 63 })
         }
         let wordcnt = 1
         for (let word of words) {
@@ -260,7 +264,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         }
         let isSkin = eveIsSkins(input);
         let isBlueprint = eveIsBlueprint(input);
-        result = await this.SearchByWords([input], limit, isSkin, isBlueprint, false, onlyMarketable)
+        result = await this.SearchByWords([input], limit, isSkin, isBlueprint, false, false, onlyMarketable)
         if (result.length > 0) {
             this.logger.info(`${opId}| Find [${result.length}] result by Word for [${input}]`)
             return {
@@ -270,7 +274,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         }
         let inputT = eveCommonNameTransfer(input);
         if (inputT === input) {
-            result = await this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, onlyMarketable)
+            result = await this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, false, onlyMarketable)
             if (result.length > 0) {
                 this.logger.info(`${opId}| Find [${result.length}] result by SpliteWords without CommonName for [${input}]`)
                 return {
@@ -279,8 +283,8 @@ export class modelEveESIUniverseTypes implements tModelBase {
                 }
             }
         } else {
-            let pResultO = this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, onlyMarketable)
-            let pResultT = this.SearchByWords(spliteWords(inputT), limit, isSkin, isBlueprint, false, onlyMarketable)
+            let pResultO = this.SearchByWords(spliteWords(input), limit, isSkin, isBlueprint, false, false, onlyMarketable)
+            let pResultT = this.SearchByWords(spliteWords(inputT), limit, isSkin, isBlueprint, false, false, onlyMarketable)
             result = uniq((await pResultO).concat(await pResultT))
             if (result.length > 0) {
                 this.logger.info(`${opId}| Find [${result.length}] result by SpliteWords with CommonName for [${input}]`)
