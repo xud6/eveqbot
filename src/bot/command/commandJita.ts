@@ -4,7 +4,7 @@ import { cQQBotExtService, cQQBot } from "..";
 import { tLogger } from "tag-tree-logger";
 import { eveMarketApi, eveServerInfo, eveMarketApiInfo, eveServer } from "../../types";
 import { join, startsWith, compact, trimEnd, replace, trim, orderBy } from "lodash";
-import { itemNameDisp, formatItemNames, itemNameDispShort, itemNameDispShortCn } from "../../utils/eveFuncs";
+import { itemNameDisp, formatItemNames, itemNameDispShort, itemNameDispShortCn, itemsNameListCn } from "../../utils/eveFuncs";
 import { tMessageInfo } from "../qqMessage";
 import { tQQBotMessagePacket } from "../types";
 import { numberFormat } from "../../utils/format";
@@ -28,9 +28,9 @@ export class commandJita implements tCommandBase {
     readonly adminOnly: boolean = false
     readonly param = {
         searchContentLimit: 30,
-        resultPriceListLimit: 10,
+        resultPriceListLimit: 6,
         resultPriceListLimitExtended: 50,
-        resultNameListLimit: 20,
+        resultNameListLimit: 25,
         resultNameListLimitExtended: 100,
     }
     constructor(
@@ -95,9 +95,9 @@ export class commandJita implements tCommandBase {
         } else {
             this.logger.info(`${opId}| 搜索结果过多: ${result.types.length}, 需少于${resultPriceListLimit}个`)
             if (result.types.length > resultNameListLimit) {
-                return `共有超过${resultNameListLimit}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(result.types)}\n......`
+                return `共有超过${resultNameListLimit}种物品符合符合该条件，请给出更明确的物品名称\n${itemsNameListCn(result.types)}\n......`
             } else {
-                return `共有${result.types.length}种物品符合符合该条件，请给出更明确的物品名称\n${formatItemNames(result.types)}`
+                return `共有${result.types.length}种物品符合符合该条件，请给出更明确的物品名称\n${itemsNameListCn(result.types)}`
             }
         }
     }

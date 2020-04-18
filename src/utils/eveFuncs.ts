@@ -58,6 +58,23 @@ export function itemNameDispShortCn(item: eveESIUniverseTypes) {
     return `ID:${item.id} | ${item.name_cn}`
 }
 
+export function itemsNameListCn(items: eveESIUniverseTypes[], lineLength: number = 120) {
+    let resultArray: string[] = []
+    let resultArrayStr = ""
+    items.forEach((item, index) => {
+        let newItem = `ID:🔹${item.id} ${item.name_cn}`
+        if (resultArrayStr.length + newItem.length > lineLength) {
+            resultArray.push(resultArrayStr);
+            resultArrayStr = "";
+            resultArrayStr += newItem
+        } else {
+            resultArrayStr += " | "
+            resultArrayStr += newItem
+        }
+    })
+    return join(resultArray, "\n")
+}
+
 export function formatItemNames(items: eveESIUniverseTypes[]) {
     let d = 0;
     return join(map(items, item => {
