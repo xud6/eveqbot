@@ -173,7 +173,7 @@ export class cQQBot {
                     this.logger.info(`${opId}| Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
                     res = await commandMsg.command.handler(opId, messageSource, messageInfo, messagePacket)
                     if (res) {
-                        return `[CQ:at,qq=${messageInfo.sender_user_id}]\n${res}`
+                        return `[CQ:at,qq=${messageInfo.sender_user_id}] | ${res}`
                     }
                 } catch (e) {
                     this.logger.error(`${opId}| command process error ${e}`)
