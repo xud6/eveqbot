@@ -26,7 +26,7 @@ export class commandItem implements tCommandBase {
     }
     async startup() { }
     async shutdown() { }
-    async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
+    async handler(opId: number, messageId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         let message = messagePacket.message
         if (message.length > this.param.searchContentLimit) {
             this.logger.info(`${opId}| search content too long from [${messageInfo.sender_user_id}]`)

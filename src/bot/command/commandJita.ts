@@ -42,7 +42,7 @@ export class commandJita implements tCommandBase {
     }
     async startup() { }
     async shutdown() { }
-    async handlerSingleItem(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+    async handlerSingleItem(opId: number, messageId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
         let perf = new performance()
         let perfUtil = new performance()
         let message = messageLines[0]
@@ -74,16 +74,16 @@ export class commandJita implements tCommandBase {
             return '找不到该物品'
         } else if (result.types.length > 0 && result.types.length <= resultPriceListLimit) {
             if (isExtendedMode && result.types.length > this.param.resultPriceListLimit) {
-                this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${result.types.length}项条目，查询API中`)
+                this.QQBot.replyMessage(opId, messageInfo, `MID${messageId} | 共有 ${result.types.length}项条目，查询API中`)
             }
             if (eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `OP${opId} | 共有${result.types.length}种物品符合该条件, 匹配方式${result.matchType.cn}, 耗时${perf.timePastStrMS()}, ${eveServerInfo[eve_server].dispName}市场价格:\n`
+                let head = `MID${messageId} | 共有${result.types.length}种物品符合该条件, 匹配方式${result.matchType.cn}, 耗时${perf.timePastStrMS()}, ${eveServerInfo[eve_server].dispName}市场价格:\n`
                 perfUtil.reset()
                 let marketdata: string[] = await Promise.all(result.types.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), eve_server)
-                    if(eve_server == eveServer.serenity){
+                    if (eve_server == eveServer.serenity) {
                         return `🔹${itemNameDispShortCn(item)} | ${market}`;
-                    }else{
+                    } else {
                         return `🔹${itemNameDisp(item)}\n ${market}`;
                     }
                 }))
@@ -101,7 +101,7 @@ export class commandJita implements tCommandBase {
             }
         }
     }
-    async handlerEveFit(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+    async handlerEveFit(opId: number, messageId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
         let perf = new performance()
         let perfUtil = new performance()
         let EVEFitHead = messageLines[0].match(EVEFitHeadRegexp)
@@ -123,7 +123,7 @@ export class commandJita implements tCommandBase {
                     }
                 }
             })
-            this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
+            this.QQBot.replyMessage(opId, messageInfo, `MID${messageId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
             // this.logger.info(items)
             let resultLineData = [];
             let resultSumSellLow = 0;
@@ -161,7 +161,7 @@ export class commandJita implements tCommandBase {
                     resultTypeError.push(inputItem.name)
                 }
             }
-            let resultStr = `OP${opId} | `
+            let resultStr = `MID${messageId} | `
             resultStr += `EVE FIT总计${inputItems.length}种物品\n`
             if (resultTypeError.length) {
                 resultStr += `不可识别物品${resultTypeError.length}种\n`
@@ -189,7 +189,7 @@ export class commandJita implements tCommandBase {
             return false
         }
     }
-    async handlerContract(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+    async handlerContract(opId: number, messageId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
         let perf = new performance()
         let perfUtil = new performance()
         let EVEContractLine = messageLines[0].match(EVEContractLineRegexp)
@@ -219,7 +219,7 @@ export class commandJita implements tCommandBase {
                     UnknowLines.push(line)
                 }
             })
-            this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${inputItems.length}项条目，查询API中`)
+            this.QQBot.replyMessage(opId, messageInfo, `MID${messageId} | 共有 ${inputItems.length}项条目，查询API中`)
             for (let inputItem of inputItems) {
                 perfUtil.reset()
                 let type = (await this.extService.models.modelEveESIUniverseTypes.searchByExactName(inputItem.name))[0]
@@ -251,7 +251,7 @@ export class commandJita implements tCommandBase {
                 }
             }
 
-            let resultStr = `OP${opId} | `
+            let resultStr = `MID${messageId} | `
             resultStr += `总计${inputItems.length}种物品\n`
             if (UnknowLines.length) {
                 resultStr += `不可识别行${UnknowLines.length}行\n`
@@ -283,7 +283,7 @@ export class commandJita implements tCommandBase {
             return false
         }
     }
-    async handlerGroup(opId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
+    async handlerGroup(opId: number, messageId: number, messageLines: string[], messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | false | null> {
         let perf = new performance()
         let perfUtil = new performance()
         let message = messageLines[0]
@@ -308,10 +308,10 @@ export class commandJita implements tCommandBase {
             return '找不到该物品'
         } else if (result.length > 0 && result.length <= resultPriceListLimit) {
             if (isExtendedMode && result.length > this.param.resultPriceListLimit) {
-                this.QQBot.replyMessage(opId, messageInfo, `OP${opId} | 共有 ${result.length}项条目，查询API中`)
+                this.QQBot.replyMessage(opId, messageInfo, `MID${messageId} | 共有 ${result.length}项条目，查询API中`)
             }
             if (eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `OP${opId} | 共有${result.length}种物品符合该条件, ${eveServerInfo[eve_server].dispName}市场价格:\n`
+                let head = `MID${messageId} | 共有${result.length}种物品符合该条件, ${eveServerInfo[eve_server].dispName}市场价格:\n`
                 perfUtil.reset()
                 let marketdata: string[] = await Promise.all(result.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), eve_server)
@@ -331,7 +331,7 @@ export class commandJita implements tCommandBase {
             }
         }
     }
-    async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
+    async handler(opId: number, messageId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         if (messagePacket.message === "") {
             return `1| .jita {物品名}`
                 + `\n` + `2| .jita {物品ID}`
@@ -350,23 +350,23 @@ export class commandJita implements tCommandBase {
 
             if (startsWith(messageLines[0], `group `) || startsWith(messageLines[0], `GROUP `)) {
                 messageLines[0] = trim(messageLines[0].slice(5))
-                let result = await this.handlerGroup(opId, messageLines, messageSource, messageInfo, messagePacket)
+                let result = await this.handlerGroup(opId, messageId, messageLines, messageSource, messageInfo, messagePacket)
                 if (result !== false) {
                     return result
                 }
             }
-            let result = await this.handlerSingleItem(opId, messageLines, messageSource, messageInfo, messagePacket)
+            let result = await this.handlerSingleItem(opId, messageId, messageLines, messageSource, messageInfo, messagePacket)
             if (result !== false) {
                 return result
             }
         } else {
             this.logger.log(`${opId}| first line is ${messageLines[0]}`)
-            let result = await this.handlerEveFit(opId, messageLines, messageSource, messageInfo, messagePacket)
+            let result = await this.handlerEveFit(opId, messageId, messageLines, messageSource, messageInfo, messagePacket)
             if (result !== false) {
                 return result
             }
 
-            result = await this.handlerContract(opId, messageLines, messageSource, messageInfo, messagePacket)
+            result = await this.handlerContract(opId, messageId, messageLines, messageSource, messageInfo, messagePacket)
             if (result !== false) {
                 return result
             }

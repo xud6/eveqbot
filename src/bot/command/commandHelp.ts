@@ -24,7 +24,7 @@ export class commandHelp implements tCommandBase {
     }
     async startup() { }
     async shutdown() { }
-    async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
+    async handler(opId: number, messageId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         let message = messagePacket.message
         let result = ""
         result = result + join(this.QQBot.commands.map((c) => {

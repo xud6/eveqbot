@@ -14,6 +14,7 @@ import { opId } from "../opId";
 import { retryHandler } from "../utils/retryHandler";
 import { commandLy } from "./command/commandLy";
 import { cModels } from "../models";
+import { messageId } from "./messageId";
 
 export interface tCQQBotCfg {
     cqwebConfig: Partial<CQWebSocketOption>
@@ -33,6 +34,7 @@ export class cQQBot {
     readonly logger: tLogger
     readonly bot: CQWebSocket
     readonly commands: tCommandBase[]
+    readonly messageId: messageId
     socketConntectCnt: number = 0;
     timerKeepAlive: NodeJS.Timeout | undefined
     constructor(
@@ -60,6 +62,8 @@ export class cQQBot {
         this.commands.push(new commandLy(this.logger, this.extService, this))
         this.commands.push(new commandCfg(this.logger, this.extService, this))
         this.commands.push(new commandHelp(this.logger, this.extService, this))
+
+        this.messageId = new messageId(this.extService.models);
     }
     async startup() {
         this.bot.connect()
@@ -170,8 +174,9 @@ export class cQQBot {
                         }
                     }
                     let res: string | null = null
-                    this.logger.info(`${opId}| Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
-                    res = await commandMsg.command.handler(opId, messageSource, messageInfo, messagePacket)
+                    let messageId = await this.messageId.getMessageId();
+                    this.logger.info(`${opId}|MID${messageId}| Command [${commandMsg.command.name}] with [${commandMsg.msg}] from [${messageSource.id}/${messageSource.source_type}/${messageSource.source_id}/${messageInfo.sender_user_id}]`);
+                    res = await commandMsg.command.handler(opId, messageId, messageSource, messageInfo, messagePacket)
                     if (res) {
                         return `[CQ:at,qq=${messageInfo.sender_user_id}] | ${res}`
                     }

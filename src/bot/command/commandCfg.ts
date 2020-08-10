@@ -26,7 +26,7 @@ export class commandCfg implements tCommandBase {
     }
     async startup() { }
     async shutdown() { }
-    async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
+    async handler(opId: number, messageId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         if (messagePacket.atMe && messagePacket.isAdmin) {
             this.logger.info(`${opId}| cfg command from ${messageInfo.sender_user_id} in ${messageSource.source_type}/${messageSource.source_id}`)
             this.logger.info(`${opId}| ${messagePacket.message}`)

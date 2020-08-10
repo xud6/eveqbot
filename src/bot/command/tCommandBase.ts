@@ -9,5 +9,5 @@ export interface tCommandBase {
     adminOnly: boolean,
     startup: () => Promise<void>,
     shutdown: () => Promise<void>,
-    handler: (opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket) => Promise<string | null>
+    handler: (opId: number, messageId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket) => Promise<string | null>
 }

@@ -89,7 +89,7 @@ export class commandLy implements tCommandBase {
             }), `\n`)
         return res
     }
-    async handler(opId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
+    async handler(opId: number, messageId: number, messageSource: QQBotMessageSource, messageInfo: tMessageInfo, messagePacket: tQQBotMessagePacket): Promise<string | null> {
         this.logger.info(`${opId}| ly command ${messagePacket.message} from ${messageInfo.sender_user_id} in ${messageSource.source_type}/${messageSource.source_id}`)
         if (messagePacket.message === "") {
             this.logger.info(`${opId}| show`)
