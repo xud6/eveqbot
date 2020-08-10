@@ -74,10 +74,10 @@ export class commandJita implements tCommandBase {
             return '找不到该物品'
         } else if (result.types.length > 0 && result.types.length <= resultPriceListLimit) {
             if (isExtendedMode && result.types.length > this.param.resultPriceListLimit) {
-                this.QQBot.replyMessage(opId, messageInfo, `MID${messageId} | 共有 ${result.types.length}项条目，查询API中`)
+                this.QQBot.replyMessage(opId, messageInfo, `M${messageId} | 共有 ${result.types.length}项条目，查询API中`)
             }
             if (eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `MID${messageId} | 共有${result.types.length}种物品符合该条件, 匹配方式${result.matchType.cn}, 耗时${perf.timePastStrMS()}, ${eveServerInfo[eve_server].dispName}市场价格:\n`
+                let head = `M${messageId} | 共有${result.types.length}种物品符合该条件, 匹配方式${result.matchType.cn}, 耗时${perf.timePastStrMS()}, ${eveServerInfo[eve_server].dispName}市场价格:\n`
                 perfUtil.reset()
                 let marketdata: string[] = await Promise.all(result.types.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), eve_server)
@@ -123,7 +123,7 @@ export class commandJita implements tCommandBase {
                     }
                 }
             })
-            this.QQBot.replyMessage(opId, messageInfo, `MID${messageId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
+            this.QQBot.replyMessage(opId, messageInfo, `M${messageId} | EVE Fit 共有 ${inputItems.length}项条目，查询API中`)
             // this.logger.info(items)
             let resultLineData = [];
             let resultSumSellLow = 0;
@@ -161,7 +161,7 @@ export class commandJita implements tCommandBase {
                     resultTypeError.push(inputItem.name)
                 }
             }
-            let resultStr = `MID${messageId} | `
+            let resultStr = `M${messageId} | `
             resultStr += `EVE FIT总计${inputItems.length}种物品\n`
             if (resultTypeError.length) {
                 resultStr += `不可识别物品${resultTypeError.length}种\n`
@@ -219,7 +219,7 @@ export class commandJita implements tCommandBase {
                     UnknowLines.push(line)
                 }
             })
-            this.QQBot.replyMessage(opId, messageInfo, `MID${messageId} | 共有 ${inputItems.length}项条目，查询API中`)
+            this.QQBot.replyMessage(opId, messageInfo, `M${messageId} | 共有 ${inputItems.length}项条目，查询API中`)
             for (let inputItem of inputItems) {
                 perfUtil.reset()
                 let type = (await this.extService.models.modelEveESIUniverseTypes.searchByExactName(inputItem.name))[0]
@@ -251,7 +251,7 @@ export class commandJita implements tCommandBase {
                 }
             }
 
-            let resultStr = `MID${messageId} | `
+            let resultStr = `M${messageId} | `
             resultStr += `总计${inputItems.length}种物品\n`
             if (UnknowLines.length) {
                 resultStr += `不可识别行${UnknowLines.length}行\n`
@@ -308,10 +308,10 @@ export class commandJita implements tCommandBase {
             return '找不到该物品'
         } else if (result.length > 0 && result.length <= resultPriceListLimit) {
             if (isExtendedMode && result.length > this.param.resultPriceListLimit) {
-                this.QQBot.replyMessage(opId, messageInfo, `MID${messageId} | 共有 ${result.length}项条目，查询API中`)
+                this.QQBot.replyMessage(opId, messageInfo, `M${messageId} | 共有 ${result.length}项条目，查询API中`)
             }
             if (eve_marketApi === eveMarketApi.ceveMarket) {
-                let head = `MID${messageId} | 共有${result.length}种物品符合该条件, ${eveServerInfo[eve_server].dispName}市场价格:\n`
+                let head = `M${messageId} | 共有${result.length}种物品符合该条件, ${eveServerInfo[eve_server].dispName}市场价格:\n`
                 perfUtil.reset()
                 let marketdata: string[] = await Promise.all(result.map(async item => {
                     let market = await this.extService.CEVEMarketApi.getMarketString(opId, item.id.toString(), eve_server)
