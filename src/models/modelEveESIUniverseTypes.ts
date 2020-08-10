@@ -242,7 +242,7 @@ export class modelEveESIUniverseTypes implements tModelBase {
         let result
         try {
             let inputId = parseInt(input);
-            if (inputId) {
+            if (inputId && inputId.toString() === input.trim()) {
                 this.logger.log(`${opId}| parsed id [${inputId}] from input [${input}]`)
                 result = await this.searchById(inputId, onlyMarketable);
                 if (result.length > 0) {
